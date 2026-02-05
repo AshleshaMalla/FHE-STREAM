@@ -1,0 +1,48 @@
+# CMake build artifacts
+build/
+cmake-build-debug/
+cmake-build-release/
+cmake-build-relwithdebinfo/
+cmake-build-minsizerel/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Build output
+bin/
+lib/
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# IDE and editor files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+.clang-format.bak
+compile_commands.json
+
+# Generated executables
+fhe_raiderstream
+fhe_raiderstream.exe
+
+# Temporary and backup files
+*.tmp
+*.bak
+.git/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
