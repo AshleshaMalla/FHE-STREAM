@@ -35,6 +35,9 @@ public:
   std::vector<lbcrypto::DCRTPoly> B;  // Input array 2
   std::vector<lbcrypto::DCRTPoly> C;  // Output array
 
+  /* Index vector for irregular (gather/scatter) access patterns */
+  std::vector<std::size_t> IDX;
+
   /* Precomputed per-tower moduli and Barrett reduction constants */
   std::vector<lbcrypto::NativeInteger> towerModuli;  // Modulus for each RNS tower
   std::vector<lbcrypto::NativeInteger> towerMu;      // Barrett mu for ModMulFast

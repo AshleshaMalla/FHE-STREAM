@@ -8,6 +8,14 @@
 
 #include "FHERaiderSTREAM.h"
 
+#ifdef FHE_RS_DEBUG_THREADS
+#include <iostream>
+#endif
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 namespace {
 
 /* 
@@ -45,8 +53,23 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_COPY)(benchmark::State& state) {
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
 
+#ifdef FHE_RS_DEBUG_THREADS
+  /* Debug: Verify thread count before benchmark loop */
+  {
+    int actual_threads = 0;
+    int max_threads = omp_get_max_threads();
+#pragma omp parallel num_threads(max_threads)
+    {
+#pragma omp single
+      actual_threads = omp_get_num_threads();
+    }
+    std::cout << "[DEBUG] RS_SEQ_COPY: omp_get_max_threads()=" << max_threads
+              << ", actual parallel region threads=" << actual_threads << std::endl;
+  }
+#endif
+
   for (auto _ : state) {
-#pragma omp parallel for schedule(static)  // Distribute polynomials across threads
+#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& cTowers = C[i].GetAllElements();
       const auto& aTowers = A[i].GetAllElements();
@@ -56,7 +79,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_COPY)(benchmark::State& state) {
         for (std::size_t j = 0; j < static_cast<std::size_t>(ringDim); ++j) {
           cTower[j] = aTower[j];  // Per-coefficient copy
         }
-        benchmark::DoNotOptimize(cTower);  // Prevent dead code elimination
+        benchmark::DoNotOptimize(&cTower[0]);  // Force materialization via raw pointer
       }
     }
     benchmark::ClobberMemory();  // Memory fence between iterations
@@ -78,7 +101,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_SCALE)(benchmark::State& state) {
   const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(scalar));  // Pre-computed scalar
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& bTowers = B[i].GetAllElements();
       const auto& cTowers = C[i].GetAllElements();
@@ -90,7 +113,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_SCALE)(benchmark::State& state) {
         for (std::size_t j = 0; j < static_cast<std::size_t>(ringDim); ++j) {
           bTower[j] = cTower[j].ModMulFast(scalarNI, mod, mu);  // Fast modular multiplication
         }
-        benchmark::DoNotOptimize(bTower);
+        benchmark::DoNotOptimize(&bTower[0]);  // Force materialization via raw pointer
       }
     }
     benchmark::ClobberMemory();
@@ -111,7 +134,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_ADD)(benchmark::State& state) {
   const std::size_t nPolys = A.size();
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& cTowers = C[i].GetAllElements();
       const auto& aTowers = A[i].GetAllElements();
@@ -124,7 +147,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_ADD)(benchmark::State& state) {
         for (std::size_t j = 0; j < static_cast<std::size_t>(ringDim); ++j) {
           cTower[j] = aTower[j].ModAddFast(bTower[j], mod);  // Modular addition
         }
-        benchmark::DoNotOptimize(cTower);
+        benchmark::DoNotOptimize(&cTower[0]);  // Force materialization via raw pointer
       }
     }
     benchmark::ClobberMemory();
@@ -146,7 +169,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {
   const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(scalar));  // Pre-computed scalar
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& aTowers = A[i].GetAllElements();
       const auto& bTowers = B[i].GetAllElements();
@@ -161,7 +184,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {
           const auto scaled = cTower[j].ModMulFast(scalarNI, mod, mu);  // Modular multiply
           aTower[j] = bTower[j].ModAddFast(scaled, mod);               // Modular add
         }
-        benchmark::DoNotOptimize(aTower);
+        benchmark::DoNotOptimize(&aTower[0]);  // Force materialization via raw pointer
       }
     }
     benchmark::ClobberMemory();

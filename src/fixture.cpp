@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <cstdint>
 #include <iomanip>
+#include <numeric>
+#include <random>
 
 #ifdef __GLIBC__
 #include <malloc.h>
@@ -149,6 +151,16 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
     B[i] = lbcrypto::DCRTPoly(dug, params, ::Format::EVALUATION);
     C[i] = lbcrypto::DCRTPoly(dug, params, ::Format::EVALUATION);
   }
+
+  /*
+    Initialize the index vector for irregular (gather/scatter) access patterns.
+    Sequential fill first to establish a baseline; enable std::shuffle for
+    randomized access once the control case has been verified.
+  */
+  IDX.resize(nPolys);
+  std::iota(IDX.begin(), IDX.end(), std::size_t{0});  // Fill with 0, 1, 2, ..., nPolys-1
+  std::mt19937 rng(42);  // Fixed seed for reproducibility
+  // std::shuffle(IDX.begin(), IDX.end(), rng);  // TODO: Uncomment after verifying control case
 }
 
 /*
@@ -168,6 +180,7 @@ void FHERaiderSTREAM::TearDown(const benchmark::State&) {
   std::vector<lbcrypto::DCRTPoly>().swap(A);
   std::vector<lbcrypto::DCRTPoly>().swap(B);
   std::vector<lbcrypto::DCRTPoly>().swap(C);
+  std::vector<std::size_t>().swap(IDX);
 
 #ifdef __GLIBC__
   /* Return freed memory pages to the OS to avoid cross-benchmark contamination */
