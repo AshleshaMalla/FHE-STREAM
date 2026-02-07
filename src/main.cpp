@@ -7,5 +7,22 @@
 
 #include <benchmark/benchmark.h>
 
-/* Entry point: invokes Google Benchmark with command-line argument processing */
-BENCHMARK_MAIN();
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+int RS_Execution_Threads = 1;
+
+int main(int argc, char** argv) {
+#ifdef _OPENMP
+  RS_Execution_Threads = omp_get_max_threads();
+#endif
+
+  ::benchmark::Initialize(&argc, argv);
+  if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {
+    return 1;
+  }
+  ::benchmark::RunSpecifiedBenchmarks();
+  ::benchmark::Shutdown();
+  return 0;
+}

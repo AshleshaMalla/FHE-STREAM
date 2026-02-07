@@ -160,7 +160,7 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   IDX.resize(nPolys);
   std::iota(IDX.begin(), IDX.end(), std::size_t{0});  // Fill with 0, 1, 2, ..., nPolys-1
   std::mt19937 rng(42);  // Fixed seed for reproducibility
-  // std::shuffle(IDX.begin(), IDX.end(), rng);  // TODO: Uncomment after verifying control case
+  std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
 }
 
 /*
