@@ -160,7 +160,17 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   IDX.resize(nPolys);
   std::iota(IDX.begin(), IDX.end(), std::size_t{0});  // Fill with 0, 1, 2, ..., nPolys-1
   std::mt19937 rng(42);  // Fixed seed for reproducibility
-  std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
+  // std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
+
+  /*
+    Initialize coefficient index vector for inner-loop gather.
+    Sequential fill first to establish a baseline; enable std::shuffle for
+    randomized access once the control case has been verified.
+  */
+  COEFF_IDX.resize(static_cast<std::size_t>(ringDim));
+  std::iota(COEFF_IDX.begin(), COEFF_IDX.end(), std::size_t{0});  // 0, 1, 2, ..., ringDim-1
+  std::mt19937 coeff_rng(43);  // Fixed seed for reproducibility
+  std::shuffle(COEFF_IDX.begin(), COEFF_IDX.end(), coeff_rng);  // Randomized access pattern
 }
 
 /*

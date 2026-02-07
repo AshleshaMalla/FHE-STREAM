@@ -59,6 +59,7 @@ add_executable(fhe_raiderstream
   src/fixture.cpp
   src/kernels_sequential.cpp
   src/kernels_gather.cpp
+  src/kernels_gather_coeff.cpp
 )
 
 # ---- Includes ----

@@ -38,6 +38,9 @@ public:
   /* Index vector for irregular (gather/scatter) access patterns */
   std::vector<std::size_t> IDX;
 
+  /* Index vector for coefficient shuffling */
+  std::vector<std::size_t> COEFF_IDX;
+
   /* Precomputed per-tower moduli and Barrett reduction constants */
   std::vector<lbcrypto::NativeInteger> towerModuli;  // Modulus for each RNS tower
   std::vector<lbcrypto::NativeInteger> towerMu;      // Barrett mu for ModMulFast
