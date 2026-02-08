@@ -33,13 +33,26 @@ inline std::int64_t DeepBytesPerPoly(std::int64_t ringDim, std::int64_t numTower
 */
 void SchemeArgs(benchmark::internal::Benchmark* b) {
   /* CKKS scheme: Large ring dimension (2^16) with deep RNS tower stack (32) */
-  b->Args({1 << 16, 32});
+  b->Args({1 << 16, 32, static_cast<int>(ShuffleMode::None)});
 
   /* BFV scheme: Medium ring dimension (2^15) with moderate tower count (16) */
-  b->Args({1 << 15, 16});
+  b->Args({1 << 15, 16, static_cast<int>(ShuffleMode::None)});
 
   /* TFHE-style: Small ring dimension (2^11) with minimal towers (2) for fast gate evaluation */
-  b->Args({1 << 11, 2});
+  b->Args({1 << 11, 2, static_cast<int>(ShuffleMode::None)});
+}
+
+inline const char* LabelForMode(ShuffleMode mode) {
+  switch (mode) {
+    case ShuffleMode::None:
+      return "Mode: Sequential";
+    case ShuffleMode::Poly:
+      return "Mode: Poly Shuffle";
+    case ShuffleMode::Coeff:
+      return "Mode: Coeff Shuffle";
+    default:
+      return "Mode: Unknown";
+  }
 }
 
 }  // namespace
@@ -49,6 +62,7 @@ void SchemeArgs(benchmark::internal::Benchmark* b) {
   Simple memory read and write pattern; fundamental bandwidth benchmark.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_COPY)(benchmark::State& state) {
+  state.SetLabel(LabelForMode(static_cast<ShuffleMode>(state.range(2))));
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();

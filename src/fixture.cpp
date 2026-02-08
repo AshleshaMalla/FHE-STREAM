@@ -51,6 +51,8 @@ inline std::int64_t DeepBytesPerPoly(std::int64_t ringDim, std::int64_t numTower
   Called before each benchmark iteration to prepare the working set.
 */
 void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
+    const auto mode = static_cast<ShuffleMode>(state.range(2));
+
   /* 
     Disable OpenFHE's internal parallelism while preserving benchmark-level OpenMP threads.
     OpenFHE's SetNumThreads(1) calls omp_set_num_threads(1) internally, which would
@@ -111,6 +113,7 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   const std::uint64_t bytesPerIndexAllArrays = bytesPerPoly * 3ULL;  // Three arrays: A, B, C
   const std::size_t nPolys = std::max<std::size_t>(1, CeilDivU64(kMinFootprintBytes, bytesPerIndexAllArrays));
 
+
   /* 
     Print setup configuration once per unique parameter set.
     Uses static variables to avoid redundant output across benchmark iterations.
@@ -160,6 +163,9 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   IDX.resize(nPolys);
   std::iota(IDX.begin(), IDX.end(), std::size_t{0});  // Fill with 0, 1, 2, ..., nPolys-1
   std::mt19937 rng(42);  // Fixed seed for reproducibility
+    if (mode == ShuffleMode::Poly) {
+      std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
+    }
   // std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
 
   /*
@@ -170,7 +176,9 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   COEFF_IDX.resize(static_cast<std::size_t>(ringDim));
   std::iota(COEFF_IDX.begin(), COEFF_IDX.end(), std::size_t{0});  // 0, 1, 2, ..., ringDim-1
   std::mt19937 coeff_rng(43);  // Fixed seed for reproducibility
-  std::shuffle(COEFF_IDX.begin(), COEFF_IDX.end(), coeff_rng);  // Randomized access pattern
+    if (mode == ShuffleMode::Coeff) {
+      std::shuffle(COEFF_IDX.begin(), COEFF_IDX.end(), coeff_rng);  // Randomized access pattern
+    }
 }
 
 /*

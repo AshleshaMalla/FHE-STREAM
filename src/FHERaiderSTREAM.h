@@ -16,6 +16,8 @@
 
 #include "openfhe.h"
 
+enum class ShuffleMode { None = 0, Poly = 1, Coeff = 2 };
+
 /*
   FHERaiderSTREAM Benchmark Fixture
   
