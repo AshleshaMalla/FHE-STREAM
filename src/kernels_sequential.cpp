@@ -16,6 +16,9 @@
 #include <omp.h>
 #endif
 
+/* Global thread count for benchmarks */
+extern int RS_Execution_Threads;
+
 namespace {
 
 /* 
@@ -83,7 +86,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_COPY)(benchmark::State& state) {
 #endif
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
+#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& cTowers = C[i].GetAllElements();
       const auto& aTowers = A[i].GetAllElements();
@@ -115,7 +118,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_SCALE)(benchmark::State& state) {
   const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(scalar));  // Pre-computed scalar
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
+#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& bTowers = B[i].GetAllElements();
       const auto& cTowers = C[i].GetAllElements();
@@ -148,7 +151,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_ADD)(benchmark::State& state) {
   const std::size_t nPolys = A.size();
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
+#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& cTowers = C[i].GetAllElements();
       const auto& aTowers = A[i].GetAllElements();
@@ -183,7 +186,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {
   const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(scalar));  // Pre-computed scalar
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(omp_get_max_threads())
+#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
     for (std::size_t i = 0; i < nPolys; ++i) {
       auto& aTowers = A[i].GetAllElements();
       const auto& bTowers = B[i].GetAllElements();
