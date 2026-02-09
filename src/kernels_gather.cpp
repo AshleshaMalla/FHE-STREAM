@@ -5,16 +5,7 @@
   randomized using an index vector (IDX). The write pattern remains sequential.
 */
 
-#include "FHERaiderSTREAM.h"
-
-#include <cstdint>
-
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
-/* Global thread count for benchmarks */
-extern int RS_Execution_Threads;
+#include "StreamCore.h"
 
 namespace {
 
@@ -45,19 +36,6 @@ void SchemeArgs(benchmark::internal::Benchmark* b) {
   b->Args({1 << 11, 2, static_cast<int>(ShuffleMode::Poly)});
 }
 
-inline const char* LabelForMode(ShuffleMode mode) {
-  switch (mode) {
-    case ShuffleMode::None:
-      return "Mode: Sequential";
-    case ShuffleMode::Poly:
-      return "Mode: Poly Shuffle";
-    case ShuffleMode::Coeff:
-      return "Mode: Coeff Shuffle";
-    default:
-      return "Mode: Unknown";
-  }
-}
-
 }  // namespace
 
 /*
@@ -65,28 +43,16 @@ inline const char* LabelForMode(ShuffleMode mode) {
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_COPY)(benchmark::State& state) {
-  state.SetLabel(LabelForMode(static_cast<ShuffleMode>(state.range(2))));
+  RunGatherPoly(*this, state,
+                [](auto&, auto& rndA, auto&, auto&, auto& seqC, auto&, const auto&, const auto&, const auto&, std::size_t dim) {
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    seqC[j] = rndA[j];
+                  }
+                });
+
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
-
-  for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      const std::size_t src = IDX[i];
-      auto& cTowers = C[i].GetAllElements();
-      const auto& aTowers = A[src].GetAllElements();
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& cTower = cTowers[t];
-        const auto& aTower = aTowers[t];
-        for (std::size_t j = 0; j < static_cast<std::size_t>(ringDim); ++j) {
-          cTower[j] = aTower[j];
-        }
-        benchmark::DoNotOptimize(cTower[static_cast<std::size_t>(ringDim) - 1]);
-      }
-    }
-    benchmark::ClobberMemory();
-  }
 
   /* Report aggregate bytes read/written: 2 arrays (A and C) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 2;
@@ -98,31 +64,17 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_COPY)(benchmark::State& state) {
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_SCALE)(benchmark::State& state) {
-  state.SetLabel(LabelForMode(static_cast<ShuffleMode>(state.range(2))));
+  RunGatherPoly(*this, state,
+                [](auto&, auto&, auto& seqB, auto&, auto&, auto& rndC, const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                  const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(sc));
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    seqB[j] = rndC[j].ModMulFast(scalarNI, mod, mu);
+                  }
+                });
+
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = C.size();
-  const lbcrypto::NativeInteger scalarNI(3);
-
-  for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      const std::size_t src = IDX[i];
-      auto& bTowers = B[i].GetAllElements();
-      const auto& cTowers = C[src].GetAllElements();
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& bTower = bTowers[t];
-        const auto& cTower = cTowers[t];
-        const auto& mod = towerModuli[t];
-        const auto& mu = towerMu[t];
-        for (std::size_t j = 0; j < static_cast<std::size_t>(ringDim); ++j) {
-          bTower[j] = cTower[j].ModMulFast(scalarNI, mod, mu);
-        }
-        benchmark::DoNotOptimize(bTower[static_cast<std::size_t>(ringDim) - 1]);
-      }
-    }
-    benchmark::ClobberMemory();
-  }
 
   /* Report aggregate bytes read/written: 2 arrays (C and B) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 2;
@@ -134,31 +86,16 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_SCALE)(benchmark::State& state) {
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_ADD)(benchmark::State& state) {
-  state.SetLabel(LabelForMode(static_cast<ShuffleMode>(state.range(2))));
+  RunGatherPoly(*this, state,
+                [](auto&, auto& rndA, auto&, auto& rndB, auto& seqC, auto&, const auto& mod, const auto&, const auto&, std::size_t dim) {
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    seqC[j] = rndA[j].ModAddFast(rndB[j], mod);
+                  }
+                });
+
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
-
-  for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      const std::size_t src = IDX[i];
-      auto& cTowers = C[i].GetAllElements();
-      const auto& aTowers = A[src].GetAllElements();
-      const auto& bTowers = B[src].GetAllElements();
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& cTower = cTowers[t];
-        const auto& aTower = aTowers[t];
-        const auto& bTower = bTowers[t];
-        const auto& mod = towerModuli[t];
-        for (std::size_t j = 0; j < static_cast<std::size_t>(ringDim); ++j) {
-          cTower[j] = aTower[j].ModAddFast(bTower[j], mod);
-        }
-        benchmark::DoNotOptimize(cTower[static_cast<std::size_t>(ringDim) - 1]);
-      }
-    }
-    benchmark::ClobberMemory();
-  }
 
   /* Report aggregate bytes read/written: 3 arrays (A, B, C) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 3;
@@ -170,34 +107,18 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_ADD)(benchmark::State& state) {
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_TRIAD)(benchmark::State& state) {
-  state.SetLabel(LabelForMode(static_cast<ShuffleMode>(state.range(2))));
+  RunGatherPoly(*this, state,
+                [](auto& seqA, auto&, auto&, auto& rndB, auto&, auto& rndC, const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                  const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(sc));
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    const auto scaled = rndC[j].ModMulFast(scalarNI, mod, mu);
+                    seqA[j] = rndB[j].ModAddFast(scaled, mod);
+                  }
+                });
+
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
-  const lbcrypto::NativeInteger scalarNI(3);
-
-  for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      const std::size_t src = IDX[i];
-      auto& aTowers = A[i].GetAllElements();
-      const auto& bTowers = B[src].GetAllElements();
-      const auto& cTowers = C[src].GetAllElements();
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& aTower = aTowers[t];
-        const auto& bTower = bTowers[t];
-        const auto& cTower = cTowers[t];
-        const auto& mod = towerModuli[t];
-        const auto& mu = towerMu[t];
-        for (std::size_t j = 0; j < static_cast<std::size_t>(ringDim); ++j) {
-          const auto scaled = cTower[j].ModMulFast(scalarNI, mod, mu);
-          aTower[j] = bTower[j].ModAddFast(scaled, mod);
-        }
-        benchmark::DoNotOptimize(aTower[static_cast<std::size_t>(ringDim) - 1]);
-      }
-    }
-    benchmark::ClobberMemory();
-  }
 
   /* Report aggregate bytes read/written: 3 arrays (A, B, C) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 3;
