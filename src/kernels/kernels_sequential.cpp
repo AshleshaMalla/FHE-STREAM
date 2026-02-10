@@ -11,34 +11,6 @@
 /* Global thread count for benchmarks */
 extern int RS_Execution_Threads;
 
-namespace {
-
-/* 
-  Calculates the deep byte size of a single DCRTPoly in the RNS representation.
-  Each polynomial has ringDim coefficients per tower, with numTowers in total,
-  and each coefficient is a 64-bit NativeInteger (8 bytes).
-*/
-inline std::int64_t DeepBytesPerPoly(std::int64_t ringDim, std::int64_t numTowers) {
-  return ringDim * numTowers * 8;  // RingDim * NumTowers * 8 bytes per NativeInteger
-}
-
-/* 
-  Registers benchmark parameter sets representing three distinct FHE use cases.
-  Each set has a unique ring dimension and RNS tower count.
-*/
-void SchemeArgs(benchmark::internal::Benchmark* b) {
-  /* CKKS scheme: Large ring dimension (2^16) with deep RNS tower stack (32) */
-  b->Args({1 << 16, 32, static_cast<int>(ShuffleMode::None)});
-
-  /* BFV scheme: Medium ring dimension (2^15) with moderate tower count (16) */
-  b->Args({1 << 15, 16, static_cast<int>(ShuffleMode::None)});
-
-  /* TFHE-style: Small ring dimension (2^11) with minimal towers (2) for fast gate evaluation */
-  b->Args({1 << 11, 2, static_cast<int>(ShuffleMode::None)});
-}
-
-}  // namespace
-
 /* 
   COPY kernel: C[i] = A[i] for all polynomials.
   Simple memory read and write pattern; fundamental bandwidth benchmark.
@@ -66,9 +38,8 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_COPY)(benchmark::State& state) {
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_SCALE)(benchmark::State& state) {
   RunSequential(*this, state,
                 [](auto&, auto& B, auto& C, const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                  const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(sc));
                   for (std::size_t j = 0; j < dim; ++j) {
-                    B[j] = C[j].ModMulFast(scalarNI, mod, mu);
+                    B[j] = C[j].ModMulFast(sc, mod, mu);
                   }
                 });
 
@@ -107,9 +78,8 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_ADD)(benchmark::State& state) {
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {
   RunSequential(*this, state,
                 [](auto& A, auto& B, auto& C, const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                  const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(sc));
                   for (std::size_t j = 0; j < dim; ++j) {
-                    const auto scaled = C[j].ModMulFast(scalarNI, mod, mu);
+                    const auto scaled = C[j].ModMulFast(sc, mod, mu);
                     A[j] = B[j].ModAddFast(scaled, mod);
                   }
                 });
@@ -123,7 +93,11 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {
 }
 
 /* Register each benchmark kernel with all FHE parameter sets */
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_COPY)->Apply(SchemeArgs);
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_SCALE)->Apply(SchemeArgs);
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_ADD)->Apply(SchemeArgs);
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_TRIAD)->Apply(SchemeArgs);
+BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_COPY)
+  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });
+BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_SCALE)
+  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });
+BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_ADD)
+  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });
+BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_TRIAD)
+  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });

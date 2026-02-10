@@ -57,15 +57,16 @@ endif()
 add_executable(fhe_raiderstream
   src/main.cpp
   src/fixture.cpp
-  src/kernels_sequential.cpp
-  src/kernels_gather.cpp
-  src/kernels_gather_coeff.cpp
+  src/kernels/kernels_sequential.cpp
+  src/kernels/kernels_gather.cpp
+  src/kernels/kernels_scatter.cpp
 )
 
 # ---- Includes ----
 target_include_directories(fhe_raiderstream
   PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # OpenFHE headers are commonly split across subdirs (core/pke/binfhe). Some
