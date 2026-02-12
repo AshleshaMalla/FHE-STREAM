@@ -12,13 +12,25 @@
   SCATTER COPY kernel: C[IDX[i]] = A[i] for all polynomials.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_COPY)(benchmark::State& state) {
-  RunScatterPoly(*this, state,
-                 [](auto& seqA, auto&, auto&, auto&, auto&, auto& rndC,
-                    const auto&, const auto&, const auto&, std::size_t dim) {
-                   for (std::size_t j = 0; j < dim; ++j) {
-                     rndC[j] = seqA[j];
-                   }
-                 });
+  const auto mode = static_cast<ShuffleMode>(state.range(2));
+  if (mode == ShuffleMode::Coeff) {
+    RunScatterCoeff(*this, state,
+                    [](auto& aTower, auto&, auto& cTower, const auto& idx,
+                       const auto&, const auto&, const auto&, std::size_t dim) {
+                      for (std::size_t j = 0; j < dim; ++j) {
+                        const std::size_t dst_idx = idx[j];
+                        cTower[dst_idx] = aTower[j];
+                      }
+                    });
+  } else {
+    RunScatterPoly(*this, state,
+                   [](auto& seqA, auto&, auto&, auto&, auto&, auto& rndC,
+                      const auto&, const auto&, const auto&, std::size_t dim) {
+                     for (std::size_t j = 0; j < dim; ++j) {
+                       rndC[j] = seqA[j];
+                     }
+                   });
+  }
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -33,13 +45,25 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_COPY)(benchmark::State& state) {
   SCATTER SCALE kernel: B[IDX[i]] = scalar * C[i] for all polynomials.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_SCALE)(benchmark::State& state) {
-  RunScatterPoly(*this, state,
-                 [](auto&, auto&, auto& seqB, auto&, auto&, auto& rndC,
-                    const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                   for (std::size_t j = 0; j < dim; ++j) {
-                     seqB[j] = rndC[j].ModMulFast(sc, mod, mu);
-                   }
-                 });
+  const auto mode = static_cast<ShuffleMode>(state.range(2));
+  if (mode == ShuffleMode::Coeff) {
+    RunScatterCoeff(*this, state,
+                    [](auto&, auto& bTower, auto& cTower, const auto& idx,
+                       const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                      for (std::size_t j = 0; j < dim; ++j) {
+                        const std::size_t dst_idx = idx[j];
+                        bTower[dst_idx] = cTower[j].ModMulFast(sc, mod, mu);
+                      }
+                    });
+  } else {
+    RunScatterPoly(*this, state,
+                   [](auto&, auto&, auto& seqB, auto&, auto&, auto& rndC,
+                      const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                     for (std::size_t j = 0; j < dim; ++j) {
+                       seqB[j] = rndC[j].ModMulFast(sc, mod, mu);
+                     }
+                   });
+  }
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -54,13 +78,25 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_SCALE)(benchmark::State& state) {
   SCATTER ADD kernel: C[IDX[i]] = A[i] + B[i] for all polynomials.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_ADD)(benchmark::State& state) {
-  RunScatterPoly(*this, state,
-                 [](auto& seqA, auto&, auto& seqB, auto&, auto&, auto& rndC,
-                    const auto& mod, const auto&, const auto&, std::size_t dim) {
-                   for (std::size_t j = 0; j < dim; ++j) {
-                     rndC[j] = seqA[j].ModAddFast(seqB[j], mod);
-                   }
-                 });
+  const auto mode = static_cast<ShuffleMode>(state.range(2));
+  if (mode == ShuffleMode::Coeff) {
+    RunScatterCoeff(*this, state,
+                    [](auto& aTower, auto& bTower, auto& cTower, const auto& idx,
+                       const auto& mod, const auto&, const auto&, std::size_t dim) {
+                      for (std::size_t j = 0; j < dim; ++j) {
+                        const std::size_t dst_idx = idx[j];
+                        cTower[dst_idx] = aTower[j].ModAddFast(bTower[j], mod);
+                      }
+                    });
+  } else {
+    RunScatterPoly(*this, state,
+                   [](auto& seqA, auto&, auto& seqB, auto&, auto&, auto& rndC,
+                      const auto& mod, const auto&, const auto&, std::size_t dim) {
+                     for (std::size_t j = 0; j < dim; ++j) {
+                       rndC[j] = seqA[j].ModAddFast(seqB[j], mod);
+                     }
+                   });
+  }
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -75,14 +111,27 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_ADD)(benchmark::State& state) {
   SCATTER TRIAD kernel: A[IDX[i]] = B[i] + scalar * C[i] for all polynomials.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_TRIAD)(benchmark::State& state) {
-  RunScatterPoly(*this, state,
-                 [](auto& seqA, auto&, auto& seqB, auto&, auto&, auto& rndC,
-                    const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                   for (std::size_t j = 0; j < dim; ++j) {
-                     const auto scaled = rndC[j].ModMulFast(sc, mod, mu);
-                     seqA[j] = seqB[j].ModAddFast(scaled, mod);
-                   }
-                 });
+  const auto mode = static_cast<ShuffleMode>(state.range(2));
+  if (mode == ShuffleMode::Coeff) {
+    RunScatterCoeff(*this, state,
+                    [](auto& aTower, auto& bTower, auto& cTower, const auto& idx,
+                       const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                      for (std::size_t j = 0; j < dim; ++j) {
+                        const std::size_t dst_idx = idx[j];
+                        const auto scaled = cTower[j].ModMulFast(sc, mod, mu);
+                        aTower[dst_idx] = bTower[j].ModAddFast(scaled, mod);
+                      }
+                    });
+  } else {
+    RunScatterPoly(*this, state,
+                   [](auto& seqA, auto&, auto& seqB, auto&, auto&, auto& rndC,
+                      const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                     for (std::size_t j = 0; j < dim; ++j) {
+                       const auto scaled = rndC[j].ModMulFast(sc, mod, mu);
+                       seqA[j] = seqB[j].ModAddFast(scaled, mod);
+                     }
+                   });
+  }
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -93,109 +142,15 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_TRIAD)(benchmark::State& state) {
   state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
 }
 
-/*
-  COEFFICIENT SCATTER COPY kernel: C[i][COEFF_IDX[j]] = A[i][j] for all polynomials.
-*/
-BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_COEFF_COPY)(benchmark::State& state) {
-  RunScatterCoeff(*this, state,
-                  [](auto& aTower, auto&, auto& cTower, const auto& idx,
-                     const auto&, const auto&, const auto&, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      const std::size_t dst_idx = idx[j];
-                      cTower[dst_idx] = aTower[j];
-                    }
-                  });
 
-  const std::int64_t ringDim = state.range(0);
-  const std::int64_t numTowers = state.range(1);
-  const std::size_t nPolys = A.size();
-
-  const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers)
-                                   * static_cast<std::int64_t>(nPolys) * 2;
-  state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
-}
-
-/*
-  COEFFICIENT SCATTER SCALE kernel: B[i][COEFF_IDX[j]] = scalar * C[i][j] for all polynomials.
-*/
-BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_COEFF_SCALE)(benchmark::State& state) {
-  RunScatterCoeff(*this, state,
-                  [](auto&, auto& bTower, auto& cTower, const auto& idx,
-                     const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      const std::size_t dst_idx = idx[j];
-                      bTower[dst_idx] = cTower[j].ModMulFast(sc, mod, mu);
-                    }
-                  });
-
-  const std::int64_t ringDim = state.range(0);
-  const std::int64_t numTowers = state.range(1);
-  const std::size_t nPolys = C.size();
-
-  const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers)
-                                   * static_cast<std::int64_t>(nPolys) * 2;
-  state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
-}
-
-/*
-  COEFFICIENT SCATTER ADD kernel: C[i][COEFF_IDX[j]] = A[i][j] + B[i][j] for all polynomials.
-*/
-BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_COEFF_ADD)(benchmark::State& state) {
-  RunScatterCoeff(*this, state,
-                  [](auto& aTower, auto& bTower, auto& cTower, const auto& idx,
-                     const auto& mod, const auto&, const auto&, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      const std::size_t dst_idx = idx[j];
-                      cTower[dst_idx] = aTower[j].ModAddFast(bTower[j], mod);
-                    }
-                  });
-
-  const std::int64_t ringDim = state.range(0);
-  const std::int64_t numTowers = state.range(1);
-  const std::size_t nPolys = A.size();
-
-  const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers)
-                                   * static_cast<std::int64_t>(nPolys) * 3;
-  state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
-}
-
-/*
-  COEFFICIENT SCATTER TRIAD kernel: A[i][COEFF_IDX[j]] = B[i][j] + scalar * C[i][j] for all polynomials.
-*/
-BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_COEFF_TRIAD)(benchmark::State& state) {
-  RunScatterCoeff(*this, state,
-                  [](auto& aTower, auto& bTower, auto& cTower, const auto& idx,
-                     const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      const std::size_t dst_idx = idx[j];
-                      const auto scaled = cTower[j].ModMulFast(sc, mod, mu);
-                      aTower[dst_idx] = bTower[j].ModAddFast(scaled, mod);
-                    }
-                  });
-
-  const std::int64_t ringDim = state.range(0);
-  const std::int64_t numTowers = state.range(1);
-  const std::size_t nPolys = A.size();
-
-  const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers)
-                                   * static_cast<std::int64_t>(nPolys) * 3;
-  state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
-}
 
 /* Register the scatter kernels with all FHE parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_COPY)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly}); });
+    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_SCALE)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly}); });
+  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_ADD)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly}); });
+  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_TRIAD)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly}); });
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_COEFF_COPY)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Coeff}); });
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_COEFF_SCALE)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Coeff}); });
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_COEFF_ADD)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Coeff}); });
-BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_COEFF_TRIAD)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Coeff}); });
+  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
+
