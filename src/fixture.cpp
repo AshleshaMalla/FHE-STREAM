@@ -168,6 +168,13 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
     }
   // std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
 
+  IDX_WRITE.resize(nPolys);
+  std::iota(IDX_WRITE.begin(), IDX_WRITE.end(), std::size_t{0});  // Fill with 0, 1, 2, ..., nPolys-1
+  std::mt19937 rng_write(99);  // Distinct seed for write-side shuffling
+    if (mode == ShuffleMode::Poly) {
+      std::shuffle(IDX_WRITE.begin(), IDX_WRITE.end(), rng_write);
+    }
+
   /*
     Initialize coefficient index vector for inner-loop gather.
     Sequential fill first to establish a baseline; enable std::shuffle for
@@ -178,6 +185,13 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   std::mt19937 coeff_rng(43);  // Fixed seed for reproducibility
     if (mode == ShuffleMode::Coeff) {
       std::shuffle(COEFF_IDX.begin(), COEFF_IDX.end(), coeff_rng);  // Randomized access pattern
+    }
+
+  COEFF_IDX_WRITE.resize(static_cast<std::size_t>(ringDim));
+  std::iota(COEFF_IDX_WRITE.begin(), COEFF_IDX_WRITE.end(), std::size_t{0});  // 0, 1, 2, ..., ringDim-1
+  std::mt19937 coeff_rng_write(99);  // Distinct seed for write-side shuffling
+    if (mode == ShuffleMode::Coeff) {
+      std::shuffle(COEFF_IDX_WRITE.begin(), COEFF_IDX_WRITE.end(), coeff_rng_write);
     }
 }
 
@@ -199,6 +213,9 @@ void FHERaiderSTREAM::TearDown(const benchmark::State&) {
   std::vector<lbcrypto::DCRTPoly>().swap(B);
   std::vector<lbcrypto::DCRTPoly>().swap(C);
   std::vector<std::size_t>().swap(IDX);
+  std::vector<std::size_t>().swap(IDX_WRITE);
+  std::vector<std::size_t>().swap(COEFF_IDX);
+  std::vector<std::size_t>().swap(COEFF_IDX_WRITE);
 
 #ifdef __GLIBC__
   /* Return freed memory pages to the OS to avoid cross-benchmark contamination */

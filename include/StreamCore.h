@@ -207,3 +207,65 @@ inline void RunScatterCoeff(FHERaiderSTREAM& self, benchmark::State& state, Kern
     benchmark::ClobberMemory();
   }
 }
+
+template <typename Kernel>
+inline void RunScatterGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+  SetLabel(state);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::size_t nPolys = self.A.size();
+  const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  for (auto _ : state) {
+#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
+    for (std::size_t i = 0; i < nPolys; ++i) {
+      const std::size_t src_k = self.IDX[i];
+      const std::size_t dst_k = self.IDX_WRITE[i];
+      auto& aRndTowers = self.A[src_k].GetAllElements();
+      auto& bRndTowers = self.B[src_k].GetAllElements();
+      auto& cRndTowers = self.C[dst_k].GetAllElements();
+      const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
+      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
+        auto& aRnd = aRndTowers[t];
+        auto& bRnd = bRndTowers[t];
+        auto& cRnd = cRndTowers[t];
+        const auto& mod = self.towerModuli[t];
+        const auto& mu = self.towerMu[t];
+        kernel(aRnd, bRnd, cRnd, mod, mu, scalarNI, dim);
+      }
+    }
+    benchmark::ClobberMemory();
+  }
+}
+
+template <typename Kernel>
+inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+  SetLabel(state);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::size_t nPolys = self.A.size();
+  const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  for (auto _ : state) {
+#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
+    for (std::size_t i = 0; i < nPolys; ++i) {
+      auto& aTowers = self.A[i].GetAllElements();
+      auto& bTowers = self.B[i].GetAllElements();
+      auto& cTowers = self.C[i].GetAllElements();
+      const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
+      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
+        auto& aTower = aTowers[t];
+        auto& bTower = bTowers[t];
+        auto& cTower = cTowers[t];
+        const auto& mod = self.towerModuli[t];
+        const auto& mu = self.towerMu[t];
+        for (std::size_t j = 0; j < dim; ++j) {
+          const std::size_t src_k = self.COEFF_IDX[j];
+          const std::size_t dst_k = self.COEFF_IDX_WRITE[j];
+          kernel(aTower[src_k], bTower[src_k], cTower[dst_k], mod, mu, scalarNI);
+        }
+      }
+    }
+    benchmark::ClobberMemory();
+  }
+}
