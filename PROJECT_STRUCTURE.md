@@ -15,6 +15,8 @@ The FHE-RaiderSTREAM benchmark has been refactored into a **modular, scalable ar
 - `class FHERaiderSTREAM : public benchmark::Fixture`
 - Member variables:
   - `std::vector<lbcrypto::DCRTPoly> A, B, C` — Working arrays
+  - `std::vector<std::size_t> IDX, IDX_WRITE` — Read/write poly indices
+  - `std::vector<std::size_t> COEFF_IDX, COEFF_IDX_WRITE` — Read/write coeff indices
   - `std::vector<lbcrypto::NativeInteger> towerModuli` — Per-tower moduli
   - `std::vector<lbcrypto::NativeInteger> towerMu` — Barrett constants
   - `int64_t scalar` — Scalar multiplier (default: 3)
@@ -43,6 +45,7 @@ The FHE-RaiderSTREAM benchmark has been refactored into a **modular, scalable ar
   - Creates BFV CryptoContext
   - Calculates polynomial count for 4 GiB minimum footprint
   - **NUMA first-touch parallel initialization** of arrays A, B, C
+  - Initializes read/write index vectors with distinct seeds
   - Single-iteration configuration logging
 
 - **TearDown()**:
@@ -118,20 +121,56 @@ BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_COPY)->Apply(SchemeArgs);
 
 ---
 
-### 4. **src/main.cpp** — The Control Room
-**Purpose:** Entry point and framework initialization
+### 4. **src/kernels_gather.cpp** — Gather Workloads
+**Purpose:** Irregular access (random read) kernels
 
-**Contents:**
-- Minimal executable setup
-- Single `BENCHMARK_MAIN()` macro invocation
-
-**Why minimal?**
-- Kernels registered in `kernels_sequential.cpp` to ensure BENCHMARK_DEFINE_F comes before BENCHMARK_REGISTER_F
-- Google Benchmark handles command-line parsing and execution
+**Implements:**
+- `RS_GATHER_COPY`, `RS_GATHER_SCALE`, `RS_GATHER_ADD`, `RS_GATHER_TRIAD`
+- Poly and Coeff modes merged under primary kernel names
 
 ---
 
-### 5. **CMakeLists.txt** — The Build System
+### 5. **src/kernels_scatter.cpp** — Scatter Workloads
+**Purpose:** Irregular access (random write) kernels
+
+**Implements:**
+- `RS_SCATTER_COPY`, `RS_SCATTER_SCALE`, `RS_SCATTER_ADD`, `RS_SCATTER_TRIAD`
+- Poly and Coeff modes merged under primary kernel names
+
+---
+
+### 6. **src/kernels_scatter_gather.cpp** — Scatter-Gather Workloads
+**Purpose:** Double-indirection random read + random write kernels
+
+**Implements:**
+- `RS_SCATTER_GATHER_COPY`, `RS_SCATTER_GATHER_SCALE`, `RS_SCATTER_GATHER_ADD`, `RS_SCATTER_GATHER_TRIAD`
+- Poly and Coeff modes with distinct read/write index vectors
+
+---
+
+### 7. **include/StreamCore.h** — Kernel Dispatchers
+**Purpose:** Shared kernel dispatch and labeling
+
+**Adds:**
+- `RunScatterGatherPoly`
+- `RunScatterGatherCoeff`
+
+---
+
+### 8. **src/main.cpp** — The Control Room
+**Purpose:** Entry point and framework initialization
+
+**Contents:**
+- Custom help handler for `--help`
+- ASCII banner printed on every run
+
+**Why here?**
+- Banner and help are user-facing entry-point behavior
+- Kernel registration still lives in each kernel file
+
+---
+
+### 9. **CMakeLists.txt** — The Build System
 **Purpose:** Multi-source compilation configuration
 
 **Key Updates:**
@@ -140,6 +179,9 @@ add_executable(fhe_raiderstream
   src/main.cpp
   src/fixture.cpp
   src/kernels_sequential.cpp
+  src/kernels_gather.cpp
+  src/kernels_scatter.cpp
+  src/kernels_scatter_gather.cpp
 )
 ```
 

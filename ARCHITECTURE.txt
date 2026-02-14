@@ -10,7 +10,9 @@
 PROJECT ROOT
 │
 ├─ CMakeLists.txt ⚙️  [Build Configuration]
-│  └─ Sources: main.cpp, fixture.cpp, kernels_sequential.cpp
+│  └─ Sources: main.cpp, fixture.cpp,
+│              kernels_sequential.cpp, kernels_gather.cpp,
+│              kernels_scatter.cpp, kernels_scatter_gather.cpp
 │  └─ Finds: OpenFHE, OpenMP, Google Benchmark
 │  └─ Links: All dependencies together
 │
@@ -19,6 +21,8 @@ PROJECT ROOT
 │  ├─ FHERaiderSTREAM.h 📋 [The Blueprint]
 │  │  ├─ Class definition: FHERaiderSTREAM : public benchmark::Fixture
 │  │  ├─ Members: A, B, C (DCRTPoly arrays)
+│  │  ├─ Members: IDX, IDX_WRITE (read/write poly indices)
+│  │  ├─ Members: COEFF_IDX, COEFF_IDX_WRITE (read/write coeff indices)
 │  │  ├─ Members: towerModuli, towerMu (precomputed values)
 │  │  ├─ Member: scalar = 3
 │  │  ├─ Member: cc (CryptoContext)
@@ -87,13 +91,32 @@ PROJECT ROOT
 │  │  ├─ Helper: DeepBytesPerPoly()
 │  │  └─ Lines: ~220
 │  │
+│  ├─ kernels_gather.cpp 📊 [Gather Workloads]
+│  │  ├─ Kernels: RS_GATHER_COPY/SCALE/ADD/TRIAD
+│  │  ├─ Modes: Poly + Coeff (merged into primary kernel names)
+│  │  └─ Uses: RunGatherPoly / RunGatherCoeff
+│  │
+│  ├─ kernels_scatter.cpp 📊 [Scatter Workloads]
+│  │  ├─ Kernels: RS_SCATTER_COPY/SCALE/ADD/TRIAD
+│  │  ├─ Modes: Poly + Coeff (merged into primary kernel names)
+│  │  └─ Uses: RunScatterPoly / RunScatterCoeff
+│  │
+│  ├─ kernels_scatter_gather.cpp 📊 [Scatter-Gather Workloads]
+│  │  ├─ Kernels: RS_SCATTER_GATHER_COPY/SCALE/ADD/TRIAD
+│  │  ├─ Modes: Poly + Coeff (read/write indirection)
+│  │  └─ Uses: RunScatterGatherPoly / RunScatterGatherCoeff
+│  │
+│  ├─ StreamCore.h ⚙️ [Kernel Dispatchers]
+│  │  ├─ RunSequential / RunGatherPoly / RunGatherCoeff
+│  │  ├─ RunScatterPoly / RunScatterCoeff
+│  │  ├─ RunScatterGatherPoly / RunScatterGatherCoeff
+│  │  └─ Sets labels for ShuffleMode (Sequential/Poly/Coeff)
+│  │
 │  ├─ main.cpp 🚀 [The Control Room]
 │  │  ├─ Purpose: Framework entry point
-│  │  ├─ Content: BENCHMARK_MAIN() macro
-│  │  ├─ Note: Minimal by design
-│  │  │        (Registration done in kernels_sequential.cpp)
-│  │  ├─ Why? Ensures BENCHMARK_DEFINE_F comes before BENCHMARK_REGISTER_F
-│  │  └─ Lines: ~9
+│  │  ├─ Content: Custom help + ASCII banner
+│  │  ├─ Behavior: Prints banner on every run
+│  │  └─ Lines: ~120
 │  │
 │  └─ FHERaiderSTREAM.cpp ⚠️ [DEPRECATED]
 │     └─ Original monolithic implementation (superseded by modular structure)

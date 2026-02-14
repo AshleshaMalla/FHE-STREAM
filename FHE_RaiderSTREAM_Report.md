@@ -1,87 +1,79 @@
-# FHE-RaiderSTREAM: Project Status & Refactoring Report
+# FHE-RaiderSTREAM: A Micro-Architectural Benchmark Suite for Homomorphic Encryption
 
-## 1. Executive Summary
-The FHE-RaiderSTREAM benchmark has successfully transitioned from a monolithic proof-of-concept into a **modular, template-driven scientific instrument**. The codebase now isolates the "Memory Wall" in Homomorphic Encryption using a strictly layered architecture that separates business logic (Kernels), engine logic (StreamCore), and lifecycle management (Fixture).
-
-**Current Status:** ✅ **Production Ready**
-The benchmark now supports Sequential, Gather, and Scatter patterns across all standard STREAM operations (Copy, Scale, Add, Triad), verified against theoretical hardware limits.
+## 1. Abstract
+FHE-RaiderSTREAM is a specialized micro-benchmark suite designed to characterize the memory bandwidth bottlenecks inherent to Homomorphic Encryption (FHE) workloads. Unlike traditional FHE benchmarks that measure high-level algorithmic throughput, this suite isolates the fundamental interactions between OpenFHE data structures (DCRTPoly) and the underlying hardware memory subsystem. By implementing the standard STREAM operations (Copy, Scale, Add, Triad) across distinct stochastic access patterns, FHE-RaiderSTREAM quantifies the "Memory Wall"—the performance gap between sequential bandwidth capability and the latency-bound random access patterns required by operations such as Key Switching and Bootstrapping.
 
 ---
 
-## 2. File Inventory (Current Architecture)
+## 2. Project Architecture
 
-The project is now organized into a **Category-Based Structure** to maximize maintainability and reuse.
+The system utilizes a modular, template-driven architecture designed to ensure zero-overhead abstraction while maintaining rigorous scientific reproducibility.
 
-### 📂 `include/` (The Blueprints)
-| File | Purpose | Key Features |
-|------|---------|--------------|
-| `FHERaiderSTREAM.h` | Data Structures | Defines the `FHERaiderSTREAM` class, aligned vectors, and FHE context. |
-| `StreamCore.h` | **The Engine** | Contains 5 templated dispatchers (`RunSequential`, `RunGatherPoly`, etc.) that standardize threading, looping, and safety checks across all kernels. |
+### 2.1 Core Execution Logic (`include/StreamCore.h`)
+This component serves as the central dispatch mechanism. It utilizes C++ template metaprogramming to generate highly optimized machine code for different access patterns.
+* **Templated Dispatchers:** Generic functions (`RunSequential`, `RunGather`, `RunScatterGather`) that handle OpenMP threading, loop unrolling, and memory safety checks.
+* **Lambda Injection:** Kernel logic is injected via lambda functions, allowing the reuse of the same traversal logic for different arithmetic operations (Copy, Scale, Add, Triad).
+* **Scalar Optimization:** Arithmetic constants are pre-converted to `NativeInteger` format outside of execution loops to eliminate redundant type conversion cycles.
 
-### 📂 `src/` (The Core)
-| File | Purpose | Key Features |
-|------|---------|--------------|
-| `fixture.cpp` | Lifecycle | Handles complex OpenFHE context generation, NUMA-aware memory allocation, and random index permutation. Features "Quiet Mode" reporting. |
-| `main.cpp` | Entry Point | Minimal Google Benchmark entry point with custom console reporting logic. |
+### 2.2 Lifecycle Management (`src/fixture.cpp`)
+The test harness acts as the system's runtime environment, managing the initialization and teardown of complex FHE contexts.
+* **Context Generation:** Automates the creation of `CryptoContext` and `DCRTPoly` objects with cryptographically secure parameters.
+* **NUMA-Aware Allocation:** Ensures memory is allocated and touched on the local NUMA node to prevent remote access latency from contaminating benchmark results.
+* **Stochastic Index Generation:** Generates high-entropy permutation vectors (`IDX_READ`, `IDX_WRITE`) using separate random seeds to ensure statistical independence between read and write streams.
 
-### 📂 `src/kernels/` (The Wheels)
-| File | Purpose | Status |
-|------|---------|--------|
-| `kernels_sequential.cpp` | Baseline | ✅ Implements standard linear access patterns. |
-| `kernels_gather.cpp` | Read-Random | ✅ Implements both Poly-Gather and Coeff-Gather patterns. |
-| `kernels_scatter.cpp` | Write-Random | ✅ Implements both Poly-Scatter and Coeff-Scatter patterns. |
-
----
-
-## 3. Key Technical Achievements
-
-### A. The "StreamCore" Engine
-We replaced repetitive boilerplate code with a unified templating system in `StreamCore.h`.
-* **Benefit:** A single fix in the engine (e.g., the "Cold Memory" cache pollution fix) automatically propagates to all 12 benchmark kernels.
-* **Optimization:** Uses `inline` templates and C++ lambdas to ensure zero-overhead abstraction.
-
-### B. Scientific Verification
-We have scientifically characterized the hardware limits for FHE operations:
-* **Sequential Baseline:** Verified at **~153 GiB/s** (Hardware Limit).
-* **Large Object Shuffling:** Proved that random access of large objects (16MB Polynomials) incurs **zero latency penalty**.
-* **The Memory Wall:** Isolated the bottleneck in **Coefficient Shuffling**, where performance drops to **~60 GiB/s** (-60%).
-* **Arithmetic Hiding:** Discovered that complex operations (Triad) can be faster than simple ones (Copy) in Scatter modes because modular arithmetic hides the write latency.
-
-### C. Usability & Quality of Life
-* **Smart Console Output:** Implemented a logic-driven reporter in `fixture.cpp` that suppresses repetitive logs, printing configuration headers only when hardware parameters change.
-* **Scalar Optimization:** Optimized `int64_t` to `NativeInteger` conversion to occur outside hot loops, saving billions of CPU cycles.
+### 2.3 Kernel Implementations (`src/kernels/`)
+The benchmark suite is partitioned into four primary access regimes:
+1.  **Sequential (`kernels_sequential.cpp`):** Measures the hardware's peak theoretical throughput using linear memory access.
+2.  **Gather (`kernels_gather.cpp`):** Isolates read latency by performing indirect reads (`A[IDX[i]]`) from random memory locations.
+3.  **Scatter (`kernels_scatter.cpp`):** Isolates the Write-Allocate/Read-For-Ownership (RFO) penalty by performing indirect writes (`A[IDX[i]]`).
+4.  **Scatter-Gather (`kernels_scatter_gather.cpp`):** Represents the worst-case scenario, combining random read latency with random write RFO overhead via double indirection.
 
 ---
 
-## 4. Refactoring History
+## 3. Methodology & Access Patterns
 
-### Phase 1: Modular Split (Completed)
-* **Goal:** Break `FHERaiderSTREAM.cpp` (259 lines) into manageable components.
-* **Result:** Created `fixture.cpp` and `kernels_sequential.cpp`. Established the CMake build system.
+The suite evaluates performance across three distinct levels of memory granularity, referred to as "Shuffle Modes."
 
-### Phase 2: The Template Engine (Completed)
-* **Goal:** Remove code duplication and enforce safety (e.g., reference semantics).
-* **Result:** Created `StreamCore.h`. Introduced `RunSequential` and `RunGather` templates. Fixed the "Missing Reference" bug that caused unnecessary object copying.
+| Shuffle Mode | Description | Micro-Architectural Target |
+| :--- | :--- | :--- |
+| **0: Sequential** | Linear access to contiguous memory. | **Hardware Prefetcher & Memory Controller Bandwidth.** |
+| **1: Poly Shuffle** | Random access at 16MB granularity (Polynomial level). | **Translation Lookaside Buffer (TLB) & L3 Cache.** |
+| **2: Coeff Shuffle** | Random access at 8-byte granularity (Coefficient level). | **L1/L2 Cache Latency & Line Fill Buffers.** |
 
-### Phase 3: Irregular Access Patterns (Completed)
-* **Goal:** Implement Gather and Scatter benchmarks.
-* **Result:**
-    * Consolidated `kernels_gather.cpp` (Poly + Coeff).
-    * Consolidated `kernels_scatter.cpp` (Poly + Coeff).
-    * Verified thread-safety of Scatter operations using permutation indices.
+### Supported Operations
+Each access pattern is tested against the four standard STREAM vector operations, adapted for Modular Arithmetic:
+* **COPY:** $C \leftarrow A$
+* **SCALE:** $B \leftarrow s \cdot C \pmod q$
+* **ADD:** $C \leftarrow A + B \pmod q$
+* **TRIAD:** $A \leftarrow B + s \cdot C \pmod q$
 
 ---
 
-## 5. Future Works
+## 4. Performance Characterization
 
-### 🚀 Near Term: Combined Patterns
-* **Scatter-Gather Kernels:** Implement a "Worst Case" kernel that reads from random locations AND writes to random locations (`C[IDX[i]] = A[IDX[i]]`).
-    * *Hypothesis:* This will likely yield the lowest throughput of the entire suite, stressing the load/store units simultaneously.
+Empirical analysis on commodity hardware (14-core CPU) has established distinct performance regimes for FHE workloads.
 
-### ⚡ Mid Term: Optimizations
-* **SIMD Vectorization:** Investigate if manual AVX-512 intrinsics can speed up the `ModMulFast` operations inside the `StreamCore` lambdas.
-* **Huge Pages:** Test the impact of enabling Transparent Huge Pages (THP) on the `poly` vector allocations in `fixture.cpp`.
+### 4.1 Throughput Saturation (Sequential Regime)
+* **Throughput:** ~160 GiB/s
+* **Observation:** The system successfully saturates the memory controller bandwidth. Arithmetic complexity (e.g., Modular Multiplication) is effectively hidden by the memory transfer time, confirming that FHE is memory-bound rather than compute-bound in linear regimes.
 
-### 🌍 Long Term: Portability
-* **Scheme Agnosticism:** Refactor `fixture.cpp` to support CKKS and BGV schemes in addition to the current BFV implementation.
-* **Hardware Port:** Adapt the benchmark to run on GPUs (via CUDA) to compare the "FHE Memory Wall" between CPU and GPU architectures.
+### 4.2 Latency-Bound Regime (Coeff Shuffle)
+* **Throughput:** ~42 GiB/s
+* **Observation:** When access granularity is reduced to individual coefficients (8 bytes), performance degrades by approximately 73%. This "Speed Floor" represents the physical limit of the CPU's ability to handle outstanding cache misses.
+* **Key Finding:** The transition from simple Copy to complex Triad operations in this regime shows negligible performance impact (<10%), proving that optimizing arithmetic logic units (ALUs) yields diminishing returns without addressing memory latency.
+
+---
+
+## 5. Future Research Directions
+
+### 5.1 Strided Access Analysis (NTT Benchmarking)
+The next phase involves implementing `kernels_ntt.cpp` to measure the impact of power-of-two strided access patterns required by the Number Theoretic Transform (NTT). This will identify the "Critical Stride"—the specific jump distance at which the hardware prefetcher fails to predict future memory access.
+
+### 5.2 Micro-Architectural Optimizations
+Future iterations will utilize this benchmark as a sandbox to test software mitigation strategies:
+* **Software Prefetching:** Evaluating the efficacy of `__builtin_prefetch` intrinsics to hide latency in Gather kernels.
+* **Non-Temporal Stores:** Implementing streaming store intrinsics to bypass cache allocation during Scatter operations, thereby mitigating the RFO penalty.
+* **Huge Page Allocation:** Investigating the use of Transparent Huge Pages (THP) to reduce TLB miss rates for small-ring parameters (e.g., Ring Dimension 2048).
+
+### 5.3 Visualization & Modeling
+Development of automated post-processing scripts to generate Roofline Models, plotting "Modular Operations per Byte" against "Memory Bandwidth" to visually quantify the efficiency gap between sequential and irregular access patterns.
