@@ -44,7 +44,7 @@ inline void SchemeArgs(benchmark::internal::Benchmark* b, std::initializer_list<
 }
 
 inline void CustomArguments(benchmark::internal::Benchmark* b) {
-  const std::vector<std::int64_t> ringDims = {32768, 65536};
+  const std::vector<std::int64_t> ringDims = {32768, 65536, 131072};
   const std::vector<std::int64_t> multDepths = {1, 5, 20, 40};
   std::int64_t batchSize = 100;
   if (const char* env = std::getenv("RS_BATCH_SIZE")) {
