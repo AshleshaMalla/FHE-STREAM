@@ -51,8 +51,6 @@ inline std::int64_t DeepBytesPerPoly(std::int64_t ringDim, std::int64_t numTower
   Called before each benchmark iteration to prepare the working set.
 */
 void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
-    const auto mode = static_cast<ShuffleMode>(state.range(2));
-
   /* 
     Disable OpenFHE's internal parallelism while preserving benchmark-level OpenMP threads.
     OpenFHE's SetNumThreads(1) calls omp_set_num_threads(1) internally, which would
@@ -66,16 +64,18 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   omp_set_num_threads(savedThreads);  // Restore thread count for benchmark parallel regions
 #endif
 
-  /* Extract benchmark parameters: ring dimension and number of RNS towers */
+  /* Extract benchmark parameters: ring dimension, multiplicative depth, and batch size */
   const std::int64_t ringDim = state.range(0);
-  const std::int64_t numTowers = state.range(1);
+  const std::int64_t multDepth = state.range(1);
+  const std::int64_t numPolysArg = state.range(2);
+  const std::size_t nPolys = numPolysArg > 0 ? static_cast<std::size_t>(numPolysArg) : 1;
 
   /* 
     Construct cyclotomic parameters for the requested configuration.
     Cyclotomic order = 2 * ringDim for power-of-two rings; depth = numTowers RNS moduli.
   */
   const std::uint32_t cyclOrder = static_cast<std::uint32_t>(2 * ringDim);
-  const std::uint32_t depth = static_cast<std::uint32_t>(numTowers);
+  const std::uint32_t depth = static_cast<std::uint32_t>(multDepth);
   constexpr std::uint32_t bitsPerTower = 60;  // 60-bit moduli for each RNS tower
   params = std::make_shared<lbcrypto::ILDCRTParams<lbcrypto::BigInteger>>(cyclOrder, depth, bitsPerTower);
 
@@ -85,10 +85,10 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   */
   towerModuli.clear();
   towerMu.clear();
-  towerModuli.reserve(static_cast<std::size_t>(numTowers));
-  towerMu.reserve(static_cast<std::size_t>(numTowers));
+  towerModuli.reserve(static_cast<std::size_t>(multDepth));
+  towerMu.reserve(static_cast<std::size_t>(multDepth));
   const auto& nativeParams = params->GetParams();
-  for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers) && t < nativeParams.size(); ++t) {
+  for (std::size_t t = 0; t < static_cast<std::size_t>(multDepth) && t < nativeParams.size(); ++t) {
     const auto& q = nativeParams[t]->GetModulus();
     towerModuli.push_back(q);
     towerMu.push_back(q.ComputeMu());  // Pre-compute Barrett mu for ModMulFast
@@ -101,17 +101,12 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   lbcrypto::CCParams<lbcrypto::CryptoContextBFVRNS> ccParams;
   ccParams.SetSecurityLevel(lbcrypto::HEStd_NotSet);   // No security requirement for benchmarking
   ccParams.SetPlaintextModulus(65537);                  // Small plaintext space
-  ccParams.SetMultiplicativeDepth(1);                   // Minimal multiplicative depth
+  ccParams.SetMultiplicativeDepth(static_cast<uint32_t>(multDepth));
   ccParams.SetRingDim(static_cast<uint32_t>(ringDim));  // Match requested ring dimension
   cc = lbcrypto::GenCryptoContext(ccParams);
 
-  /* 
-    Calculate the number of polynomials needed to meet minimum 4 GiB working set size
-    across all three arrays (A, B, C). Each array has identical per-element size.
-  */
-  const std::uint64_t bytesPerPoly = static_cast<std::uint64_t>(DeepBytesPerPoly(ringDim, numTowers));
-  const std::uint64_t bytesPerIndexAllArrays = bytesPerPoly * 3ULL;  // Three arrays: A, B, C
-  const std::size_t nPolys = std::max<std::size_t>(1, CeilDivU64(kMinFootprintBytes, bytesPerIndexAllArrays));
+  /* Compute per-array footprint based on the user batch size. */
+  const std::uint64_t bytesPerPoly = static_cast<std::uint64_t>(DeepBytesPerPoly(ringDim, multDepth));
 
 
   /* 
@@ -120,15 +115,15 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   */
   const double totalFootprintGB = (bytesPerPoly * nPolys) / 1e9;
   static std::int64_t lastRingDim = -1;
-  static std::int64_t lastNumTowers = -1;
-  if (lastRingDim != ringDim || lastNumTowers != numTowers) {
+  static std::int64_t lastMultDepth = -1;
+  if (lastRingDim != ringDim || lastMultDepth != multDepth) {
     lastRingDim = ringDim;
-    lastNumTowers = numTowers;
+    lastMultDepth = multDepth;
     std::cout << "\n" << std::string(70, '=') << std::endl;
     std::cout << "  FHE-RaiderSTREAM Setup Configuration" << std::endl;
     std::cout << std::string(70, '=') << std::endl;
     std::cout << "  Ring Dimension:        " << ringDim << std::endl;
-    std::cout << "  Number of Towers:      " << numTowers << std::endl;
+    std::cout << "  Multiplicative Depth:  " << multDepth << std::endl;
     std::cout << "  Number of Polys:       " << nPolys << std::endl;
     std::cout << "  Per-Array Footprint:   " << std::fixed << std::setprecision(5) << totalFootprintGB << " GB" << std::endl;
     std::cout << "  Total Footprint (A+B+C): " << std::fixed << std::setprecision(5) << (3.0 * totalFootprintGB) << " GB" << std::endl;
@@ -163,17 +158,12 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   IDX.resize(nPolys);
   std::iota(IDX.begin(), IDX.end(), std::size_t{0});  // Fill with 0, 1, 2, ..., nPolys-1
   std::mt19937 rng(42);  // Fixed seed for reproducibility
-    if (mode == ShuffleMode::Poly) {
-      std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
-    }
-  // std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
+  std::shuffle(IDX.begin(), IDX.end(), rng);  // Randomized access pattern
 
   IDX_WRITE.resize(nPolys);
   std::iota(IDX_WRITE.begin(), IDX_WRITE.end(), std::size_t{0});  // Fill with 0, 1, 2, ..., nPolys-1
   std::mt19937 rng_write(99);  // Distinct seed for write-side shuffling
-    if (mode == ShuffleMode::Poly) {
-      std::shuffle(IDX_WRITE.begin(), IDX_WRITE.end(), rng_write);
-    }
+  std::shuffle(IDX_WRITE.begin(), IDX_WRITE.end(), rng_write);
 
   /*
     Initialize coefficient index vector for inner-loop gather.
@@ -183,16 +173,12 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   COEFF_IDX.resize(static_cast<std::size_t>(ringDim));
   std::iota(COEFF_IDX.begin(), COEFF_IDX.end(), std::size_t{0});  // 0, 1, 2, ..., ringDim-1
   std::mt19937 coeff_rng(43);  // Fixed seed for reproducibility
-    if (mode == ShuffleMode::Coeff) {
-      std::shuffle(COEFF_IDX.begin(), COEFF_IDX.end(), coeff_rng);  // Randomized access pattern
-    }
+  std::shuffle(COEFF_IDX.begin(), COEFF_IDX.end(), coeff_rng);  // Randomized access pattern
 
   COEFF_IDX_WRITE.resize(static_cast<std::size_t>(ringDim));
   std::iota(COEFF_IDX_WRITE.begin(), COEFF_IDX_WRITE.end(), std::size_t{0});  // 0, 1, 2, ..., ringDim-1
   std::mt19937 coeff_rng_write(99);  // Distinct seed for write-side shuffling
-    if (mode == ShuffleMode::Coeff) {
-      std::shuffle(COEFF_IDX_WRITE.begin(), COEFF_IDX_WRITE.end(), coeff_rng_write);
-    }
+  std::shuffle(COEFF_IDX_WRITE.begin(), COEFF_IDX_WRITE.end(), coeff_rng_write);
 }
 
 /*

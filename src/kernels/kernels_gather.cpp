@@ -13,25 +13,13 @@
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_COPY)(benchmark::State& state) {
-  const auto mode = static_cast<ShuffleMode>(state.range(2));
-  if (mode == ShuffleMode::Coeff) {
-    RunGatherCoeff(*this, state,
-                   [](auto& aTower, auto&, auto& cTower, const auto& idx,
-                      const auto&, const auto&, const auto&, std::size_t dim) {
-                     for (std::size_t j = 0; j < dim; ++j) {
-                       const std::size_t src_idx = idx[j];
-                       cTower[j] = aTower[src_idx];
-                     }
-                   });
-  } else {
-    RunGatherPoly(*this, state,
-                  [](auto&, auto& rndA, auto&, auto&, auto& seqC, auto&,
-                     const auto&, const auto&, const auto&, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      seqC[j] = rndA[j];
-                    }
-                  });
-  }
+  RunGatherPoly(*this, state,
+                [](auto&, auto& rndA, auto&, auto&, auto& seqC, auto&,
+                   const auto&, const auto&, const auto&, std::size_t dim) {
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    seqC[j] = rndA[j];
+                  }
+                });
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -47,25 +35,13 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_COPY)(benchmark::State& state) {
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_SCALE)(benchmark::State& state) {
-  const auto mode = static_cast<ShuffleMode>(state.range(2));
-  if (mode == ShuffleMode::Coeff) {
-    RunGatherCoeff(*this, state,
-                   [](auto&, auto& bTower, auto& cTower, const auto& idx,
-                      const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                     for (std::size_t j = 0; j < dim; ++j) {
-                       const std::size_t src_idx = idx[j];
-                       bTower[j] = cTower[src_idx].ModMulFast(sc, mod, mu);
-                     }
-                   });
-  } else {
-    RunGatherPoly(*this, state,
-                  [](auto&, auto&, auto& seqB, auto&, auto&, auto& rndC,
-                     const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      seqB[j] = rndC[j].ModMulFast(sc, mod, mu);
-                    }
-                  });
-  }
+  RunGatherPoly(*this, state,
+                [](auto&, auto&, auto& seqB, auto&, auto&, auto& rndC,
+                   const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    seqB[j] = rndC[j].ModMulFast(sc, mod, mu);
+                  }
+                });
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -81,25 +57,13 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_SCALE)(benchmark::State& state) {
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_ADD)(benchmark::State& state) {
-  const auto mode = static_cast<ShuffleMode>(state.range(2));
-  if (mode == ShuffleMode::Coeff) {
-    RunGatherCoeff(*this, state,
-                   [](auto& aTower, auto& bTower, auto& cTower, const auto& idx,
-                      const auto& mod, const auto&, const auto&, std::size_t dim) {
-                     for (std::size_t j = 0; j < dim; ++j) {
-                       const std::size_t src_idx = idx[j];
-                       cTower[j] = aTower[src_idx].ModAddFast(bTower[src_idx], mod);
-                     }
-                   });
-  } else {
-    RunGatherPoly(*this, state,
-                  [](auto&, auto& rndA, auto&, auto& rndB, auto& seqC, auto&,
-                     const auto& mod, const auto&, const auto&, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      seqC[j] = rndA[j].ModAddFast(rndB[j], mod);
-                    }
-                  });
-  }
+  RunGatherPoly(*this, state,
+                [](auto&, auto& rndA, auto&, auto& rndB, auto& seqC, auto&,
+                   const auto& mod, const auto&, const auto&, std::size_t dim) {
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    seqC[j] = rndA[j].ModAddFast(rndB[j], mod);
+                  }
+                });
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -115,27 +79,14 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_ADD)(benchmark::State& state) {
   Uses the same "anchor" method as sequential kernels to prevent DCE.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_TRIAD)(benchmark::State& state) {
-  const auto mode = static_cast<ShuffleMode>(state.range(2));
-  if (mode == ShuffleMode::Coeff) {
-    RunGatherCoeff(*this, state,
-                   [](auto& aTower, auto& bTower, auto& cTower, const auto& idx,
-                      const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                     for (std::size_t j = 0; j < dim; ++j) {
-                       const std::size_t src_idx = idx[j];
-                       const auto scaled = cTower[src_idx].ModMulFast(sc, mod, mu);
-                       aTower[j] = bTower[src_idx].ModAddFast(scaled, mod);
-                     }
-                   });
-  } else {
-    RunGatherPoly(*this, state,
-                  [](auto& seqA, auto&, auto&, auto& rndB, auto&, auto& rndC,
-                     const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
-                    for (std::size_t j = 0; j < dim; ++j) {
-                      const auto scaled = rndC[j].ModMulFast(sc, mod, mu);
-                      seqA[j] = rndB[j].ModAddFast(scaled, mod);
-                    }
-                  });
-  }
+  RunGatherPoly(*this, state,
+                [](auto& seqA, auto&, auto&, auto& rndB, auto&, auto& rndC,
+                   const auto& mod, const auto& mu, const auto& sc, std::size_t dim) {
+                  for (std::size_t j = 0; j < dim; ++j) {
+                    const auto scaled = rndC[j].ModMulFast(sc, mod, mu);
+                    seqA[j] = rndB[j].ModAddFast(scaled, mod);
+                  }
+                });
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -146,15 +97,17 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_TRIAD)(benchmark::State& state) {
   state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
 }
 
-
-
-/* Register the gather kernel with all FHE parameter sets */
+/* Register the gather kernels with all parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_COPY)
-    ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_SCALE)
-  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_ADD)
-  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_TRIAD)
-  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None, ShuffleMode::Poly, ShuffleMode::Coeff}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
 

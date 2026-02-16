@@ -11,7 +11,10 @@
 
 #include <benchmark/benchmark.h>
 
+#include <cstdlib>
+#include <cerrno>
 #include <initializer_list>
+#include <string>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -21,21 +24,7 @@
 extern int RS_Execution_Threads;
 
 inline void SetLabel(benchmark::State& state) {
-  const auto mode = static_cast<ShuffleMode>(state.range(2));
-  switch (mode) {
-    case ShuffleMode::None:
-      state.SetLabel("Mode: Sequential");
-      break;
-    case ShuffleMode::Poly:
-      state.SetLabel("Mode: Poly Shuffle");
-      break;
-    case ShuffleMode::Coeff:
-      state.SetLabel("Mode: Coeff Shuffle");
-      break;
-    default:
-      state.SetLabel("Mode: Unknown");
-      break;
-  }
+  state.SetLabel("Batch: " + std::to_string(state.range(2)));
 }
 
 inline std::int64_t DeepBytesPerPoly(std::int64_t ringDim, std::int64_t numTowers) {
@@ -51,6 +40,26 @@ inline void SchemeArgs(benchmark::internal::Benchmark* b, std::initializer_list<
   }
   for (const auto mode : modes) {
     b->Args({1 << 11, 2, static_cast<int>(mode)});
+  }
+}
+
+inline void CustomArguments(benchmark::internal::Benchmark* b) {
+  const std::vector<std::int64_t> ringDims = {32768, 65536};
+  const std::vector<std::int64_t> multDepths = {1, 5, 20, 40};
+  std::int64_t batchSize = 100;
+  if (const char* env = std::getenv("RS_BATCH_SIZE")) {
+    errno = 0;
+    char* end = nullptr;
+    const long long parsed = std::strtoll(env, &end, 10);
+    if (errno == 0 && end != env && parsed > 0) {
+      batchSize = static_cast<std::int64_t>(parsed);
+    }
+  }
+
+  for (const auto ringDim : ringDims) {
+    for (const auto depth : multDepths) {
+      b->Args({ringDim, depth, batchSize});
+    }
   }
 }
 

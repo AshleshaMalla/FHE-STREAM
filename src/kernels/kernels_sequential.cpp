@@ -92,12 +92,17 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {
   state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
 }
 
-/* Register each benchmark kernel with all FHE parameter sets */
+/* Register each benchmark kernel with all parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_COPY)
-  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_SCALE)
-  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_ADD)
-  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_TRIAD)
-  ->Apply([](benchmark::internal::Benchmark* b) { SchemeArgs(b, {ShuffleMode::None}); });
+  ->Apply(CustomArguments)
+  ->Unit(benchmark::kMillisecond);
+
