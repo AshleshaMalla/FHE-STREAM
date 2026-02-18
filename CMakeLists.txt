@@ -61,6 +61,7 @@ add_executable(fhe_raiderstream
   src/kernels/kernels_gather.cpp
   src/kernels/kernels_scatter.cpp
   src/kernels/kernels_scatter_gather.cpp
+  src/kernels/kernels_ntt.cpp
 )
 
 # ---- Includes ----

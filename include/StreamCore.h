@@ -278,3 +278,30 @@ inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state
     benchmark::ClobberMemory();
   }
 }
+
+/*
+  RunNTT: Number Theoretic Transform Round-Trip Benchmark
+  
+  Performs a round-trip format conversion (Coefficient -> Evaluation -> Coefficient)
+  on all polynomials to benchmark NTT and inverse NTT performance.
+  This pattern forces computation of both forward and inverse transforms.
+  
+  Parameters:
+  - self: FHERaiderSTREAM fixture containing polynomial arrays A, B, C
+  - state: Google Benchmark state object for measuring iterations and time
+*/
+inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state) {
+  SetLabel(state);
+  const std::size_t nPolys = self.A.size();
+
+  for (auto _ : state) {
+#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
+    for (std::size_t i = 0; i < nPolys; ++i) {
+      /* Inverse Transform: Coefficient format */
+      self.A[i].SetFormat(Format::COEFFICIENT);
+      /* Forward Transform: Evaluation format */
+      self.A[i].SetFormat(Format::EVALUATION);
+    }
+    benchmark::ClobberMemory();
+  }
+}
