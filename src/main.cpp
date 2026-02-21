@@ -17,6 +17,8 @@
 
 // Global variable used by StreamCore.h for threading
 int RS_Execution_Threads = 1;
+// Global toggle used by fixture.cpp for optional setup configuration printing
+bool RS_PrintSetupConfig = false;
 
 void PrintBanner() {
   std::cout << R"(
@@ -105,6 +107,11 @@ void PrintHelp() {
    --benchmark_report_aggregates_only=true : Less verbose output
    --benchmark_format=<console|json|csv>   : Output format
 
+------------------------------------------------------------------------------
+ 5. FHE-RAIDERSTREAM CUSTOM OPTIONS
+------------------------------------------------------------------------------
+  --rs_print_setup             : Print setup configuration in fixture SetUp
+
 ==============================================================================
 )" << std::endl;
 }
@@ -113,14 +120,26 @@ void PrintHelp() {
 int main(int argc, char** argv) {
   PrintBanner();
 
-  // Check for help flag before passing control to Google Benchmark
+  // Process custom flags and check for help before passing control to Google Benchmark
+  std::vector<char*> filteredArgv;
+  filteredArgv.reserve(static_cast<std::size_t>(argc));
+  filteredArgv.push_back(argv[0]);
+
   for (int i = 1; i < argc; ++i) {
     std::string arg = argv[i];
     if (arg == "-h" || arg == "--help") {
       PrintHelp();
       return 0;
     }
+    if (arg == "--rs_print_setup" || arg == "--rs-print-setup") {
+      RS_PrintSetupConfig = true;
+      continue;
+    }
+    filteredArgv.push_back(argv[i]);
   }
+
+  argc = static_cast<int>(filteredArgv.size());
+  argv = filteredArgv.data();
 
 #ifdef _OPENMP
   RS_Execution_Threads = omp_get_max_threads();

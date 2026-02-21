@@ -11,8 +11,11 @@
 #include <algorithm>
 #include <cstdint>
 #include <iomanip>
+#include <iostream>
 #include <numeric>
 #include <random>
+#include <set>
+#include <tuple>
 
 #ifdef __GLIBC__
 #include <malloc.h>
@@ -21,6 +24,9 @@
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+
+/* Global toggle for optional setup printing (defined in main.cpp) */
+extern bool RS_PrintSetupConfig;
 
 namespace {
 
@@ -108,26 +114,22 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   /* Compute per-array footprint based on the user batch size. */
   const std::uint64_t bytesPerPoly = static_cast<std::uint64_t>(DeepBytesPerPoly(ringDim, multDepth));
 
-
-  /* 
-    Print setup configuration once per unique parameter set.
-    Uses static variables to avoid redundant output across benchmark iterations.
-  */
-  const double totalFootprintGB = (bytesPerPoly * nPolys) / 1e9;
-  static std::int64_t lastRingDim = -1;
-  static std::int64_t lastMultDepth = -1;
-  if (lastRingDim != ringDim || lastMultDepth != multDepth) {
-    lastRingDim = ringDim;
-    lastMultDepth = multDepth;
-    std::cout << "\n" << std::string(70, '=') << std::endl;
-    std::cout << "  FHE-RaiderSTREAM Setup Configuration" << std::endl;
-    std::cout << std::string(70, '=') << std::endl;
-    std::cout << "  Ring Dimension:        " << ringDim << std::endl;
-    std::cout << "  Multiplicative Depth:  " << multDepth << std::endl;
-    std::cout << "  Number of Polys:       " << nPolys << std::endl;
-    std::cout << "  Per-Array Footprint:   " << std::fixed << std::setprecision(5) << totalFootprintGB << " GB" << std::endl;
-    std::cout << "  Total Footprint (A+B+C): " << std::fixed << std::setprecision(5) << (3.0 * totalFootprintGB) << " GB" << std::endl;
-    std::cout << std::string(70, '=') << "\n" << std::endl;
+  if (RS_PrintSetupConfig) {
+    static std::set<std::tuple<std::int64_t, std::int64_t, std::size_t>> printedConfigs;
+    const auto configKey = std::make_tuple(ringDim, multDepth, nPolys);
+    const bool shouldPrint = printedConfigs.insert(configKey).second;
+    if (shouldPrint) {
+      const double totalFootprintGB = (bytesPerPoly * nPolys) / 1e9;
+      std::cout << "\n" << std::string(70, '=') << std::endl;
+      std::cout << "  FHE-RaiderSTREAM Setup Configuration" << std::endl;
+      std::cout << std::string(70, '=') << std::endl;
+      std::cout << "  Ring Dimension:        " << ringDim << std::endl;
+      std::cout << "  Multiplicative Depth:  " << multDepth << std::endl;
+      std::cout << "  Number of Polys:       " << nPolys << std::endl;
+      std::cout << "  Per-Array Footprint:   " << std::fixed << std::setprecision(5) << totalFootprintGB << " GB" << std::endl;
+      std::cout << "  Total Footprint (A+B+C): " << std::fixed << std::setprecision(5) << (3.0 * totalFootprintGB) << " GB" << std::endl;
+      std::cout << std::string(70, '=') << "\n" << std::endl;
+    }
   }
 
   /* Allocate polynomial vectors */

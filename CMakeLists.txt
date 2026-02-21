@@ -5,6 +5,10 @@ project(FHE_RaiderSTREAM LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(NOT CMAKE_CONFIGURATION_TYPES AND NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
 # Option to link against OpenFHE static libraries if needed.
 option(BUILD_STATIC "Set to ON to use OpenFHE static libraries" OFF)
 
