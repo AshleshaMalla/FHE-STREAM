@@ -11,6 +11,8 @@ endif()
 
 # Option to link against OpenFHE static libraries if needed.
 option(BUILD_STATIC "Set to ON to use OpenFHE static libraries" OFF)
+option(ENABLE_DCRT "Build the DCRTPoly backend" ON)
+option(ENABLE_CIPHERTEXT "Build the Ciphertext backend" OFF)
 
 # ---- OpenFHE ----
 find_package(OpenFHE CONFIG REQUIRED)
@@ -60,13 +62,34 @@ endif()
 
 add_executable(fhe_raiderstream
   src/main.cpp
-  src/fixture.cpp
-  src/kernels/kernels_sequential.cpp
-  src/kernels/kernels_gather.cpp
-  src/kernels/kernels_scatter.cpp
-  src/kernels/kernels_scatter_gather.cpp
-  src/kernels/kernels_ntt.cpp
+  src/common/BenchmarkUtils.cpp
 )
+
+if(ENABLE_DCRT)
+  target_sources(fhe_raiderstream PRIVATE
+    src/backends/dcrt/DCRTFixture.cpp
+    src/backends/dcrt/kernels_sequential.cpp
+    src/backends/dcrt/kernels_gather.cpp
+    src/backends/dcrt/kernels_scatter.cpp
+    src/backends/dcrt/kernels_scatter_gather.cpp
+    src/backends/dcrt/kernels_ntt.cpp
+  )
+  target_compile_definitions(fhe_raiderstream PRIVATE RAIDERSTREAM_DCRT)
+  message(STATUS "DCRT backend enabled")
+endif()
+
+if(ENABLE_CIPHERTEXT)
+  target_sources(fhe_raiderstream PRIVATE
+    src/backends/ciphertext/CTFixture.cpp
+    src/backends/ciphertext/kernels_ct.cpp
+  )
+  target_compile_definitions(fhe_raiderstream PRIVATE RAIDERSTREAM_CIPHERTEXT)
+  message(STATUS "Ciphertext backend enabled")
+endif()
+
+if(NOT ENABLE_DCRT AND NOT ENABLE_CIPHERTEXT)
+  message(WARNING "No backend enabled. Enable at least one backend (ENABLE_DCRT or ENABLE_CIPHERTEXT).")
+endif()
 
 # ---- Includes ----
 target_include_directories(fhe_raiderstream
@@ -120,12 +143,6 @@ else()
 endif()
 
 target_link_libraries(fhe_raiderstream PRIVATE benchmark::benchmark OpenMP::OpenMP_CXX)
-
-# Ensure OpenMP compiler and linker flags are applied
-if(OpenMP_CXX_FLAGS)
-  target_compile_options(fhe_raiderstream PRIVATE ${OpenMP_CXX_FLAGS})
-  target_link_options(fhe_raiderstream PRIVATE ${OpenMP_CXX_FLAGS})
-endif()
 
 # Ensure OpenMP compiler and linker flags are applied
 if(OpenMP_CXX_FLAGS)

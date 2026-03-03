@@ -6,7 +6,7 @@
   a round-trip pattern (Coefficient -> Evaluation -> Coefficient).
 */
 
-#include "StreamCore.h"
+#include "backends/dcrt/StreamCore.h"
 
 /* Global thread count for benchmarks */
 extern int RS_Execution_Threads;
@@ -34,5 +34,5 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_NTT_ROUNDTRIP)(benchmark::State& state) {
 
 /* Register the NTT benchmark kernel with all parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_NTT_ROUNDTRIP)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);

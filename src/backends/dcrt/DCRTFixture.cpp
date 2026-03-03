@@ -6,7 +6,7 @@
   and resource cleanup between benchmark iterations.
 */
 
-#include "FHERaiderSTREAM.h"
+#include "backends/dcrt/DCRTFixture.h"
 
 #include <algorithm>
 #include <cstdint>

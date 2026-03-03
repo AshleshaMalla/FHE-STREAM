@@ -1,17 +1,11 @@
 /*
-  FHE-RaiderSTREAM Benchmark: Gather Kernel Implementations (Phase 2)
-
-  Implements irregular-access benchmark kernels where the read pattern is
-  randomized using an index vector (IDX) or coefficient index (COEFF_IDX).
-  The write pattern remains sequential.
+  FHE-RaiderSTREAM Benchmark: Gather Kernel Implementations
 */
 
-#include "StreamCore.h"
+#include "backends/dcrt/DCRTFixture.h"
+#include "backends/dcrt/StreamCore.h"
+#include "common/BenchmarkUtils.h"
 
-/*
-  GATHER COPY kernel: C[i] = A[IDX[i]] for all polynomials.
-  Uses the same "anchor" method as sequential kernels to prevent DCE.
-*/
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_COPY)(benchmark::State& state) {
   RunGatherPoly(*this, state,
                 [](auto&, auto& rndA, auto&, auto&, auto& seqC, auto&,
@@ -24,16 +18,10 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_COPY)(benchmark::State& state) {
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
-
-  /* Report aggregate bytes read/written: 2 arrays (A and C) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 2;
   state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
 }
 
-/*
-  GATHER SCALE kernel: B[i] = scalar * C[IDX[i]] for all polynomials.
-  Uses the same "anchor" method as sequential kernels to prevent DCE.
-*/
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_SCALE)(benchmark::State& state) {
   RunGatherPoly(*this, state,
                 [](auto&, auto&, auto& seqB, auto&, auto&, auto& rndC,
@@ -46,16 +34,10 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_SCALE)(benchmark::State& state) {
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = C.size();
-
-  /* Report aggregate bytes read/written: 2 arrays (C and B) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 2;
   state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
 }
 
-/*
-  GATHER ADD kernel: C[i] = A[IDX[i]] + B[IDX[i]] for all polynomials.
-  Uses the same "anchor" method as sequential kernels to prevent DCE.
-*/
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_ADD)(benchmark::State& state) {
   RunGatherPoly(*this, state,
                 [](auto&, auto& rndA, auto&, auto& rndB, auto& seqC, auto&,
@@ -68,16 +50,10 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_ADD)(benchmark::State& state) {
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
-
-  /* Report aggregate bytes read/written: 3 arrays (A, B, C) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 3;
   state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
 }
 
-/*
-  GATHER TRIAD kernel: A[i] = B[IDX[i]] + scalar * C[IDX[i]] for all polynomials.
-  Uses the same "anchor" method as sequential kernels to prevent DCE.
-*/
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_TRIAD)(benchmark::State& state) {
   RunGatherPoly(*this, state,
                 [](auto& seqA, auto&, auto&, auto& rndB, auto&, auto& rndC,
@@ -91,23 +67,19 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_TRIAD)(benchmark::State& state) {
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
-
-  /* Report aggregate bytes read/written: 3 arrays (A, B, C) * data size */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 3;
   state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
 }
 
-/* Register the gather kernels with all parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_COPY)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_SCALE)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_ADD)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_TRIAD)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
-

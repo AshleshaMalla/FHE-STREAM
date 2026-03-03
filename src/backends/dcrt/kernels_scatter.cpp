@@ -6,7 +6,7 @@
   The read pattern remains sequential.
 */
 
-#include "StreamCore.h"
+#include "backends/dcrt/StreamCore.h"
 
 /*
   SCATTER COPY kernel: C[IDX[i]] = A[i] for all polynomials.
@@ -95,15 +95,14 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_TRIAD)(benchmark::State& state) {
 
 /* Register the scatter kernels with all parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_COPY)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_SCALE)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_ADD)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_TRIAD)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
-

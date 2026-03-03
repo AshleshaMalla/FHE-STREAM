@@ -5,7 +5,7 @@
   patterns are randomized using index vectors (IDX or COEFF_IDX).
 */
 
-#include "StreamCore.h"
+#include "backends/dcrt/StreamCore.h"
 
 /*
   SCATTER-GATHER COPY kernel: C[IDX[i]] = A[IDX[i]] for all polynomials.
@@ -94,15 +94,14 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_GATHER_TRIAD)(benchmark::State& s
 
 /* Register the scatter-gather kernels with all parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_GATHER_COPY)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_GATHER_SCALE)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_GATHER_ADD)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_GATHER_TRIAD)
-  ->Apply(CustomArguments)
+  ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
-
