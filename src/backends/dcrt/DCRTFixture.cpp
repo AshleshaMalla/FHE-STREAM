@@ -139,7 +139,7 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   }
 
 #ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
+  RS_BARRIER();
 #endif
 
   /* Allocate polynomial vectors */
@@ -199,7 +199,7 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
 */
 void FHERaiderSTREAM::TearDown(const benchmark::State&) {
 #ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
+  RS_BARRIER();
 #endif
   /* Release OpenFHE objects */
   cc.reset();

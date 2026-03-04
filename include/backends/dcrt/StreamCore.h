@@ -25,10 +25,10 @@
 #include <mpi.h>
 #endif
 
+#include "common/MPIUtils.h"
+
 /* Global thread count for benchmarks */
 extern int RS_Execution_Threads;
-extern int RS_MPI_Rank;
-extern int RS_MPI_Size;
 
 inline void SetLabel(benchmark::State& state) {
   state.SetLabel("Batch: " + std::to_string(state.range(2)));
@@ -58,9 +58,7 @@ inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, int64_
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -82,17 +80,7 @@ inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, int64_
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  // Aggregate processed bytes across all ranks to compute total bandwidth
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
@@ -103,9 +91,7 @@ inline void RunGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, int64_
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -134,16 +120,7 @@ inline void RunGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, int64_
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
@@ -154,9 +131,7 @@ inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -178,16 +153,7 @@ inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
@@ -198,9 +164,7 @@ inline void RunScatterPoly(FHERaiderSTREAM& self, benchmark::State& state, int64
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -229,16 +193,7 @@ inline void RunScatterPoly(FHERaiderSTREAM& self, benchmark::State& state, int64
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
@@ -249,9 +204,7 @@ inline void RunScatterCoeff(FHERaiderSTREAM& self, benchmark::State& state, int6
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -273,16 +226,7 @@ inline void RunScatterCoeff(FHERaiderSTREAM& self, benchmark::State& state, int6
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
@@ -293,9 +237,7 @@ inline void RunScatterGatherPoly(FHERaiderSTREAM& self, benchmark::State& state,
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -319,16 +261,7 @@ inline void RunScatterGatherPoly(FHERaiderSTREAM& self, benchmark::State& state,
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
@@ -339,9 +272,7 @@ inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -367,16 +298,7 @@ inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }
 
 /*
@@ -394,9 +316,7 @@ inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytes
   SetLabel(state);
   const std::size_t nPolys = self.A.size();
 
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-#endif
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -410,15 +330,5 @@ inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytes
   }
 
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-
-#ifdef RAIDERSTREAM_MPI
-  MPI_Barrier(MPI_COMM_WORLD);
-  // NTT reports bytes_processed based on 2*size (fwd + inv)
-  double local_bytes = static_cast<double>(state.bytes_processed());
-  double total_bytes = 0;
-  MPI_Reduce(&local_bytes, &total_bytes, 1, MPI_DOUBLE, MPI_SUM, 0, MPI_COMM_WORLD);
-  if (RS_MPI_Rank == 0) {
-    state.counters["AggregateBandwidth"] = benchmark::Counter(total_bytes, benchmark::Counter::kIsRate);
-  }
-#endif
+  AggregateBandwidth(state);
 }

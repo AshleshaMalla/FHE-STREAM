@@ -15,11 +15,9 @@
 #include <vector>
 
 #include "openfhe.h"
+#include "common/MPIUtils.h"
 
 enum class ShuffleMode { None = 0, Poly = 1, Coeff = 2 };
-
-extern int RS_MPI_Rank;
-extern int RS_MPI_Size;
 
 /*
   FHERaiderSTREAM Benchmark Fixture
