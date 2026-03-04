@@ -25,6 +25,10 @@
 #include <omp.h>
 #endif
 
+#ifdef RAIDERSTREAM_MPI
+#include <mpi.h>
+#endif
+
 /* Global toggle for optional setup printing (defined in main.cpp) */
 extern bool RS_PrintSetupConfig;
 
@@ -114,23 +118,29 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   /* Compute per-array footprint based on the user batch size. */
   const std::uint64_t bytesPerPoly = static_cast<std::uint64_t>(DeepBytesPerPoly(ringDim, multDepth));
 
-  if (RS_PrintSetupConfig) {
+  if (RS_PrintSetupConfig && RS_MPI_Rank == 0) {
     static std::set<std::tuple<std::int64_t, std::int64_t, std::size_t>> printedConfigs;
     const auto configKey = std::make_tuple(ringDim, multDepth, nPolys);
     const bool shouldPrint = printedConfigs.insert(configKey).second;
     if (shouldPrint) {
       const double totalFootprintGB = (bytesPerPoly * nPolys) / 1e9;
       std::cout << "\n" << std::string(70, '=') << std::endl;
-      std::cout << "  FHE-RaiderSTREAM Setup Configuration" << std::endl;
+      std::cout << "  FHE-RaiderSTREAM Setup Configuration (Per-Rank)" << std::endl;
       std::cout << std::string(70, '=') << std::endl;
+      std::cout << "  MPI Ranks:             " << RS_MPI_Size << std::endl;
       std::cout << "  Ring Dimension:        " << ringDim << std::endl;
       std::cout << "  Multiplicative Depth:  " << multDepth << std::endl;
       std::cout << "  Number of Polys:       " << nPolys << std::endl;
       std::cout << "  Per-Array Footprint:   " << std::fixed << std::setprecision(5) << totalFootprintGB << " GB" << std::endl;
       std::cout << "  Total Footprint (A+B+C): " << std::fixed << std::setprecision(5) << (3.0 * totalFootprintGB) << " GB" << std::endl;
+      std::cout << "  Aggregate Footprint:   " << std::fixed << std::setprecision(5) << (3.0 * totalFootprintGB * RS_MPI_Size) << " GB" << std::endl;
       std::cout << std::string(70, '=') << "\n" << std::endl;
     }
   }
+
+#ifdef RAIDERSTREAM_MPI
+  RS_BARRIER();
+#endif
 
   /* Allocate polynomial vectors */
   A.resize(nPolys);
@@ -188,6 +198,9 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   Called after each benchmark iteration to clean up the working set.
 */
 void FHERaiderSTREAM::TearDown(const benchmark::State&) {
+#ifdef RAIDERSTREAM_MPI
+  RS_BARRIER();
+#endif
   /* Release OpenFHE objects */
   cc.reset();
   params.reset();

@@ -65,6 +65,19 @@ add_executable(fhe_raiderstream
   src/common/BenchmarkUtils.cpp
 )
 
+# ---- MPI (Optional) ----
+option(ENABLE_MPI "Build with MPI support" ON)
+if(ENABLE_MPI)
+  find_package(MPI QUIET)
+  if(MPI_CXX_FOUND)
+    message(STATUS "MPI found: ${MPI_CXX_LIBRARIES}")
+    target_compile_definitions(fhe_raiderstream PRIVATE RAIDERSTREAM_MPI)
+    target_link_libraries(fhe_raiderstream PRIVATE MPI::MPI_CXX)
+  else()
+    message(STATUS "MPI not found. Distributed benchmarking disabled.")
+  endif()
+endif()
+
 if(ENABLE_DCRT)
   target_sources(fhe_raiderstream PRIVATE
     src/backends/dcrt/DCRTFixture.cpp

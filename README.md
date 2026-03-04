@@ -12,6 +12,7 @@ Standalone C++ benchmark that approximates **sustainable memory bandwidth** for 
 - OpenFHE (built + installed with CMake package config)
 - Google Benchmark
 - OpenMP (optional, used if found)
+- MPI (optional, e.g., OpenMPI or MPICH, for distributed benchmarking)
 
 ## Build
 
@@ -21,13 +22,20 @@ cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
-If Google Benchmark is not installed on your system, CMake will fetch and build it automatically.
+If Google Benchmark is not installed on your system, CMake will fetch and build it automatically. Use `-DENABLE_MPI=ON/OFF` to explicitly control MPI support (detected automatically if found).
 
 ## Run
 
+### Local Execution
 ```bash
 ./build/fhe_raiderstream --benchmark_min_time=1
 ```
+
+### Distributed Execution (MPI)
+```bash
+mpirun -n <num_ranks> ./build/fhe_raiderstream --benchmark_min_time=1
+```
+Distributed runs report an `AggregateBandwidth` counter representing the total throughput across all ranks.
 
 Useful options:
 

@@ -10,116 +10,37 @@
 PROJECT ROOT
 │
 ├─ CMakeLists.txt ⚙️  [Build Configuration]
-│  └─ Sources: main.cpp, fixture.cpp,
-│              kernels_sequential.cpp, kernels_gather.cpp,
-│              kernels_scatter.cpp, kernels_scatter_gather.cpp
-│  └─ Finds: OpenFHE, OpenMP, Google Benchmark
+│  └─ Sources: main.cpp, fixture.cpp, kernels_*.cpp
+│  └─ Finds: OpenFHE, OpenMP, Google Benchmark, MPI (Optional)
 │  └─ Links: All dependencies together
+│
+├─ include/
+│  ├─ common/
+│  │  ├─ BenchmarkUtils.h  [Parameter management]
+│  │  └─ MPIUtils.h 🌐     [RS_BARRIER & Aggregation helpers]
 │
 ├─ src/ [Source Code]
 │  │
-│  ├─ FHERaiderSTREAM.h 📋 [The Blueprint]
-│  │  ├─ Class definition: FHERaiderSTREAM : public benchmark::Fixture
-│  │  ├─ Members: A, B, C (DCRTPoly arrays)
-│  │  ├─ Members: IDX, IDX_WRITE (read/write poly indices)
-│  │  ├─ Members: COEFF_IDX, COEFF_IDX_WRITE (read/write coeff indices)
-│  │  ├─ Members: towerModuli, towerMu (precomputed values)
-│  │  ├─ Member: scalar = 3
-│  │  ├─ Member: cc (CryptoContext)
-│  │  ├─ Member: params (RNS parameters)
-│  │  ├─ Method: SetUp(const benchmark::State&) override
-│  │  └─ Method: TearDown(const benchmark::State&) override
-│  │  Lines: ~55
-│  │
-│  ├─ fixture.cpp 🔧 [The Engine]
-│  │  ├─ Implements: SetUp()
-│  │  │  ├─ Thread management: save → SetNumThreads(1) → restore
-│  │  │  ├─ RNS parameter construction (cyclotomic order, 60-bit moduli)
-│  │  │  ├─ Barrett reduction precomputation
-│  │  │  ├─ CryptoContext creation
-│  │  │  ├─ Polynomial count calculation (4 GiB minimum)
-│  │  │  ├─ Configuration logging (once per unique parameters)
-│  │  │  └─ NUMA first-touch parallel initialization
-│  │  │      #pragma omp parallel for schedule(static)
-│  │  │      → A[i], B[i], C[i] initialized per-thread
-│  │  │
-│  │  ├─ Implements: TearDown()
-│  │  │  ├─ Release OpenFHE resources (cc, params)
-│  │  │  ├─ Clear precomputed constants (towerModuli, towerMu)
-│  │  │  ├─ Force memory deallocation via swap()
-│  │  │  └─ Return memory to OS (malloc_trim)
-│  │  │
-│  │  ├─ Helpers: CeilDivU64(), DeepBytesPerPoly()
-│  │  ├─ Constant: kMinFootprintBytes (4 GiB)
-│  │  └─ Lines: ~165
-│  │
-│  ├─ kernels_sequential.cpp 📊 [The Workloads]
-│  │  ├─ Kernel 1: RS_SEQ_COPY
-│  │  │  ├─ Operation: C[i] = A[i]
-│  │  │  ├─ Pattern: Binary (read, write)
-│  │  │  ├─ Bytes: 2 × data_size
-│  │  │  ├─ Threading: #pragma omp parallel for
-│  │  │  ├─ Optimization prevention: benchmark::DoNotOptimize(cTower)
-│  │  │  └─ Memory fence: benchmark::ClobberMemory()
-│  │  │
-│  │  ├─ Kernel 2: RS_SEQ_SCALE
-│  │  │  ├─ Operation: B[i] = scalar × C[i]
-│  │  │  ├─ Arithmetic: ModMulFast (fast modular multiplication)
-│  │  │  ├─ Bytes: 2 × data_size
-│  │  │  └─ (same threading & optimization prevention)
-│  │  │
-│  │  ├─ Kernel 3: RS_SEQ_ADD
-│  │  │  ├─ Operation: C[i] = A[i] + B[i]
-│  │  │  ├─ Pattern: Ternary (read two, write one)
-│  │  │  ├─ Arithmetic: ModAddFast (fast modular addition)
-│  │  │  ├─ Bytes: 3 × data_size
-│  │  │  └─ (same threading & optimization prevention)
-│  │  │
-│  │  ├─ Kernel 4: RS_SEQ_TRIAD
-│  │  │  ├─ Operation: A[i] = B[i] + scalar × C[i]
-│  │  │  ├─ Pattern: Combined multiply + add (stream triad)
-│  │  │  ├─ Bytes: 3 × data_size
-│  │  │  └─ (same threading & optimization prevention)
-│  │  │
-│  │  ├─ Parameter Registration:
-│  │  │  ├─ SchemeArgs() function defines 3 FHE parameter sets
-│  │  │  ├─ CKKS:  ring_dim=2^16, towers=32
-│  │  │  ├─ BFV:   ring_dim=2^15, towers=16
-│  │  │  ├─ TFHE:  ring_dim=2^11, towers=2
-│  │  │  └─ BENCHMARK_REGISTER_F(...)->Apply(SchemeArgs) for each kernel
-│  │  │
-│  │  ├─ Helper: DeepBytesPerPoly()
-│  │  └─ Lines: ~220
-│  │
-│  ├─ kernels_gather.cpp 📊 [Gather Workloads]
-│  │  ├─ Kernels: RS_GATHER_COPY/SCALE/ADD/TRIAD
-│  │  ├─ Modes: Poly + Coeff (merged into primary kernel names)
-│  │  └─ Uses: RunGatherPoly / RunGatherCoeff
-│  │
-│  ├─ kernels_scatter.cpp 📊 [Scatter Workloads]
-│  │  ├─ Kernels: RS_SCATTER_COPY/SCALE/ADD/TRIAD
-│  │  ├─ Modes: Poly + Coeff (merged into primary kernel names)
-│  │  └─ Uses: RunScatterPoly / RunScatterCoeff
-│  │
-│  ├─ kernels_scatter_gather.cpp 📊 [Scatter-Gather Workloads]
-│  │  ├─ Kernels: RS_SCATTER_GATHER_COPY/SCALE/ADD/TRIAD
-│  │  ├─ Modes: Poly + Coeff (read/write indirection)
-│  │  └─ Uses: RunScatterGatherPoly / RunScatterGatherCoeff
-│  │
-│  ├─ StreamCore.h ⚙️ [Kernel Dispatchers]
-│  │  ├─ RunSequential / RunGatherPoly / RunGatherCoeff
-│  │  ├─ RunScatterPoly / RunScatterCoeff
-│  │  ├─ RunScatterGatherPoly / RunScatterGatherCoeff
-│  │  └─ Sets labels for ShuffleMode (Sequential/Poly/Coeff)
-│  │
 │  ├─ main.cpp 🚀 [The Control Room]
-│  │  ├─ Purpose: Framework entry point
-│  │  ├─ Content: Custom help + ASCII banner
-│  │  ├─ Behavior: Prints banner on every run
-│  │  └─ Lines: ~120
+│  │  ├─ Behavior: Rank-0 banner/help control
+│  │  └─ Behavior: MPI_Init/Finalize lifecycle
 │  │
-│  └─ FHERaiderSTREAM.cpp ⚠️ [DEPRECATED]
-│     └─ Original monolithic implementation (superseded by modular structure)
+│  ├─ backends/dcrt/
+│  │  ├─ DCRTFixture.cpp 🔧 [The Engine]
+│  │  │  ├─ Implements: SetUp() with RS_BARRIER
+│  │  │  └─ Implements: TearDown() with RS_BARRIER
+│  │  │
+│  │  └─ kernels_*.cpp 📊 [The Workloads]
+│  │      └─ Logic: Uses Run* dispatchers with AggregateBandwidth
+│  │
+│  └─ ...
+│
+├─ Documentation/ 📚
+│  ├─ PROJECT_STRUCTURE.md
+│  ├─ REFACTORING_REPORT.md
+│  ├─ DISTRIBUTED.md [NEW]
+│  └─ ...
+
 │
 ├─ Documentation/ 📚
 │  ├─ PROJECT_STRUCTURE.md

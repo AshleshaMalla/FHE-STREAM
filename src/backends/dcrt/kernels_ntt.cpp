@@ -22,14 +22,13 @@ extern int RS_Execution_Threads;
   providing a fair measure of NTT throughput on the target platform.
 */
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_NTT_ROUNDTRIP)(benchmark::State& state) {
-  RunNTT(*this, state);
-
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = A.size();
   /* Report aggregate bytes traversed by NTT: 1 array (A) * data size * 2 (round-trip) */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 2;
-  state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * bytesPerIter);
+
+  RunNTT(*this, state, bytesPerIter);
 }
 
 /* Register the NTT benchmark kernel with all parameter sets */
