@@ -1,42 +1,19 @@
 #!/bin/bash
-set -euo pipefail
+set -e  # Exit on error
 
 # FHE-RaiderSTREAM Build and Run Script
-# Usage: ./build.sh [--run] [--light] [--smoke] [--help]
+# Usage: ./build.sh [--run] [--light]
 #   --run   : Run benchmarks after building
-#   --light : Run only RS_SEQ COPY+SCALE (faster)
-#   --smoke : Run quick RS_SEQ + RS_GATHER COPY validation
-#   --help  : Print usage
-
-RUN_AFTER_BUILD=false
-LIGHT_RUN=false
-SMOKE_RUN=false
-
-for arg in "$@"; do
-    case "$arg" in
-        --run)
-            RUN_AFTER_BUILD=true
-            ;;
-        --light)
-            LIGHT_RUN=true
-            ;;
-        --smoke)
-            SMOKE_RUN=true
-            ;;
-        --help|-h)
-            echo "Usage: ./build.sh [--run] [--light] [--smoke] [--help]"
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $arg"
-            echo "Usage: ./build.sh [--run] [--light] [--smoke] [--help]"
-            exit 1
-            ;;
-    esac
-done
+#   --light : Run only COPY+SCALE (faster)
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$PROJECT_DIR"
+
+# Optional: Automatic activation if env/activate exists
+if [ -f "env/activate" ] && [ -z "$ENV_DIR" ]; then
+    echo "==> Automatically sourcing env/activate..."
+    source env/activate
+fi
 
 echo "==> Configuring CMake..."
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -46,14 +23,11 @@ cmake --build build -j
 
 echo "==> Build complete: build/fhe_raiderstream"
 
-# Run benchmarks if requested
-if [[ "$RUN_AFTER_BUILD" == true ]]; then
+# Check if --run flag is present
+if [[ "$*" == *"--run"* ]]; then
     echo ""
-    if [[ "$SMOKE_RUN" == true ]]; then
-        echo "==> Running smoke benchmarks (RS_SEQ_COPY + RS_GATHER_COPY)..."
-        RS_BATCH_SIZE="${RS_BATCH_SIZE:-4}" ./build/fhe_raiderstream --benchmark_filter='RS_(SEQ|GATHER)_COPY.*' --benchmark_min_time=0.02s --benchmark_repetitions=1
-    elif [[ "$LIGHT_RUN" == true ]]; then
-        echo "==> Running light benchmarks (RS_SEQ_COPY + RS_SEQ_SCALE)..."
+    if [[ "$*" == *"--light"* ]]; then
+        echo "==> Running COPY+SCALE benchmarks..."
         ./build/fhe_raiderstream --benchmark_filter='RS_SEQ_(COPY|SCALE).*' --benchmark_min_time=0.1s
     else
         echo "==> Running full Phase 1 suite (COPY/SCALE/ADD/TRIAD)..."

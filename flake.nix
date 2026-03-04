@@ -60,6 +60,7 @@
             openfhe
             gbenchmark
             openmp
+            pkgs.openmpi
           ];
 
           cmakeFlags = [
@@ -84,9 +85,11 @@
         devShells.default = pkgs.mkShell {
           buildInputs = [
             pkgs.cmake
+            pkgs.python315
             openfhe
             gbenchmark
             openmp
+            pkgs.openmpi
           ];
 
           shellHook = ''

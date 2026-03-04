@@ -15,12 +15,21 @@
 #include <omp.h>
 #endif
 
+#ifdef RAIDERSTREAM_MPI
+#include <mpi.h>
+#endif
+
 // Global variable used by StreamCore.h for threading
 int RS_Execution_Threads = 1;
 // Global toggle used by fixture.cpp for optional setup configuration printing
 bool RS_PrintSetupConfig = false;
 
+// MPI Globals
+int RS_MPI_Rank = 0;
+int RS_MPI_Size = 1;
+
 void PrintBanner() {
+  if (RS_MPI_Rank != 0) return;
   std::cout << R"(
                                                                                                                                     
  ▄▄▄▄▄▄▄ ▄▄▄   ▄▄▄  ▄▄▄▄▄▄▄       ▄▄▄▄▄▄▄                ▄▄              ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄    ▄▄▄▄▄▄▄   ▄▄▄▄   ▄▄▄      ▄▄▄ 
@@ -34,6 +43,7 @@ void PrintBanner() {
 }
 
 void PrintHelp() {
+  if (RS_MPI_Rank != 0) return;
   std::cout << R"(
 ==============================================================================
                 FHE-RaiderSTREAM Benchmark Suite
@@ -118,6 +128,12 @@ void PrintHelp() {
 
 
 int main(int argc, char** argv) {
+#ifdef RAIDERSTREAM_MPI
+  MPI_Init(&argc, &argv);
+  MPI_Comm_rank(MPI_COMM_WORLD, &RS_MPI_Rank);
+  MPI_Comm_size(MPI_COMM_WORLD, &RS_MPI_Size);
+#endif
+
   PrintBanner();
 
   // Process custom flags and check for help before passing control to Google Benchmark
@@ -129,6 +145,9 @@ int main(int argc, char** argv) {
     std::string arg = argv[i];
     if (arg == "-h" || arg == "--help") {
       PrintHelp();
+#ifdef RAIDERSTREAM_MPI
+      MPI_Finalize();
+#endif
       return 0;
     }
     if (arg == "--rs_print_setup" || arg == "--rs-print-setup") {
@@ -147,9 +166,16 @@ int main(int argc, char** argv) {
 
   ::benchmark::Initialize(&argc, argv);
   if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {
+#ifdef RAIDERSTREAM_MPI
+    MPI_Finalize();
+#endif
     return 1;
   }
   ::benchmark::RunSpecifiedBenchmarks();
   ::benchmark::Shutdown();
+
+#ifdef RAIDERSTREAM_MPI
+  MPI_Finalize();
+#endif
   return 0;
 }
