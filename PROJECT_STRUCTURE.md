@@ -193,6 +193,26 @@ add_executable(fhe_raiderstream
 
 ---
 
+### 9. **include/common/MPIUtils.h** — Distributed Helpers
+**Purpose:** Shared MPI synchronization and aggregation logic.
+
+**Contents:**
+- `RS_BARRIER()`: Centralized wrapper for `MPI_Barrier(MPI_COMM_WORLD)`.
+- `AggregateBandwidth(benchmark::State& state)`: Aggregates processed bytes from all ranks using `MPI_Reduce` and reports `AggregateBandwidth` at Rank 0.
+
+---
+
+## Distributed Benchmarking (MPI)
+
+The suite supports distributed execution to measure aggregate bandwidth across multiple processes (ranks).
+
+### Implementation Details:
+- **Synchronization**: `RS_BARRIER()` is called in `SetUp`, `TearDown`, and surrounding the kernel loop in each dispatcher to ensure timing accuracy across ranks.
+- **Aggregation**: Results are aggregated at the end of each kernel run. Each rank calculates its local `SetBytesProcessed`, and Rank 0 performs a reduction to compute the total cluster throughput.
+- **Conditional Compilation**: All MPI-specific code is wrapped in `#ifdef RAIDERSTREAM_MPI`, allowing the project to build without MPI dependencies if needed.
+
+---
+
 ## Design Principles
 
 ### 1. **Separation of Concerns**

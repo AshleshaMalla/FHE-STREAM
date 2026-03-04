@@ -21,6 +21,12 @@
 #include <omp.h>
 #endif
 
+#ifdef RAIDERSTREAM_MPI
+#include <mpi.h>
+#endif
+
+#include "common/MPIUtils.h"
+
 /* Global thread count for benchmarks */
 extern int RS_Execution_Threads;
 
@@ -45,12 +51,14 @@ inline void SchemeArgs(benchmark::internal::Benchmark* b, std::initializer_list<
 }
 
 template <typename Kernel>
-inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -70,15 +78,20 @@ inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, Kernel
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
-inline void RunGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+inline void RunGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -105,15 +118,20 @@ inline void RunGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, Kernel
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
-inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -133,15 +151,20 @@ inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, Kerne
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
-inline void RunScatterPoly(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+inline void RunScatterPoly(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -168,15 +191,20 @@ inline void RunScatterPoly(FHERaiderSTREAM& self, benchmark::State& state, Kerne
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
-inline void RunScatterCoeff(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+inline void RunScatterCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -196,15 +224,20 @@ inline void RunScatterCoeff(FHERaiderSTREAM& self, benchmark::State& state, Kern
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
-inline void RunScatterGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+inline void RunScatterGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -226,15 +259,20 @@ inline void RunScatterGatherPoly(FHERaiderSTREAM& self, benchmark::State& state,
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
 
 template <typename Kernel>
-inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, Kernel&& kernel) {
+inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
   const std::size_t nPolys = self.A.size();
   const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -258,6 +296,9 @@ inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
 
 /*
@@ -271,9 +312,11 @@ inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state
   - self: FHERaiderSTREAM fixture containing polynomial arrays A, B, C
   - state: Google Benchmark state object for measuring iterations and time
 */
-inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state) {
+inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter) {
   SetLabel(state);
   const std::size_t nPolys = self.A.size();
+
+  RS_BARRIER();
 
   for (auto _ : state) {
 #pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
@@ -285,4 +328,7 @@ inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state) {
     }
     benchmark::ClobberMemory();
   }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
 }
