@@ -332,3 +332,26 @@ inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytes
   state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
   AggregateBandwidth(state);
 }
+
+/*
+  RS_KEYSWITCH_MOCK: mock KeySwitch FMA-style kernel
+
+  Simulates streaming a large key tensor (B) against an L1-resident
+  ciphertext digit (C[0]) and accumulating into A.
+*/
+inline void RS_KEYSWITCH_MOCK(benchmark::State& state,
+                              std::vector<lbcrypto::DCRTPoly>& A,
+                              const std::vector<lbcrypto::DCRTPoly>& B,
+                              const std::vector<lbcrypto::DCRTPoly>& C) {
+  const std::size_t batchSize = A.size();
+  if (C.empty()) {
+    return;
+  }
+
+  for (auto _ : state) {
+#pragma omp parallel for schedule(static)
+    for (std::size_t i = 0; i < batchSize; ++i) {
+      A[i] = A[i] + B[i] * C[0];
+    }
+  }
+}

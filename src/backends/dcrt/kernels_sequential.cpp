@@ -63,6 +63,18 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {
                 });
 }
 
+BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_KEYSWITCH_MOCK)(benchmark::State& state) {
+  RS_KEYSWITCH_MOCK(state, A, B, C);
+
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::int64_t batchSize = state.range(2);
+  const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
+
+  // Reads: A + B, Writes: A (C[0] assumed cache-resident and excluded)
+  state.SetBytesProcessed(state.iterations() * batchSize * (3 * bytesPerPoly));
+}
+
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_COPY)
   ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
@@ -73,5 +85,8 @@ BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_ADD)
   ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_TRIAD)
+  ->Apply(RaiderSTREAM_Arguments)
+  ->Unit(benchmark::kMillisecond);
+BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_KEYSWITCH_MOCK)
   ->Apply(RaiderSTREAM_Arguments)
   ->Unit(benchmark::kMillisecond);
