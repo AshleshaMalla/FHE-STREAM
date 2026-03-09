@@ -52,9 +52,15 @@ void CTFixture::SetUp(const benchmark::State& state) {
 
   /* ---- CryptoContext creation ---- */
   CCParams<CryptoContextBFVRNS> parameters;
+  parameters.SetSecurityLevel(HEStd_NotSet);  // Benchmarking only — no security requirement
   parameters.SetMultiplicativeDepth(static_cast<uint32_t>(Depth));
   parameters.SetRingDim(static_cast<uint32_t>(RingDim));
-  parameters.SetPlaintextModulus(65537);
+  /*
+    Packed encoding requires (ptMod - 1) % (2 * RingDim) == 0.
+    65537 works for RingDim <= 32768; 786433 (= 3*2^18 + 1, prime) works for all.
+  */
+  const PlaintextModulus ptMod = (RingDim <= 32768) ? 65537 : 786433;
+  parameters.SetPlaintextModulus(ptMod);
   cc = GenCryptoContext(parameters);
 
   /* Enable required features */
@@ -92,6 +98,7 @@ void CTFixture::SetUp(const benchmark::State& state) {
   ct_A.resize(batchSz);
   ct_B.resize(batchSz);
   ct_C.resize(batchSz);
+  ct_A_deg2.resize(batchSz);
 
   /* Encrypt in parallel; each call is independent */
 #pragma omp parallel for schedule(static)
@@ -99,6 +106,12 @@ void CTFixture::SetUp(const benchmark::State& state) {
     ct_A[i] = cc->Encrypt(keyPair.publicKey, pt_ones);
     ct_B[i] = cc->Encrypt(keyPair.publicKey, pt_twos);
     ct_C[i] = ct_A[i]->Clone();
+  }
+
+  /* Precompute degree-2 ciphertexts for relinearization benchmarking */
+#pragma omp parallel for
+  for (std::size_t i = 0; i < batchSz; ++i) {
+    ct_A_deg2[i] = cc->EvalMultNoRelin(ct_A[i], ct_B[i]);
   }
 }
 
@@ -110,6 +123,7 @@ void CTFixture::TearDown(const benchmark::State&) {
   std::vector<Ciphertext<DCRTPoly>>().swap(ct_A);
   std::vector<Ciphertext<DCRTPoly>>().swap(ct_B);
   std::vector<Ciphertext<DCRTPoly>>().swap(ct_C);
+  std::vector<Ciphertext<DCRTPoly>>().swap(ct_A_deg2);
 
   /* Release key material and context */
   keyPair = KeyPair<DCRTPoly>();

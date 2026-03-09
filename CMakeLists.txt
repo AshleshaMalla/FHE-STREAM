@@ -81,12 +81,25 @@ endif()
 if(ENABLE_DCRT)
   target_sources(fhe_raiderstream PRIVATE
     src/backends/dcrt/DCRTFixture.cpp
-    src/backends/dcrt/kernels_sequential.cpp
-    src/backends/dcrt/kernels_gather.cpp
-    src/backends/dcrt/kernels_scatter.cpp
-    src/backends/dcrt/kernels_scatter_gather.cpp
-    src/backends/dcrt/kernels_ntt.cpp
   )
+
+  # Support either a monolithic DCRT kernel file or split kernel files.
+  if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/backends/dcrt/kernels_dcrt.cpp")
+    target_sources(fhe_raiderstream PRIVATE
+      src/backends/dcrt/kernels_dcrt.cpp
+    )
+    message(STATUS "Using monolithic DCRT kernels file: kernels_dcrt.cpp")
+  else()
+    target_sources(fhe_raiderstream PRIVATE
+      src/backends/dcrt/kernels_sequential.cpp
+      src/backends/dcrt/kernels_gather.cpp
+      src/backends/dcrt/kernels_scatter.cpp
+      src/backends/dcrt/kernels_scatter_gather.cpp
+      src/backends/dcrt/kernels_ntt.cpp
+    )
+    message(STATUS "Using split DCRT kernel files")
+  endif()
+
   target_compile_definitions(fhe_raiderstream PRIVATE RAIDERSTREAM_DCRT)
   message(STATUS "DCRT backend enabled")
 endif()

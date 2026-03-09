@@ -15,6 +15,7 @@ public:
   std::vector<Ciphertext<DCRTPoly>> ct_A;
   std::vector<Ciphertext<DCRTPoly>> ct_B;
   std::vector<Ciphertext<DCRTPoly>> ct_C;
+  std::vector<lbcrypto::Ciphertext<lbcrypto::DCRTPoly>> ct_A_deg2;
 
   void SetUp(const benchmark::State& state) override;
   void TearDown(const benchmark::State& state) override;
