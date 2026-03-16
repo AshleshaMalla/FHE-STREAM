@@ -76,17 +76,17 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_KEYSWITCH_MOCK)(benchmark::State& state) 
 }
 
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_COPY)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Sequential)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_SCALE)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Sequential)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_ADD)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Sequential)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SEQ_TRIAD)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Sequential)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_KEYSWITCH_MOCK)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Sequential)
   ->Unit(benchmark::kMillisecond);

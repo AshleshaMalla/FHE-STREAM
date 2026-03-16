@@ -113,14 +113,14 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_TRIAD)(benchmark::State& state) {
 }
 
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_COPY)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_SCALE)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_ADD)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_GATHER_TRIAD)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);

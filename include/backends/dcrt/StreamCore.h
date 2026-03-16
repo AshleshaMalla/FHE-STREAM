@@ -34,7 +34,12 @@ inline void SetLabel(benchmark::State& state) {
   const std::int64_t ringDim = state.range(0);
   const std::int64_t depth = state.range(1);
   const int mode = static_cast<int>(state.range(2));
-  state.SetLabel("N=" + std::to_string(ringDim) + " L=" + std::to_string(depth) + " M=" + std::to_string(mode));
+  if (mode == 0) {
+    state.SetLabel("N=" + std::to_string(ringDim) + " L=" + std::to_string(depth));
+  } else {
+    std::string modeName = (mode == 1) ? "Poly" : "Coeff";
+    state.SetLabel("N=" + std::to_string(ringDim) + " L=" + std::to_string(depth) + " " + modeName);
+  }
 }
 
 inline std::int64_t DeepBytesPerPoly(std::int64_t ringDim, std::int64_t numTowers) {

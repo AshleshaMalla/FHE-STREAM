@@ -128,14 +128,14 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_TRIAD)(benchmark::State& state) {
 
 /* Register the scatter kernels with all parameter sets */
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_COPY)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_SCALE)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_ADD)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);
 BENCHMARK_REGISTER_F(FHERaiderSTREAM, RS_SCATTER_TRIAD)
-  ->Apply(RaiderSTREAM_Arguments)
+  ->Apply(RaiderSTREAM_Arguments_Irregular)
   ->Unit(benchmark::kMillisecond);
