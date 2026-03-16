@@ -15,7 +15,11 @@ option(ENABLE_DCRT "Build the DCRTPoly backend" ON)
 option(ENABLE_CIPHERTEXT "Build the Ciphertext backend" OFF)
 
 # ---- intel hexl ----
-find_package(HEXL CONFIG OPTIONAL)
+find_package(HEXL CONFIG)
+if(HEXL_FOUND)
+else()
+  message(STATUS "Intel HEXL not found; won't use")
+endif()
 
 # ---- OpenFHE ----
 find_package(OpenFHE CONFIG REQUIRED)
