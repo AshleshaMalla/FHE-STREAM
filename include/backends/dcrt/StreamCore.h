@@ -146,7 +146,11 @@ inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64
         auto& cTower = cTowers[t];
         const auto& mod = self.towerModuli[t];
         const auto& mu = self.towerMu[t];
-        kernel(aTower, bTower, cTower, self.COEFF_IDX, mod, mu, scalarNI, dim);
+        /* Coefficient-level gather: read random, write sequential */
+        for (std::size_t j = 0; j < dim; ++j) {
+          const std::size_t src_k = self.COEFF_IDX[j];
+          kernel(aTower[src_k], bTower[src_k], cTower[j], mod, mu, scalarNI);
+        }
       }
     }
     benchmark::ClobberMemory();
@@ -219,7 +223,11 @@ inline void RunScatterCoeff(FHERaiderSTREAM& self, benchmark::State& state, int6
         auto& cTower = cTowers[t];
         const auto& mod = self.towerModuli[t];
         const auto& mu = self.towerMu[t];
-        kernel(aTower, bTower, cTower, self.COEFF_IDX, mod, mu, scalarNI, dim);
+        /* Coefficient-level scatter: read sequential, write random */
+        for (std::size_t j = 0; j < dim; ++j) {
+          const std::size_t dst_k = self.COEFF_IDX_WRITE[j];
+          kernel(aTower[j], bTower[j], cTower[dst_k], mod, mu, scalarNI);
+        }
       }
     }
     benchmark::ClobberMemory();

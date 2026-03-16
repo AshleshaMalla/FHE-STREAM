@@ -1,0 +1,60 @@
+# FHE-RaiderSTREAM commands for REPACSS cluster
+
+# Build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_DCRT=ON -DENABLE_CIPHERTEXT=ON -DENABLE_MPI=ON
+cmake --build build -j
+
+# Create results directory
+mkdir -p results
+
+# 1) Core scaling
+
+for t in 1 16 64 128 256; do
+  OMP_NUM_THREADS="$t" RS_BATCH_SIZE=256 \
+  ./build/fhe_raiderstream \
+    --benchmark_filter="RS_SEQ_ADD/65536/20" \
+    --benchmark_min_time=0.50s \
+    --benchmark_format=csv \
+    --benchmark_out="results/sweep1_core_scaling_t${t}.csv"
+ done
+
+# 2) Memory access pattern penalty (Gather/Scatter)
+
+OMP_NUM_THREADS=256 RS_BATCH_SIZE=100 \
+./build/fhe_raiderstream \
+  --benchmark_filter="(RS_SEQ_ADD|RS_GATHER_ADD|RS_SCATTER_ADD|RS_SCATTER_GATHER_ADD)/65536/5" \
+  --benchmark_min_time=0.50s \
+  --benchmark_format=csv \
+  --benchmark_out="results/sweep2_memory_access_pattern.csv"
+
+# 3) TRIAD vs KEYSWITCH_MOCK
+
+for b in 10 40; do
+  OMP_NUM_THREADS=256 RS_BATCH_SIZE="$b" \
+  ./build/fhe_raiderstream \
+    --benchmark_filter="(RS_SEQ_TRIAD|RS_KEYSWITCH_MOCK)/65536/20" \
+    --benchmark_min_time=0.50s \
+    --benchmark_format=csv \
+    --benchmark_out="results/sweep3_triad_vs_keyswitch_b${b}.csv"
+ done
+
+# 4) Software abstraction penalty
+
+for b in 40 128; do
+  OMP_NUM_THREADS=256 RS_BATCH_SIZE="$b" \
+  ./build/fhe_raiderstream \
+    --benchmark_filter="(RS_SEQ_ADD|CTFixture/CT_SEQ_ADD)/(32768|65536)/20" \
+    --benchmark_min_time=0.50s \
+    --benchmark_format=csv \
+    --benchmark_out="results/sweep4_software_tax_b${b}.csv"
+ done
+
+# 5) Capacity Wall test
+
+OMP_NUM_THREADS=256 RS_BATCH_SIZE=256 \
+./build/fhe_raiderstream \
+  --benchmark_filter="CTFixture/CT_SEQ_RELIN/131072/40" \
+  --benchmark_min_time=0.05s \
+  --benchmark_format=csv \
+  --benchmark_out="results/sweep5_capacity_wall.csv"
+
