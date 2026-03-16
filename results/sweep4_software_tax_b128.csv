@@ -1,0 +1,75 @@
+{
+  "context": {
+    "date": "2026-03-16T14:56:25-05:00",
+    "host_name": "rpc-91-10",
+    "executable": "./build/fhe_raiderstream",
+    "num_cpus": 256,
+    "mhz_per_cpu": 3095,
+    "cpu_scaling_enabled": false,
+    "aslr_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1048576,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 16777216,
+        "num_sharing": 8
+      }
+    ],
+    "load_avg": [13.76,4.47,2.55],
+    "library_version": "v1.9.5-29-ged9d1151",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "FHERaiderSTREAM/RS_SEQ_ADD/32768/20/128",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_SEQ_ADD/32768/20/128",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 166,
+      "real_time": 4.2840175117444561e+00,
+      "cpu_time": 4.2206462530120499e+00,
+      "time_unit": "ms",
+      "bytes_per_second": 4.7700418355678107e+11,
+      "label": "Batch: 128"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_SEQ_ADD/65536/20/128",
+      "family_index": 0,
+      "per_family_instance_index": 1,
+      "run_name": "FHERaiderSTREAM/RS_SEQ_ADD/65536/20/128",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 70,
+      "real_time": 9.6302229112812459e+00,
+      "cpu_time": 9.4364809857142795e+00,
+      "time_unit": "ms",
+      "bytes_per_second": 4.2669845317292480e+11,
+      "label": "Batch: 128"
+    }
+  ]
+}
