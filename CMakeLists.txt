@@ -14,6 +14,9 @@ option(BUILD_STATIC "Set to ON to use OpenFHE static libraries" OFF)
 option(ENABLE_DCRT "Build the DCRTPoly backend" ON)
 option(ENABLE_CIPHERTEXT "Build the Ciphertext backend" OFF)
 
+# ---- intel hexl ----
+find_package(HEXL CONFIG OPTIONAL)
+
 # ---- OpenFHE ----
 find_package(OpenFHE CONFIG REQUIRED)
 if(OpenFHE_FOUND)
