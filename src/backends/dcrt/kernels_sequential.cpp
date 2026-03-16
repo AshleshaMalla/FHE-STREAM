@@ -68,7 +68,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_KEYSWITCH_MOCK)(benchmark::State& state) 
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
-  const std::int64_t batchSize = state.range(2);
+  const std::int64_t batchSize = static_cast<std::int64_t>(A.size());
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
 
   // Reads: A + B, Writes: A (C[0] assumed cache-resident and excluded)

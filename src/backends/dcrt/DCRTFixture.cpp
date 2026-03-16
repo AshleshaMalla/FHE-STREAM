@@ -74,11 +74,22 @@ void FHERaiderSTREAM::SetUp(const benchmark::State& state) {
   omp_set_num_threads(savedThreads);  // Restore thread count for benchmark parallel regions
 #endif
 
-  /* Extract benchmark parameters: ring dimension, multiplicative depth, and batch size */
+  /* Extract benchmark parameters: ring dimension, multiplicative depth, and shuffle mode */
   const std::int64_t ringDim = state.range(0);
   const std::int64_t multDepth = state.range(1);
-  const std::int64_t numPolysArg = state.range(2);
-  const std::size_t nPolys = numPolysArg > 0 ? static_cast<std::size_t>(numPolysArg) : 1;
+  const std::int64_t shuffleMode = state.range(2);
+
+  /* Read batch size from RS_BATCH_SIZE environment variable */
+  std::int64_t nPolysArg = 100;  // Default batch size
+  if (const char* env = std::getenv("RS_BATCH_SIZE")) {
+    errno = 0;
+    char* end = nullptr;
+    const long long parsed = std::strtoll(env, &end, 10);
+    if (errno == 0 && end != env && parsed > 0) {
+      nPolysArg = static_cast<std::int64_t>(parsed);
+    }
+  }
+  const std::size_t nPolys = static_cast<std::size_t>(nPolysArg);
 
   /* 
     Construct cyclotomic parameters for the requested configuration.
