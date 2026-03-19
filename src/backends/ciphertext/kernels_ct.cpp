@@ -36,7 +36,7 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_COPY)(benchmark::State& state) {
   /* Bytes model: each ciphertext holds ~2 polynomials (a, b) in RNS form. */
   const std::int64_t ringDim    = state.range(0);
   const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = state.range(2);
+  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   const std::int64_t bytesPerCt   = bytesPerPoly * 2;            // 2 ring elements per ct
   /* Clone reads A (1 ct) and writes C (1 ct) → 2 ct transfers per element */
@@ -61,7 +61,7 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_ADD)(benchmark::State& state) {
 
   const std::int64_t ringDim    = state.range(0);
   const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = state.range(2);
+  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   const std::int64_t bytesPerCt   = bytesPerPoly * 2;
   /* Reads A + B, writes C → 3 ct transfers */
@@ -89,7 +89,7 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_SCALE)(benchmark::State& state) {
 
   const std::int64_t ringDim    = state.range(0);
   const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = state.range(2);
+  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   const std::int64_t bytesPerCt   = bytesPerPoly * 2;
   /* Reads C, writes B → 2 ct transfers */
@@ -118,7 +118,7 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_TRIAD)(benchmark::State& state) {
 
   const std::int64_t ringDim    = state.range(0);
   const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = state.range(2);
+  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   const std::int64_t bytesPerCt   = bytesPerPoly * 2;
   /* Reads B + C, writes A → 3 ct transfers */
@@ -143,7 +143,7 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_MULT_NO_RELIN)(benchmark::State& state) {
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
-  const std::int64_t batch = state.range(2);
+  const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   /* MultNoRelin reads A(2 polys) + B(2 polys), writes C(3 polys) = 7 polys */
   state.SetBytesProcessed(state.iterations() * batch * (7 * bytesPerPoly));
@@ -167,7 +167,7 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_RELIN)(benchmark::State& state) {
 
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
-  const std::int64_t batch = state.range(2);
+  const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   /* Relinearize reads A_deg2(3 polys), writes C(2 polys) = 5 polys */
   state.SetBytesProcessed(state.iterations() * batch * (5 * bytesPerPoly));
@@ -191,7 +191,7 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_ADD_INPLACE)(benchmark::State& state) {
 
   const std::int64_t ringDim    = state.range(0);
   const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = state.range(2);
+  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   const std::int64_t bytesPerCt   = bytesPerPoly * 2;
   /* Reads A, reads+writes C → 2 ct transfers (A read + C read/write) */

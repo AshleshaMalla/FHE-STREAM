@@ -9,7 +9,9 @@
 
 #include "backends/ciphertext/CTFixture.h"
 
+#include <cerrno>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
 #include <set>
 #include <tuple>
@@ -45,10 +47,20 @@ void CTFixture::SetUp(const benchmark::State& state) {
 #endif
 
   /* Extract benchmark parameters */
-  const std::int64_t RingDim   = state.range(0);
-  const std::int64_t Depth     = state.range(1);
-  const std::int64_t BatchSize = state.range(2);
-  const std::size_t  batchSz   = BatchSize > 0 ? static_cast<std::size_t>(BatchSize) : 1;
+  const std::int64_t RingDim = state.range(0);
+  const std::int64_t Depth = state.range(1);
+
+  /* Read batch size from RS_BATCH_SIZE environment variable (default: 100) */
+  std::int64_t batchArg = 100;
+  if (const char* env = std::getenv("RS_BATCH_SIZE")) {
+    errno = 0;
+    char* end = nullptr;
+    const long long parsed = std::strtoll(env, &end, 10);
+    if (errno == 0 && end != env && parsed > 0) {
+      batchArg = static_cast<std::int64_t>(parsed);
+    }
+  }
+  const std::size_t batchSz = static_cast<std::size_t>(batchArg);
 
   /* ---- CryptoContext creation ---- */
   CCParams<CryptoContextBFVRNS> parameters;
