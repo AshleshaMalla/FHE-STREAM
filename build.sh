@@ -16,7 +16,7 @@ if [ -f "env/activate" ] && [ -z "$ENV_DIR" ]; then
 fi
 
 echo "==> Configuring CMake..."
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_CIPHERTEXT=ON
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_CIPHERTEXT=OFF -DENABLE_HEXL=ON
 
 echo "==> Building..."
 cmake --build build -j
