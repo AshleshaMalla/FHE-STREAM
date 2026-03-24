@@ -1,7 +1,7 @@
 {
   "context": {
-    "date": "2026-03-16T14:41:28-05:00",
-    "host_name": "rpc-91-10",
+    "date": "2026-03-23T19:12:02-05:00",
+    "host_name": "rpc-91-1",
     "executable": "./build/fhe_raiderstream",
     "num_cpus": 256,
     "mhz_per_cpu": 3100,
@@ -33,27 +33,27 @@
         "num_sharing": 8
       }
     ],
-    "load_avg": [22.63,5.32,1.78],
+    "load_avg": [19.16,4.53,1.52],
     "library_version": "v1.9.5-29-ged9d1151",
     "library_build_type": "release",
     "json_schema_version": 1
   },
   "benchmarks": [
     {
-      "name": "FHERaiderSTREAM/RS_SEQ_ADD/65536/20/256",
+      "name": "FHERaiderSTREAM/RS_SEQ_ADD/65536/20/0",
       "family_index": 0,
       "per_family_instance_index": 0,
-      "run_name": "FHERaiderSTREAM/RS_SEQ_ADD/65536/20/256",
+      "run_name": "FHERaiderSTREAM/RS_SEQ_ADD/65536/20/0",
       "run_type": "iteration",
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 46,
-      "real_time": 1.5451247955712935e+01,
-      "cpu_time": 1.5334636847826093e+01,
+      "iterations": 43,
+      "real_time": 1.5859939627917747e+01,
+      "cpu_time": 1.5742932930232564e+01,
       "time_unit": "ms",
-      "bytes_per_second": 5.2515516082414679e+11,
-      "label": "Batch: 256"
+      "bytes_per_second": 5.1153515775545099e+11,
+      "label": "N=65536 L=20"
     }
   ]
 }

@@ -1,0 +1,149 @@
+{
+  "context": {
+    "date": "2026-03-24T14:09:42-05:00",
+    "host_name": "rpc-95-3",
+    "executable": "./build/fhe_raiderstream",
+    "num_cpus": 256,
+    "mhz_per_cpu": 3100,
+    "cpu_scaling_enabled": false,
+    "aslr_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1048576,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 16777216,
+        "num_sharing": 8
+      }
+    ],
+    "load_avg": [0,1.61,9.76],
+    "library_version": "v1.9.5-29-ged9d1151",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "FHERaiderSTREAM/RS_SEQ_ADD/131072/40/0",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_SEQ_ADD/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 12,
+      "real_time": 6.1178393312729895e+01,
+      "cpu_time": 6.0665173833333256e+01,
+      "time_unit": "ms",
+      "bytes_per_second": 5.3098429765481964e+11,
+      "label": "N=131072 L=40"
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD/131072/40/0",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "CTFixture/CT_SEQ_ADD/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 6,
+      "real_time": 1.2997703983758888e+02,
+      "cpu_time": 1.2864549500000066e+02,
+      "time_unit": "ms",
+      "bytes_per_second": 5.0079102606740851e+11
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD/131072/40/1",
+      "family_index": 1,
+      "per_family_instance_index": 1,
+      "run_name": "CTFixture/CT_SEQ_ADD/131072/40/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 6,
+      "real_time": 1.2972281322193643e+02,
+      "cpu_time": 1.2839013700000143e+02,
+      "time_unit": "ms",
+      "bytes_per_second": 5.0178706048112781e+11
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD/131072/40/2",
+      "family_index": 1,
+      "per_family_instance_index": 2,
+      "run_name": "CTFixture/CT_SEQ_ADD/131072/40/2",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 5,
+      "real_time": 1.2984740938991308e+02,
+      "cpu_time": 1.2843379580000089e+02,
+      "time_unit": "ms",
+      "bytes_per_second": 5.0161648683437537e+11
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/0",
+      "family_index": 2,
+      "per_family_instance_index": 0,
+      "run_name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 10,
+      "real_time": 6.5164845436811447e+01,
+      "cpu_time": 6.4394230799999264e+01,
+      "time_unit": "ms",
+      "bytes_per_second": 6.6698013822692468e+11
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/1",
+      "family_index": 2,
+      "per_family_instance_index": 1,
+      "run_name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 11,
+      "real_time": 6.5166019580580965e+01,
+      "cpu_time": 6.4488237636363067e+01,
+      "time_unit": "ms",
+      "bytes_per_second": 6.6600785715660352e+11
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/2",
+      "family_index": 2,
+      "per_family_instance_index": 2,
+      "run_name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/2",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 11,
+      "real_time": 6.5116576088423074e+01,
+      "cpu_time": 6.4422594999998950e+01,
+      "time_unit": "ms",
+      "bytes_per_second": 6.6668647793527563e+11
+    }
+  ]
+}
