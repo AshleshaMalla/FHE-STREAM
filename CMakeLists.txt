@@ -13,12 +13,18 @@ endif()
 option(BUILD_STATIC "Set to ON to use OpenFHE static libraries" OFF)
 option(ENABLE_DCRT "Build the DCRTPoly backend" ON)
 option(ENABLE_CIPHERTEXT "Build the Ciphertext backend" OFF)
+option(ENABLE_HEXL "Enable Intel HEXL acceleration" ON)
 
 # ---- intel hexl ----
-find_package(HEXL CONFIG)
-if(HEXL_FOUND)
+if(ENABLE_HEXL)
+  find_package(HEXL CONFIG)
+  if(HEXL_FOUND)
+    message(STATUS "Intel HEXL found")
+  else()
+    message(STATUS "Intel HEXL not found; won't use")
+  endif()
 else()
-  message(STATUS "Intel HEXL not found; won't use")
+  message(STATUS "Intel HEXL disabled via ENABLE_HEXL=OFF")
 endif()
 
 # ---- OpenFHE ----
