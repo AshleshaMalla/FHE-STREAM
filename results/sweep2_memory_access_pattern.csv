@@ -1,0 +1,155 @@
+{
+  "context": {
+    "date": "2026-03-24T13:20:03-05:00",
+    "host_name": "rpc-95-3",
+    "executable": "./build/fhe_raiderstream",
+    "num_cpus": 256,
+    "mhz_per_cpu": 3100,
+    "cpu_scaling_enabled": false,
+    "aslr_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1048576,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 16777216,
+        "num_sharing": 8
+      }
+    ],
+    "load_avg": [8.42,7.93,7.97],
+    "library_version": "v1.9.5-29-ged9d1151",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "FHERaiderSTREAM/RS_SEQ_ADD/131072/5/0",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_SEQ_ADD/131072/5/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 94,
+      "real_time": 7.2763447471438569e+00,
+      "cpu_time": 7.2261866063829769e+00,
+      "time_unit": "ms",
+      "bytes_per_second": 5.5721393029669568e+11,
+      "label": "N=131072 L=5"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_GATHER_ADD/131072/5/1",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_GATHER_ADD/131072/5/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 73,
+      "real_time": 9.0971198507061555e+00,
+      "cpu_time": 8.8607195616438368e+00,
+      "time_unit": "ms",
+      "bytes_per_second": 4.5442492700367102e+11,
+      "label": "N=131072 L=5 Poly"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_GATHER_ADD/131072/5/2",
+      "family_index": 1,
+      "per_family_instance_index": 1,
+      "run_name": "FHERaiderSTREAM/RS_GATHER_ADD/131072/5/2",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 66,
+      "real_time": 1.0815431455601797e+01,
+      "cpu_time": 1.0696120227272734e+01,
+      "time_unit": "ms",
+      "bytes_per_second": 3.7644788525593011e+11,
+      "label": "N=131072 L=5 Coeff"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_SCATTER_ADD/131072/5/1",
+      "family_index": 2,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_SCATTER_ADD/131072/5/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 91,
+      "real_time": 7.2532127826259689e+00,
+      "cpu_time": 7.2007949010988952e+00,
+      "time_unit": "ms",
+      "bytes_per_second": 5.5917879835537622e+11,
+      "label": "N=131072 L=5 Poly"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_SCATTER_ADD/131072/5/2",
+      "family_index": 2,
+      "per_family_instance_index": 1,
+      "run_name": "FHERaiderSTREAM/RS_SCATTER_ADD/131072/5/2",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 79,
+      "real_time": 9.1916974103431919e+00,
+      "cpu_time": 9.1245105443037904e+00,
+      "time_unit": "ms",
+      "bytes_per_second": 4.4128743349567017e+11,
+      "label": "N=131072 L=5 Coeff"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_SCATTER_GATHER_ADD/131072/5/1",
+      "family_index": 3,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_SCATTER_GATHER_ADD/131072/5/1",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 67,
+      "real_time": 9.9988012894320839e+00,
+      "cpu_time": 9.6019017761194050e+00,
+      "time_unit": "ms",
+      "bytes_per_second": 4.1934732659047430e+11,
+      "label": "N=131072 L=5 Poly"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_SCATTER_GATHER_ADD/131072/5/2",
+      "family_index": 3,
+      "per_family_instance_index": 1,
+      "run_name": "FHERaiderSTREAM/RS_SCATTER_GATHER_ADD/131072/5/2",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 34,
+      "real_time": 2.0434251301647986e+01,
+      "cpu_time": 2.0173131058823486e+01,
+      "time_unit": "ms",
+      "bytes_per_second": 1.9959875481197760e+11,
+      "label": "N=131072 L=5 Coeff"
+    }
+  ]
+}
