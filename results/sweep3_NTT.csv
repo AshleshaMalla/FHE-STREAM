@@ -148,7 +148,7 @@
       "real_time": 7.8264400099093712e+02,
       "cpu_time": 7.4851178000000118e+02,
       "time_unit": "ms",
-      "bytes_per_second": 2.8690044771239227e+10,
+      "bytes_per_second": 8.0607044771239227e+10,
       "label": "N=131072 L=40 Coeff"
     }
   ]
