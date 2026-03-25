@@ -76,7 +76,7 @@ def main():
     
     # Create figure with subplots
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle('Core Scaling Benchmark Results (RS_SEQ_ADD/65536/20)', fontsize=14, fontweight='bold')
+    fig.suptitle('Core Scaling Benchmark Results (RS_SEQ_ADD/65536/20) BatchSize=256', fontsize=14, fontweight='bold')
     
     # Plot 1: Throughput vs Threads
     ax = axes[0, 0]

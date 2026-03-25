@@ -46,83 +46,77 @@ def main():
         print("No benchmark data extracted")
         return
     
-    # Extract data
-    kernels = [r['kernel'] for r in results]
-    throughput = [r['throughput_gbs'] for r in results]
-    real_time = [r['real_time_ms'] for r in results]
-    iterations = [r['iterations'] for r in results]
+    # Extract data and format labels
+    labels = []
+    throughput = []
     
-    # Calculate overhead relative to sequential
-    seq_throughput = throughput[0]
-    overhead_pct = [(seq_throughput - t) / seq_throughput * 100 for t in throughput]
-    throughput_ratio = [t / seq_throughput for t in throughput]
-    
-    print("\n=== Memory Access Pattern Results ===\n")
-    print(f"{'Kernel':<25} {'Throughput (GB/s)':<20} {'Time (ms)':<15} {'Iterations':<12} {'vs Sequential':<15}")
-    print("-" * 90)
     for r in results:
-        idx = kernels.index(r['kernel'])
-        ratio = throughput_ratio[idx]
-        overhead = overhead_pct[idx]
-        print(f"{r['kernel']:<25} {r['throughput_gbs']:<20.2f} {r['real_time_ms']:<15.4f} {r['iterations']:<12} {ratio:+.2%} ({overhead:+.1f}%)")
+        full_name = r['full_name']
+        # Parse kernel and mode from run_name
+        # Format: FHERaiderSTREAM/RS_*_ADD/131072/5/mode
+        parts = full_name.split('/')
+        kernel = parts[1]  # RS_SEQ_ADD, RS_GATHER_ADD, etc.
+        mode = int(parts[4])  # 0, 1 (Poly), 2 (Coeff)
+        
+        if kernel == 'RS_SEQ_ADD':
+            label = 'Sequential'
+        elif kernel == 'RS_GATHER_ADD':
+            label = f'Gather {"(Poly)" if mode == 1 else "(Coeff)"}'
+        elif kernel == 'RS_SCATTER_ADD':
+            label = f'Scatter {"(Poly)" if mode == 1 else "(Coeff)"}'
+        elif kernel == 'RS_SCATTER_GATHER_ADD':
+            label = f'Scatter-Gather {"(Poly)" if mode == 1 else "(Coeff)"}'
+        else:
+            label = kernel
+        
+        labels.append(label)
+        throughput.append(r['throughput_gbs'])
     
-    # Create figure with subplots
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle('Memory Access Pattern Comparison (RingDim 65536, Depth 5, Batch 100)', 
+    # Print results table
+    print("\n=== Memory Access Pattern Results ===\n")
+    print(f"{'Access Pattern':<30} {'Throughput (GB/s)':<20} {'vs Sequential':<15}")
+    print("-" * 65)
+    seq_throughput = throughput[0]
+    for label, tput in zip(labels, throughput):
+        ratio = tput / seq_throughput
+        overhead = (seq_throughput - tput) / seq_throughput * 100
+        print(f"{label:<30} {tput:<20.2f} {ratio:.2%} ({overhead:+.1f}%)")
+    
+    # Create single bar chart
+    fig, ax = plt.subplots(figsize=(12, 6))
+    
+    # Distinct color palette for each access pattern
+    colors = [
+        '#2E86AB',  # Sequential - steelblue
+        '#A23B72',  # Gather (Poly) - purple
+        '#F18F01',  # Gather (Coeff) - orange
+        '#C73E1D',  # Scatter (Poly) - red
+        '#408C7D',  # Scatter (Coeff) - teal
+        '#6B4C9A',  # Scatter-Gather (Poly) - violet
+        '#D4A574',  # Scatter-Gather (Coeff) - tan
+    ]
+    
+    # Create bar chart
+    bars = ax.bar(range(len(labels)), throughput, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
+    
+    ax.set_ylabel('Throughput (GB/s)', fontweight='bold', fontsize=12)
+    ax.set_title('DCRTPoly ADD Kernel: Memory Bandwidth vs Access Pattern\n(RingDim 131072, Depth 5)', 
                  fontsize=14, fontweight='bold')
+    ax.set_xticks(range(len(labels)))
+    ax.set_xticklabels(labels, rotation=30, ha='right', fontsize=11)
+    ax.grid(axis='y', alpha=0.3, linestyle='--')
     
-    # Define colors for better visualization
-    colors = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D']
-    
-    # Plot 1: Throughput comparison
-    ax = axes[0, 0]
-    bars = ax.bar(kernels, throughput, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
-    ax.set_ylabel('Throughput (GB/s)', fontweight='bold')
-    ax.set_title('Memory Bandwidth per Kernel')
-    ax.grid(axis='y', alpha=0.3)
-    # Rotate labels for better readability
-    ax.set_xticklabels(kernels, rotation=45, ha='right')
+    # Add value labels on bars
     for i, (bar, v) in enumerate(zip(bars, throughput)):
-        ax.text(bar.get_x() + bar.get_width()/2, v + max(throughput)*0.02, 
-                f'{v:.1f}', ha='center', va='bottom', fontweight='bold', fontsize=10)
+        ratio = v / seq_throughput if i > 0 else 1.0
+        ratio_str = f'{ratio:.1%}' if i > 0 else 'baseline'
+        ax.text(bar.get_x() + bar.get_width()/2, v + max(throughput)*0.01, 
+                f'{v:.1f} GB/s\n({ratio_str})', 
+                ha='center', va='bottom', fontweight='bold', fontsize=9)
     
-    # Plot 2: Execution time per iteration
-    ax = axes[0, 1]
-    bars = ax.bar(kernels, real_time, color=colors, alpha=0.8, edgecolor='black', linewidth=1.5)
-    ax.set_ylabel('Time per Iteration (ms)', fontweight='bold')
-    ax.set_title('Execution Time per Iteration')
-    ax.grid(axis='y', alpha=0.3)
-    ax.set_xticklabels(kernels, rotation=45, ha='right')
-    for i, (bar, v) in enumerate(zip(bars, real_time)):
-        ax.text(bar.get_x() + bar.get_width()/2, v + max(real_time)*0.02, 
-                f'{v:.4f}', ha='center', va='bottom', fontweight='bold', fontsize=9)
-    
-    # Plot 3: Performance relative to Sequential
-    ax = axes[1, 0]
-    colors_ratio = ['green' if r == kernels[0] else '#FFA500' if r > 0.9 else '#FF6B6B' 
-                    for r in throughput_ratio]
-    bars = ax.barh(kernels, throughput_ratio, color=colors_ratio, alpha=0.8, edgecolor='black', linewidth=1.5)
-    ax.set_xlabel('Throughput Relative to Sequential', fontweight='bold')
-    ax.set_title('Performance vs Sequential Baseline')
-    ax.axvline(x=1.0, color='black', linestyle='--', linewidth=2, label='Sequential Baseline')
-    ax.grid(axis='x', alpha=0.3)
-    ax.legend()
-    for i, (bar, v) in enumerate(zip(bars, throughput_ratio)):
-        ax.text(v + 0.01, bar.get_y() + bar.get_height()/2, 
-                f'{v:.2%}', ha='left', va='center', fontweight='bold', fontsize=10)
-    
-    # Plot 4: Overhead percentage
-    ax = axes[1, 1]
-    colors_overhead = ['green' if o == 0 else 'red' for o in overhead_pct]
-    bars = ax.bar(kernels, overhead_pct, color=colors_overhead, alpha=0.7, edgecolor='black', linewidth=1.5)
-    ax.set_ylabel('Overhead (%)', fontweight='bold')
-    ax.set_title('Performance Overhead vs Sequential')
-    ax.axhline(y=0, color='black', linestyle='-', linewidth=1)
-    ax.grid(axis='y', alpha=0.3)
-    ax.set_xticklabels(kernels, rotation=45, ha='right')
-    for i, (bar, v) in enumerate(zip(bars, overhead_pct)):
-        ax.text(bar.get_x() + bar.get_width()/2, v + max(abs(v) for v in overhead_pct)*0.02 if v >= 0 else v - max(abs(v) for v in overhead_pct)*0.02, 
-                f'{v:.1f}%', ha='center', va='bottom' if v >= 0 else 'top', fontweight='bold', fontsize=10)
+    # Add baseline reference line
+    ax.axhline(y=seq_throughput, color='red', linestyle='--', linewidth=2, alpha=0.6, label='Sequential Baseline')
+    ax.legend(loc='upper right', fontsize=10)
     
     plt.tight_layout()
     plt.savefig('results/sweep2_memory_access_pattern_analysis.png', dpi=300, bbox_inches='tight')
