@@ -1,6 +1,6 @@
 {
   "context": {
-    "date": "2026-03-24T21:48:04-05:00",
+    "date": "2026-03-24T21:56:45-05:00",
     "host_name": "rpc-95-3",
     "executable": "./build/fhe_raiderstream",
     "num_cpus": 256,
@@ -33,7 +33,7 @@
         "num_sharing": 8
       }
     ],
-    "load_avg": [21.95,15.38,6.19],
+    "load_avg": [0.06,4.39,5.19],
     "library_version": "v1.9.5-29-ged9d1151",
     "library_build_type": "release",
     "json_schema_version": 1
@@ -49,10 +49,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 10,
-      "real_time": 9.5305433869361877e+01,
-      "cpu_time": 7.1012693199999973e+01,
+      "real_time": 8.3002249663695693e+01,
+      "cpu_time": 7.2877716300000017e+01,
       "time_unit": "ms",
-      "bytes_per_second": 4.5361263273422809e+11,
+      "bytes_per_second": 4.4200417295457971e+11,
       "label": "N=131072 L=40 Poly"
     },
     {
@@ -65,10 +65,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 8,
-      "real_time": 8.8533549220301211e+01,
-      "cpu_time": 8.6925511750000069e+01,
+      "real_time": 9.1098843142390251e+01,
+      "cpu_time": 8.8960664125000037e+01,
       "time_unit": "ms",
-      "bytes_per_second": 3.7057308115301343e+11,
+      "bytes_per_second": 3.6209548385045837e+11,
       "label": "N=131072 L=40 Coeff"
     },
     {
@@ -81,10 +81,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 10,
-      "real_time": 6.6677668923512101e+01,
-      "cpu_time": 6.3111298100000113e+01,
+      "real_time": 6.9355547102168202e+01,
+      "cpu_time": 6.3923105599999985e+01,
       "time_unit": "ms",
-      "bytes_per_second": 5.1040393225567236e+11,
+      "bytes_per_second": 5.0392192960036670e+11,
       "label": "N=131072 L=40 Poly"
     },
     {
@@ -97,10 +97,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 9,
-      "real_time": 7.4806565987981031e+01,
-      "cpu_time": 7.1843907111110795e+01,
+      "real_time": 7.4062293343659903e+01,
+      "cpu_time": 7.3170623555554926e+01,
       "time_unit": "ms",
-      "bytes_per_second": 4.4836446144530902e+11,
+      "bytes_per_second": 4.4023479853964600e+11,
       "label": "N=131072 L=40 Coeff"
     },
     {
@@ -112,11 +112,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 1,
-      "real_time": 1.2408445980399847e+03,
-      "cpu_time": 5.1166454599999867e+02,
+      "iterations": 3,
+      "real_time": 7.5291237933561206e+02,
+      "cpu_time": 6.6612758233333363e+02,
       "time_unit": "ms",
-      "bytes_per_second": 4.1970538408186005e+10,
+      "bytes_per_second": 3.2238323482683655e+10,
       "label": "N=131072 L=40"
     },
     {
@@ -128,11 +128,11 @@
       "repetitions": 1,
       "repetition_index": 0,
       "threads": 1,
-      "iterations": 3,
-      "real_time": 3.0741420978059369e+02,
-      "cpu_time": 2.4572598233333306e+02,
+      "iterations": 1,
+      "real_time": 1.7188444179482758e+03,
+      "cpu_time": 1.4436545110000054e+03,
       "time_unit": "ms",
-      "bytes_per_second": 8.7393430178127762e+10,
+      "bytes_per_second": 1.4875329461703819e+10,
       "label": "N=131072 L=40 Poly"
     },
     {
@@ -145,10 +145,10 @@
       "repetition_index": 0,
       "threads": 1,
       "iterations": 3,
-      "real_time": 2.5087767606601119e+02,
-      "cpu_time": 2.4244122533333248e+02,
+      "real_time": 7.8264400099093712e+02,
+      "cpu_time": 7.4851178000000118e+02,
       "time_unit": "ms",
-      "bytes_per_second": 8.8577495227860870e+10,
+      "bytes_per_second": 2.8690044771239227e+10,
       "label": "N=131072 L=40 Coeff"
     }
   ]
