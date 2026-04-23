@@ -12,10 +12,14 @@
 #include <cerrno>
 #include <cstdint>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <set>
+#include <sstream>
 #include <tuple>
 #include <vector>
+
+#include <unistd.h>
 
 #ifdef __GLIBC__
 #include <malloc.h>
@@ -27,6 +31,36 @@
 
 /* Global toggle for optional setup printing (defined in main.cpp) */
 extern bool RS_PrintSetupConfig;
+
+namespace {
+
+std::uint64_t CurrentRSSBytes() {
+  std::ifstream statm("/proc/self/statm");
+  long totalPages = 0;
+  long residentPages = 0;
+  if (!(statm >> totalPages >> residentPages) || residentPages <= 0) {
+    return 0;
+  }
+
+  const long pageSize = sysconf(_SC_PAGESIZE);
+  if (pageSize <= 0) {
+    return 0;
+  }
+
+  return static_cast<std::uint64_t>(residentPages) * static_cast<std::uint64_t>(pageSize);
+}
+
+std::size_t SerializedCiphertextBytes(const Ciphertext<DCRTPoly>& ciphertext) {
+  if (!ciphertext) {
+    return 0;
+  }
+
+  std::ostringstream os;
+  lbcrypto::Serial::Serialize(ciphertext, os, lbcrypto::SerType::BINARY);
+  return os.str().size();
+}
+
+}  // namespace
 
 /*
   Benchmark fixture setup: creates a BFVrns CryptoContext, generates key
@@ -106,6 +140,8 @@ void CTFixture::SetUp(const benchmark::State& state) {
   Plaintext pt_ones = cc->MakePackedPlaintext(ones);
   Plaintext pt_twos = cc->MakePackedPlaintext(twos);
 
+  const std::uint64_t rssBeforeCtAlloc = CurrentRSSBytes();
+
   /* ---- Allocate ciphertext vectors ---- */
   ct_A.resize(batchSz);
   ct_B.resize(batchSz);
@@ -120,10 +156,35 @@ void CTFixture::SetUp(const benchmark::State& state) {
     ct_C[i] = ct_A[i]->Clone();
   }
 
+  const std::uint64_t rssAfterDeg1 = CurrentRSSBytes();
+
   /* Precompute degree-2 ciphertexts for relinearization benchmarking */
 #pragma omp parallel for
   for (std::size_t i = 0; i < batchSz; ++i) {
     ct_A_deg2[i] = cc->EvalMultNoRelin(ct_A[i], ct_B[i]);
+  }
+
+  const std::uint64_t rssAfterDeg2 = CurrentRSSBytes();
+
+  if (!ct_A.empty()) {
+    ctSerializedBytes = SerializedCiphertextBytes(ct_A.front());
+    ctDeg2SerializedBytes = SerializedCiphertextBytes(ct_A_deg2.front());
+  } else {
+    ctSerializedBytes = 0;
+    ctDeg2SerializedBytes = 0;
+  }
+
+  const std::uint64_t deg1Baseline = (rssAfterDeg1 > rssBeforeCtAlloc) ? (rssAfterDeg1 - rssBeforeCtAlloc) : 0;
+  const std::uint64_t deg2Baseline = (rssAfterDeg2 > rssAfterDeg1) ? (rssAfterDeg2 - rssAfterDeg1) : 0;
+  rssDeltaDeg1Bytes = deg1Baseline;
+  rssDeltaDeg2Bytes = deg2Baseline;
+
+  if (batchSz > 0) {
+    rssDeg1BytesPerCt = rssDeltaDeg1Bytes / static_cast<std::uint64_t>(3 * batchSz);
+    rssDeg2BytesPerCt = rssDeltaDeg2Bytes / static_cast<std::uint64_t>(batchSz);
+  } else {
+    rssDeg1BytesPerCt = 0;
+    rssDeg2BytesPerCt = 0;
   }
 }
 
@@ -136,6 +197,12 @@ void CTFixture::TearDown(const benchmark::State&) {
   std::vector<Ciphertext<DCRTPoly>>().swap(ct_B);
   std::vector<Ciphertext<DCRTPoly>>().swap(ct_C);
   std::vector<Ciphertext<DCRTPoly>>().swap(ct_A_deg2);
+  ctSerializedBytes = 0;
+  ctDeg2SerializedBytes = 0;
+  rssDeltaDeg1Bytes = 0;
+  rssDeltaDeg2Bytes = 0;
+  rssDeg1BytesPerCt = 0;
+  rssDeg2BytesPerCt = 0;
 
   /* Release key material and context */
   keyPair = KeyPair<DCRTPoly>();

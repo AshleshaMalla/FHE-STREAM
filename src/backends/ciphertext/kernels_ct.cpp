@@ -18,6 +18,31 @@
 #include <omp.h>
 #endif
 
+namespace {
+
+inline void ReportCiphertextMetrics(benchmark::State& state,
+                                    const CTFixture& fixture,
+                                    std::int64_t goodputBytesPerIter,
+                                    std::int64_t serializedBytesPerIter) {
+  state.SetBytesProcessed(static_cast<std::int64_t>(state.iterations()) * goodputBytesPerIter);
+  state.counters["PayloadBandwidth"] = benchmark::Counter(
+    static_cast<double>(state.iterations()) * static_cast<double>(goodputBytesPerIter),
+    benchmark::Counter::kIsRate);
+  state.counters["SerializedBandwidth"] = benchmark::Counter(
+    static_cast<double>(state.iterations()) * static_cast<double>(serializedBytesPerIter),
+    benchmark::Counter::kIsRate);
+  state.counters["ObjectToPayloadRatio"] = benchmark::Counter(
+    (goodputBytesPerIter > 0)
+      ? static_cast<double>(serializedBytesPerIter) / static_cast<double>(goodputBytesPerIter)
+      : 0.0);
+  state.counters["SerializedBytesPerCt"] = benchmark::Counter(static_cast<double>(fixture.ctSerializedBytes));
+  state.counters["SerializedDeg2BytesPerCt"] = benchmark::Counter(static_cast<double>(fixture.ctDeg2SerializedBytes));
+  state.counters["RSSDeg1BytesPerCt"] = benchmark::Counter(static_cast<double>(fixture.rssDeg1BytesPerCt));
+  state.counters["RSSDeg2BytesPerCt"] = benchmark::Counter(static_cast<double>(fixture.rssDeg2BytesPerCt));
+}
+
+}  // namespace
+
 /* ------------------------------------------------------------------ */
 /*  CT_SEQ_COPY — C[i] = Clone(A[i])                                  */
 /* ------------------------------------------------------------------ */
@@ -33,14 +58,15 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_COPY)(benchmark::State& state) {
     }
   }
 
-  /* Bytes model: each ciphertext holds ~2 polynomials (a, b) in RNS form. */
-  const std::int64_t ringDim    = state.range(0);
-  const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
-  const std::int64_t bytesPerCt   = bytesPerPoly * 2;            // 2 ring elements per ct
-  /* Clone reads A (1 ct) and writes C (1 ct) → 2 ct transfers per element */
-  state.SetBytesProcessed(state.iterations() * batch * (2 * bytesPerCt));
+  const std::int64_t bytesPerCt = bytesPerPoly * 2;
+  ReportCiphertextMetrics(state,
+                          *this,
+                          batch * (2 * bytesPerCt),
+                          batch * (2 * static_cast<std::int64_t>(ctSerializedBytes)));
   AggregateBandwidth(state);
 }
 
@@ -59,13 +85,15 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_ADD)(benchmark::State& state) {
     }
   }
 
-  const std::int64_t ringDim    = state.range(0);
-  const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
-  const std::int64_t bytesPerCt   = bytesPerPoly * 2;
-  /* Reads A + B, writes C → 3 ct transfers */
-  state.SetBytesProcessed(state.iterations() * batch * (3 * bytesPerCt));
+  const std::int64_t bytesPerCt = bytesPerPoly * 2;
+  ReportCiphertextMetrics(state,
+                          *this,
+                          batch * (3 * bytesPerCt),
+                          batch * (3 * static_cast<std::int64_t>(ctSerializedBytes)));
   AggregateBandwidth(state);
 }
 
@@ -87,13 +115,15 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_SCALE)(benchmark::State& state) {
     }
   }
 
-  const std::int64_t ringDim    = state.range(0);
-  const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
-  const std::int64_t bytesPerCt   = bytesPerPoly * 2;
-  /* Reads C, writes B → 2 ct transfers */
-  state.SetBytesProcessed(state.iterations() * batch * (2 * bytesPerCt));
+  const std::int64_t bytesPerCt = bytesPerPoly * 2;
+  ReportCiphertextMetrics(state,
+                          *this,
+                          batch * (2 * bytesPerCt),
+                          batch * (2 * static_cast<std::int64_t>(ctSerializedBytes)));
   AggregateBandwidth(state);
 }
 
@@ -116,13 +146,15 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_TRIAD)(benchmark::State& state) {
     }
   }
 
-  const std::int64_t ringDim    = state.range(0);
-  const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
-  const std::int64_t bytesPerCt   = bytesPerPoly * 2;
-  /* Reads B + C, writes A → 3 ct transfers */
-  state.SetBytesProcessed(state.iterations() * batch * (3 * bytesPerCt));
+  const std::int64_t bytesPerCt = bytesPerPoly * 2;
+  ReportCiphertextMetrics(state,
+                          *this,
+                          batch * (3 * bytesPerCt),
+                          batch * (3 * static_cast<std::int64_t>(ctSerializedBytes)));
   AggregateBandwidth(state);
 }
 
@@ -145,8 +177,12 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_MULT_NO_RELIN)(benchmark::State& state) {
   const std::int64_t numTowers = state.range(1);
   const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
-  /* MultNoRelin reads A(2 polys) + B(2 polys), writes C(3 polys) = 7 polys */
-  state.SetBytesProcessed(state.iterations() * batch * (7 * bytesPerPoly));
+  const std::int64_t bytesPerCt = bytesPerPoly * 2;
+  const std::int64_t bytesPerDeg2Ct = static_cast<std::int64_t>(ctDeg2SerializedBytes);
+  ReportCiphertextMetrics(state,
+                          *this,
+                          batch * (7 * bytesPerPoly),
+                          batch * (2 * static_cast<std::int64_t>(ctSerializedBytes) + bytesPerDeg2Ct));
   AggregateBandwidth(state);
 }
 
@@ -169,8 +205,12 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_RELIN)(benchmark::State& state) {
   const std::int64_t numTowers = state.range(1);
   const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
-  /* Relinearize reads A_deg2(3 polys), writes C(2 polys) = 5 polys */
-  state.SetBytesProcessed(state.iterations() * batch * (5 * bytesPerPoly));
+  const std::int64_t bytesPerCt = bytesPerPoly * 2;
+  const std::int64_t bytesPerDeg2Ct = static_cast<std::int64_t>(ctDeg2SerializedBytes);
+  ReportCiphertextMetrics(state,
+                          *this,
+                          batch * (5 * bytesPerPoly),
+                          batch * (bytesPerDeg2Ct + static_cast<std::int64_t>(ctSerializedBytes)));
   AggregateBandwidth(state);
 }
 
@@ -189,13 +229,15 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_ADD_INPLACE)(benchmark::State& state) {
     }
   }
 
-  const std::int64_t ringDim    = state.range(0);
-  const std::int64_t numTowers  = state.range(1);
-  const std::int64_t batch      = static_cast<std::int64_t>(batchSz);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::int64_t batch = static_cast<std::int64_t>(batchSz);
   const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
-  const std::int64_t bytesPerCt   = bytesPerPoly * 2;
-  /* Reads A, reads+writes C → 2 ct transfers (A read + C read/write) */
-  state.SetBytesProcessed(state.iterations() * batch * (2 * bytesPerCt));
+  const std::int64_t bytesPerCt = bytesPerPoly * 2;
+  ReportCiphertextMetrics(state,
+                          *this,
+                          batch * (2 * bytesPerCt),
+                          batch * (2 * static_cast<std::int64_t>(ctSerializedBytes)));
   AggregateBandwidth(state);
 }
 
@@ -239,14 +281,29 @@ BENCHMARK_DEFINE_F(CTFixture, CT_MPI_SENDRECV)(benchmark::State& state) {
 
   RS_BARRIER();
 
-  /* Bytes model: effective payload = 2 polynomials per ciphertext (a, b). */
-  const std::int64_t bytesPerPoly = state.range(0) * state.range(1) * 8;
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::int64_t bytesPerPoly = ringDim * numTowers * 8;
   const std::int64_t payloadBytes = bytesPerPoly * 2;
+  const std::int64_t serializedBytes = static_cast<std::int64_t>(ctSerializedBytes);
   /* Only rank 0 reports bytes so AggregateBandwidth doesn't double-count. */
   if (RS_MPI_Rank == 0)
     state.SetBytesProcessed(state.iterations() * static_cast<std::int64_t>(ct_A.size()) * payloadBytes);
   else
     state.SetBytesProcessed(0);
+
+  state.counters["SerializedBandwidth"] = benchmark::Counter(
+      static_cast<double>(state.iterations()) * static_cast<double>(ct_A.size()) * static_cast<double>(serializedBytes),
+      benchmark::Counter::kIsRate);
+    state.counters["PayloadBandwidth"] = benchmark::Counter(
+      static_cast<double>(state.iterations()) * static_cast<double>(ct_A.size()) * static_cast<double>(payloadBytes),
+      benchmark::Counter::kIsRate);
+    state.counters["ObjectToPayloadRatio"] = benchmark::Counter(
+      (payloadBytes > 0) ? static_cast<double>(serializedBytes) / static_cast<double>(payloadBytes) : 0.0);
+    state.counters["SerializedBytesPerCt"] = benchmark::Counter(static_cast<double>(ctSerializedBytes));
+    state.counters["SerializedDeg2BytesPerCt"] = benchmark::Counter(static_cast<double>(ctDeg2SerializedBytes));
+    state.counters["RSSDeg1BytesPerCt"] = benchmark::Counter(static_cast<double>(rssDeg1BytesPerCt));
+    state.counters["RSSDeg2BytesPerCt"] = benchmark::Counter(static_cast<double>(rssDeg2BytesPerCt));
 
   AggregateBandwidth(state);
 #else
