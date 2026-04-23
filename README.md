@@ -4,7 +4,7 @@ FHE-RaiderSTREAM is a C++ micro-benchmark suite for OpenFHE memory behavior.
 It measures bandwidth limits across three layers:
 
 - `DCRTPoly` backend: hardware and irregular-access limits
-- `Ciphertext` backend: software/allocator overhead and capacity limits
+- `Ciphertext` backend: payload goodput plus serialized object footprint
 - `MPI` extension: distributed aggregation and serialization overhead
 
 For full kernel descriptions and bytes models, see `BENCHMARKS.md`.
@@ -59,7 +59,14 @@ RS_BATCH_SIZE=2 mpirun -np 2 ./build/fhe_raiderstream \
 	--benchmark_filter="CTFixture/CT_MPI_SENDRECV/16384/5"
 ```
 
-MPI runs report `AggregateBandwidth` on rank 0.
+MPI runs report `AggregateBandwidth` on rank 0. Ciphertext kernels expose
+dual metrics for fair comparisons against DCRT and object-level realism:
+
+- `BytesProcessed` and `PayloadBandwidth`: payload-model goodput (same model family as DCRT).
+- `SerializedBandwidth`: wire-format proxy for full ciphertext object traffic.
+- `ObjectToPayloadRatio`: serialized bytes divided by payload bytes for the kernel.
+- `RSSDeg1BytesPerCt` and `RSSDeg2BytesPerCt`: setup-time resident-memory delta
+	per ciphertext (degree-1 and degree-2 pools, measured from `/proc/self/statm`).
 
 ## Notes
 

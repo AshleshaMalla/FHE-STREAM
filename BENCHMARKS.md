@@ -120,20 +120,29 @@ allocation).
 This backend answers the question: **"How much bandwidth does the OpenFHE
 *software* layer cost?"**
 
-All byte counters report only **payload polynomials** (the `(a, b)` ring
-elements inside each ciphertext).  This "**Goodput**" metric deliberately
-excludes metadata, vtable pointers, and allocator overhead so that the gap
-between DCRTPoly throughput and Ciphertext throughput directly quantifies the
-software tax.
+The ciphertext backend now reports both views:
+
+- `BytesProcessed` and `PayloadBandwidth` remain the payload-only
+  **goodput** estimate (directly comparable to DCRT's payload model).
+- `SerializedBandwidth` reports the serialized ciphertext size of the live
+  objects being processed.
+- `ObjectToPayloadRatio` reports serialized bytes divided by payload bytes for
+  each kernel configuration.
+- `RSSDeg1BytesPerCt` and `RSSDeg2BytesPerCt` report setup-time resident-set
+  deltas per ciphertext, derived from `/proc/self/statm` during fixture setup.
+
+This keeps the original software-tax comparison intact while also exposing
+deterministic object-size proxies and empirical resident-memory deltas for
+paper-grade discussion of real memory footprint.
 
 ### 3.1 Sequential Kernels (`CT_SEQ_*`)
 
 | Kernel               | Operation                                  | Bytes Model            |
 |----------------------|--------------------------------------------|------------------------|
-| `CT_SEQ_COPY`        | `C[i] = Clone(A[i])`                      | 2 ct (4 polys)         |
-| `CT_SEQ_ADD`         | `C[i] = EvalAdd(A[i], B[i])`              | 3 ct (6 polys)         |
-| `CT_SEQ_SCALE`       | `B[i] = EvalMult(C[i], plaintext_scalar)`  | 2 ct (4 polys)         |
-| `CT_SEQ_TRIAD`       | `A[i] = EvalAdd(B[i], EvalMult(C[i], s))` | 3 ct (6 polys)         |
+| `CT_SEQ_COPY`        | `C[i] = Clone(A[i])`                      | 2 ct goodput + 2 serialized ct |
+| `CT_SEQ_ADD`         | `C[i] = EvalAdd(A[i], B[i])`              | 3 ct goodput + 3 serialized ct |
+| `CT_SEQ_SCALE`       | `B[i] = EvalMult(C[i], plaintext_scalar)` | 2 ct goodput + 2 serialized ct |
+| `CT_SEQ_TRIAD`       | `A[i] = EvalAdd(B[i], EvalMult(C[i], s))` | 3 ct goodput + 3 serialized ct |
 
 These measure the **"Software Tax"** — the overhead of `std::shared_ptr`
 reference-count chasing, ciphertext metadata copies, and the OS memory
@@ -149,7 +158,7 @@ layer destroys.
 EvalAddInPlace(C[i], A[i])
 ```
 
-**Bytes model:** 2 ct (4 polys — read A, read+write C).
+**Bytes model:** 2 ct goodput + 2 serialized ct.
 
 This kernel exists to measure **how much performance is recovered by
 eliminating the allocator**.  `EvalAdd` allocates a new ciphertext on every
@@ -163,8 +172,8 @@ isolates the cost of `malloc` in the hot path.
 C[i] = EvalMultNoRelin(A[i], B[i])
 ```
 
-**Bytes model:** 7 polys (read A: 2, read B: 2, write C: 3 — a degree-2
-ciphertext has 3 ring elements).
+**Bytes model:** 7 polys of goodput, plus serialized size of A + B + the
+degree-2 output ciphertext.
 
 Measures the raw tensor-product cost without key-switching.  The output is a
 degree-2 ciphertext that can be fed to `CT_SEQ_RELIN`.
@@ -175,7 +184,8 @@ degree-2 ciphertext that can be fed to `CT_SEQ_RELIN`.
 C[i] = Relinearize(A_deg2[i])
 ```
 
-**Bytes model:** 5 polys (read A_deg2: 3, write C: 2).
+**Bytes model:** 5 polys of goodput, plus serialized size of the degree-2
+input and degree-1 output.
 
 This kernel measures the **"Capacity Wall."**  Relinearization must stream
 Gigabyte-sized evaluation keys from main memory for every ciphertext.  By
@@ -210,8 +220,9 @@ A synchronous Rank-0 → Rank-1 ping-pong benchmark:
    iteration counts, preventing the Google Benchmark auto-calibration
    deadlock on paired `MPI_Send`/`MPI_Recv` calls.
 
-**Bytes model:** 2 polys per ciphertext (payload only — the serialized
-metadata envelope is deliberately excluded).
+**Bytes model:** payload goodput is still reported through `BytesProcessed`;
+`SerializedBandwidth` reports the serialized size of each ciphertext sent from
+rank 0 to rank 1.
 
 This kernel explicitly measures the **"Serialization Tax"** — the cost of
 converting a live C++ ciphertext object into a flat byte stream before data
