@@ -1,0 +1,87 @@
+{
+  "context": {
+    "date": "2026-04-27T02:00:16-05:00",
+    "host_name": "rpc-91-1",
+    "executable": "./build/fhe_raiderstream",
+    "num_cpus": 256,
+    "mhz_per_cpu": 3100,
+    "cpu_scaling_enabled": false,
+    "aslr_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1048576,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 16777216,
+        "num_sharing": 8
+      }
+    ],
+    "load_avg": [0,0.18,1.05],
+    "library_version": "v1.9.5-29-ged9d1151",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "CTFixture/CT_SEQ_MULT_NO_RELIN/131072/40/0",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "CTFixture/CT_SEQ_MULT_NO_RELIN/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 3.0313955500023440e+03,
+      "cpu_time": 2.9291491619999997e+03,
+      "time_unit": "ms",
+      "ObjectToPayloadRatio": 7.0005001681191581e-01,
+      "PayloadBandwidth": 2.0046864380203250e+08,
+      "RSSDeg1BytesPerCt": 7.3416021000000000e+07,
+      "RSSDeg2BytesPerCt": 3.9683686400000000e+08,
+      "SerializedBandwidth": 1.4033807746387482e+08,
+      "SerializedBytesPerCt": 5.8724287000000000e+07,
+      "SerializedDeg2BytesPerCt": 8.8087007000000000e+07,
+      "bytes_per_second": 2.0046864380203250e+08
+    },
+    {
+      "name": "CTFixture/CT_SEQ_RELIN/131072/40/0",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "CTFixture/CT_SEQ_RELIN/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 1,
+      "real_time": 4.5306274570175447e+03,
+      "cpu_time": 4.4189418069999992e+03,
+      "time_unit": "ms",
+      "ObjectToPayloadRatio": 7.0005080223083493e-01,
+      "PayloadBandwidth": 9.4916479627675727e+07,
+      "RSSDeg1BytesPerCt": 7.3544362000000000e+07,
+      "RSSDeg2BytesPerCt": 3.9683481600000000e+08,
+      "SerializedBandwidth": 6.6446357708281092e+07,
+      "SerializedBytesPerCt": 5.8724287000000000e+07,
+      "SerializedDeg2BytesPerCt": 8.8087007000000000e+07,
+      "bytes_per_second": 9.4916479627675727e+07
+    }
+  ]
+}
