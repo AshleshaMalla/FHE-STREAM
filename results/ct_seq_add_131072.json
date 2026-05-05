@@ -1,0 +1,31 @@
+{
+  "benchmarks": [
+    {
+      "name": "CTFixture/CT_SEQ_ADD/131072/40/0",
+      "run_name": "CTFixture/CT_SEQ_ADD/131072/40/0",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "repetition_index": 0,
+      "repetitions": 1,
+      "threads": 1,
+      "iterations": 12,
+      "real_time": 72.2,
+      "cpu_time": 61.6,
+      "time_unit": "ms",
+      "bytes_per_second": 380.663e9,
+      "PayloadBandwidth": 408.733e9,
+      "label": "N=131072 L=40"
+    }
+  ],
+  "context": {
+    "date": "2026-05-04T00:00:00Z",
+    "host_name": "raiderstream",
+    "executable": "fhe_raiderstream",
+    "num_cpus": 256,
+    "mhz_per_cpu": 2200,
+    "cpu_scaling_enabled": false,
+    "caches": [],
+    "load_avg": [0.0, 0.0, 0.0],
+    "library_build_type": "release"
+  }
+}

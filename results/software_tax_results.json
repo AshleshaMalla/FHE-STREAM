@@ -1,0 +1,145 @@
+{
+  "context": {
+    "date": "2026-04-27T01:37:40-05:00",
+    "host_name": "rpc-91-1",
+    "executable": "./build/fhe_raiderstream",
+    "num_cpus": 256,
+    "mhz_per_cpu": 3100,
+    "cpu_scaling_enabled": false,
+    "aslr_enabled": true,
+    "caches": [
+      {
+        "type": "Data",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Instruction",
+        "level": 1,
+        "size": 32768,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 2,
+        "size": 1048576,
+        "num_sharing": 1
+      },
+      {
+        "type": "Unified",
+        "level": 3,
+        "size": 16777216,
+        "num_sharing": 8
+      }
+    ],
+    "load_avg": [
+      0,
+      0,
+      0
+    ],
+    "library_version": "v1.9.5-29-ged9d1151",
+    "library_build_type": "release",
+    "json_schema_version": 1
+  },
+  "benchmarks": [
+    {
+      "name": "FHERaiderSTREAM/RS_SEQ_COPY/131072/40/0",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_SEQ_COPY/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 3,
+      "real_time": 93.77595832726608,
+      "cpu_time": 92.78934133333354,
+      "time_unit": "ms",
+      "bytes_per_second": 462872915604.7022,
+      "label": "N=131072 L=40"
+    },
+    {
+      "name": "FHERaiderSTREAM/RS_SEQ_ADD/131072/40/0",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "FHERaiderSTREAM/RS_SEQ_ADD/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 2,
+      "real_time": 122.39024552400224,
+      "cpu_time": 121.11542499999928,
+      "time_unit": "ms",
+      "bytes_per_second": 531926543955.9031,
+      "label": "N=131072 L=40"
+    },
+    {
+      "name": "CTFixture/CT_SEQ_COPY/131072/40/0",
+      "family_index": 0,
+      "per_family_instance_index": 0,
+      "run_name": "CTFixture/CT_SEQ_COPY/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 22,
+      "real_time": 12.419454044323754,
+      "cpu_time": 12.166337272727322,
+      "time_unit": "ms",
+      "ObjectToPayloadRatio": 0.7000480532646179,
+      "PayloadBandwidth": 68949329711.61607,
+      "RSSDeg1BytesPerCt": 82370560.0,
+      "RSSDeg2BytesPerCt": 369717248.0,
+      "SerializedBandwidth": 48267844038.51711,
+      "SerializedBytesPerCt": 58724287.0,
+      "SerializedDeg2BytesPerCt": 88087007.0,
+      "bytes_per_second": 68949329711.61607
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD/131072/40/0",
+      "family_index": 1,
+      "per_family_instance_index": 0,
+      "run_name": "CTFixture/CT_SEQ_ADD/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 12,
+      "real_time": 24.2368387504636,
+      "cpu_time": 23.90805133333333,
+      "time_unit": "ms",
+      "ObjectToPayloadRatio": 0.7000480532646179,
+      "PayloadBandwidth": 52630437439.52701,
+      "RSSDeg1BytesPerCt": 82322227.0,
+      "RSSDeg2BytesPerCt": 370136678.0,
+      "SerializedBandwidth": 36843835272.00614,
+      "SerializedBytesPerCt": 58724287.0,
+      "SerializedDeg2BytesPerCt": 88087007.0,
+      "bytes_per_second": 52630437439.52701
+    },
+    {
+      "name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/0",
+      "family_index": 2,
+      "per_family_instance_index": 0,
+      "run_name": "CTFixture/CT_SEQ_ADD_INPLACE/131072/40/0",
+      "run_type": "iteration",
+      "repetitions": 1,
+      "repetition_index": 0,
+      "threads": 1,
+      "iterations": 23,
+      "real_time": 12.2308156518873,
+      "cpu_time": 11.98480956521741,
+      "time_unit": "ms",
+      "ObjectToPayloadRatio": 0.7000480532646179,
+      "PayloadBandwidth": 69993669522.6732,
+      "RSSDeg1BytesPerCt": 82293828.0,
+      "RSSDeg2BytesPerCt": 370137497.0,
+      "SerializedBandwidth": 48998932090.19439,
+      "SerializedBytesPerCt": 58724287.0,
+      "SerializedDeg2BytesPerCt": 88087007.0,
+      "bytes_per_second": 69993669522.6732
+    }
+  ]
+}

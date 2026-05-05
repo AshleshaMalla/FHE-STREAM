@@ -1,60 +1,40 @@
-# FHE-RaiderSTREAM commands for REPACSS cluster
+# FHE-RaiderSTREAM evaluation commands (single-line commands, JSON outputs)
 
-# Build
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_DCRT=ON -DENABLE_CIPHERTEXT=ON -DENABLE_MPI=ON
-cmake --build build -j
-
-# Create results directory
+# Pre-step: create output directory
 mkdir -p results
 
-# 1) Core scaling
+# Fixed campaign parameters
+export RS_RING=131072; export RS_DEPTH=40; export RS_BATCH_DCRT=512; export L3_TARGET_BYTES=$((512*1024*1024))
 
-for t in 1 16 64 128 256; do
-  OMP_NUM_THREADS="$t" RS_BATCH_SIZE=256 \
-  ./build/fhe_raiderstream \
-    --benchmark_filter="RS_SEQ_ADD/65536/20" \
-    --benchmark_min_time=0.50s \
-    --benchmark_format=csv \
-    --benchmark_out="results/sweep1_core_scaling_t${t}.csv"
- done
+# Goal 1 (Hardware Tax, AMD): DCRT SEQ/GATHER/SCATTER/SG x COPY/SCALE/ADD/TRIAD, N=131072, L=40, batch=512 -> hardware_tax_results.json
+OMP_NUM_THREADS=256 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_DCRT} ./build/fhe_raiderstream --benchmark_filter='RS_(SEQ|GATHER|SCATTER|SCATTER_GATHER)_(COPY|SCALE|ADD|TRIAD)/131072/40/[0-2]$' --benchmark_min_time=0.20s --benchmark_repetitions=15 --benchmark_out_format=json --benchmark_out=results/hardware_tax_results.json
 
-# 2) Memory access pattern penalty (Gather/Scatter)
+# Goal 2 (Software Tax, AMD): DCRT baseline vs CT standard vs CT ADD_INPLACE for COPY/ADD
+# Formula for CT batch (cache-busting with larger CT objects): RS_BATCH_SIZE_CT = ceil(L3_TARGET_BYTES / (2 * RSSDeg1BytesPerCt)) = (L3_TARGET_BYTES + 2*RSSDeg1BytesPerCt - 1) / (2*RSSDeg1BytesPerCt)
+OMP_NUM_THREADS=256 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=1 ./build/fhe_raiderstream --benchmark_filter='^CTFixture/CT_SEQ_COPY/131072/40/0$' --benchmark_min_time=0.02s --benchmark_out_format=json --benchmark_out=results/ct_probe_for_batch.json
+export CT_RSS_BPC=$(python3 -c 'import json; d=json.load(open("results/ct_probe_for_batch.json")); v=next((b.get("RSSDeg1BytesPerCt") for b in d.get("benchmarks",[]) if b.get("name")=="CTFixture/CT_SEQ_COPY/131072/40/0"),0); print(int(float(v or 0)))'); [ "${CT_RSS_BPC}" -gt 0 ] || { echo "CT_RSS_BPC is zero or missing; rerun ct_probe_for_batch.json generation"; exit 1; }; export RS_BATCH_CT=$(( (L3_TARGET_BYTES + 2*CT_RSS_BPC - 1) / (2*CT_RSS_BPC) ))
+OMP_NUM_THREADS=256 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_DCRT} ./build/fhe_raiderstream --benchmark_filter='RS_SEQ_(COPY|ADD)/131072/40/0$' --benchmark_min_time=0.20s --benchmark_out_format=json --benchmark_out=results/software_tax_dcrt_baseline.json
+OMP_NUM_THREADS=256 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_CT} ./build/fhe_raiderstream --benchmark_filter='^CTFixture/CT_SEQ_(COPY|ADD|ADD_INPLACE)/131072/40/0$' --benchmark_min_time=0.20s --benchmark_out_format=json --benchmark_out=results/software_tax_ct_adjusted.json
+python3 -c 'import json; a=json.load(open("results/software_tax_dcrt_baseline.json")); b=json.load(open("results/software_tax_ct_adjusted.json")); out={"context": a.get("context", {}), "benchmarks": a.get("benchmarks", []) + b.get("benchmarks", [])}; json.dump(out, open("results/software_tax_results.json", "w"), indent=2)'
 
-OMP_NUM_THREADS=256 RS_BATCH_SIZE=100 \
-./build/fhe_raiderstream \
-  --benchmark_filter="(RS_SEQ_ADD|RS_GATHER_ADD|RS_SCATTER_ADD|RS_SCATTER_GATHER_ADD)/65536/5" \
-  --benchmark_min_time=0.50s \
-  --benchmark_format=csv \
-  --benchmark_out="results/sweep2_memory_access_pattern.csv"
+# Goal 3 (Allocation Tax, AMD): CT degree growth and relin with batch selected from deg2 RSS
+# Formula for deg2-focused batch: RS_BATCH_SIZE_CT_DEG2 = ceil(L3_TARGET_BYTES / RSSDeg2BytesPerCt) = (L3_TARGET_BYTES + RSSDeg2BytesPerCt - 1) / RSSDeg2BytesPerCt
+export CT_RSS_DEG2_BPC=$(python3 -c 'import json; d=json.load(open("results/ct_probe_for_batch.json")); v=next((b.get("RSSDeg2BytesPerCt") for b in d.get("benchmarks",[]) if b.get("name")=="CTFixture/CT_SEQ_COPY/131072/40/0"),0); print(int(float(v or 0)))'); [ "${CT_RSS_DEG2_BPC}" -gt 0 ] || { echo "CT_RSS_DEG2_BPC is zero or missing; rerun ct_probe_for_batch.json generation"; exit 1; }; export RS_BATCH_CT_DEG2=$(( (L3_TARGET_BYTES + CT_RSS_DEG2_BPC - 1) / CT_RSS_DEG2_BPC ))
+OMP_NUM_THREADS=256 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_CT_DEG2} ./build/fhe_raiderstream --benchmark_filter='^CTFixture/CT_SEQ_(MULT_NO_RELIN|RELIN)/131072/40/0$' --benchmark_min_time=0.10s --benchmark_out_format=json --benchmark_out=results/rss_expansion_results.json
 
-# 3) TRIAD vs KEYSWITCH_MOCK
+# Goal 4 (Hardware Acceleration, AMD vs Intel HEXL path): use the same kernel set on each node and merge
+# Recommended thread counts from hardware topology data: AMD=256 threads (2x128 cores), Intel=64 threads (2x32 cores), both 1 thread/core
+OMP_NUM_THREADS=256 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_CT} ./build/fhe_raiderstream --benchmark_filter='CTFixture/CT_SEQ_(SCALE|MULT_NO_RELIN)/131072/40/0$|RS_NTT_ROUNDTRIP/131072/40/0$' --benchmark_min_time=0.20s --benchmark_out_format=json --benchmark_out=results/amd_vs_intel_amd.json
+OMP_NUM_THREADS=64 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_CT} ./build/fhe_raiderstream --benchmark_filter='CTFixture/CT_SEQ_(SCALE|MULT_NO_RELIN)/131072/40/0$|RS_NTT_ROUNDTRIP/131072/40/0$' --benchmark_min_time=0.20s --benchmark_out_format=json --benchmark_out=results/amd_vs_intel_intel.json
+python3 -c 'import json; a=json.load(open("results/amd_vs_intel_amd.json")); b=json.load(open("results/amd_vs_intel_intel.json")); json.dump({"amd": a, "intel": b}, open("results/amd_vs_intel_results.json", "w"), indent=2)'
 
-for b in 10 40; do
-  OMP_NUM_THREADS=256 RS_BATCH_SIZE="$b" \
-  ./build/fhe_raiderstream \
-    --benchmark_filter="(RS_SEQ_TRIAD|RS_KEYSWITCH_MOCK)/65536/20" \
-    --benchmark_min_time=0.50s \
-    --benchmark_format=csv \
-    --benchmark_out="results/sweep3_triad_vs_keyswitch_b${b}.csv"
- done
+# Useful additional runs (recommended)
+# 1) Repeatability (3 replicates per goal-1 campaign)
+for r in 1 2 3; do OMP_NUM_THREADS=256 OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_DCRT} ./build/fhe_raiderstream --benchmark_filter='RS_(SEQ|GATHER|SCATTER|SCATTER_GATHER)_(COPY|SCALE|ADD|TRIAD)/131072/40/[0-2]$' --benchmark_min_time=0.20s --benchmark_repetitions=15 --benchmark_out_format=json --benchmark_out="results/hardware_tax_results_rep${r}.json"; done
 
-# 4) Software abstraction penalty
+# 2) NUMA sensitivity on AMD (compact vs spread)
+OMP_NUM_THREADS=256 OMP_PROC_BIND=close OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_DCRT} ./build/fhe_raiderstream --benchmark_filter='RS_SEQ_(COPY|SCALE|ADD|TRIAD)/131072/40/0$' --benchmark_min_time=0.20s --benchmark_out_format=json --benchmark_out=results/hardware_tax_numa_close.json
 
-for b in 40 128; do
-  OMP_NUM_THREADS=256 RS_BATCH_SIZE="$b" \
-  ./build/fhe_raiderstream \
-    --benchmark_filter="(RS_SEQ_ADD|CTFixture/CT_SEQ_ADD)/(32768|65536)/20" \
-    --benchmark_min_time=0.50s \
-    --benchmark_format=csv \
-    --benchmark_out="results/sweep4_software_tax_b${b}.csv"
- done
-
-# 5) Capacity Wall test
-
-OMP_NUM_THREADS=256 RS_BATCH_SIZE=256 \
-./build/fhe_raiderstream \
-  --benchmark_filter="CTFixture/CT_SEQ_RELIN/131072/40" \
-  --benchmark_min_time=0.05s \
-  --benchmark_format=csv \
-  --benchmark_out="results/sweep5_capacity_wall.csv"
+# 3) Thread-scaling checkpoints for acceleration study on both nodes
+for t in 32 64 128 256; do OMP_NUM_THREADS=$t OMP_PROC_BIND=spread OMP_PLACES=cores RS_BATCH_SIZE=${RS_BATCH_CT} ./build/fhe_raiderstream --benchmark_filter='CTFixture/CT_SEQ_(SCALE|MULT_NO_RELIN)/131072/40/0$|RS_NTT_ROUNDTRIP/131072/40/0$' --benchmark_min_time=0.20s --benchmark_out_format=json --benchmark_out="results/accel_threads_t${t}.json"; done
 
