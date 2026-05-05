@@ -46,12 +46,7 @@ def configure_matplotlib() -> None:
         {
             "font.family": "serif",
             "font.serif": serif_fonts,
-            "font.size": 11,
-            "axes.labelsize": 12,
-            "axes.titlesize": 13,
-            "legend.fontsize": 10,
-            "xtick.labelsize": 11,
-            "ytick.labelsize": 11,
+            "font.size": 13,
             "text.color": "black",
             "axes.edgecolor": "black",
             "axes.labelcolor": "black",
@@ -163,6 +158,7 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
         edgecolor="black",
         linewidth=0.8,
         label=MODE_LABELS["poly"],
+        zorder=3,
     )
     bars_coeff = ax.bar(
         [x + width / 2 for x in x_positions],
@@ -172,33 +168,34 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
         edgecolor="black",
         linewidth=0.8,
         label=MODE_LABELS["coeff"],
+        zorder=3,
     )
+
+    ymax = max((v for v in poly_heights + coeff_heights if v == v), default=0.0)
+    ax.set_ylim(0, ymax * 1.15)
+
+    ax.set_ylabel("Bandwidth (GB/s)")
+    title = "DCRTPoly Shuffle-Mode Comparison: Gather / Scatter-Gather ADD and TRIAD"
+    if n_val and l_val:
+        title += f"\n(N={n_val}, L={l_val}, Batch={batch_size})"
+    ax.set_title(title, fontweight="bold")
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels([label for _, _, label in CATEGORIES])
+    ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", frameon=False, fontsize=13)
 
     for bars, heights in ((bars_poly, poly_heights), (bars_coeff, coeff_heights)):
         for bar, height in zip(bars, heights):
             if height == height:
                 ax.text(
                     bar.get_x() + bar.get_width() / 2,
-                    height,
+                    height + ymax * 0.018,
                     f"{height:.1f}",
                     ha="center",
                     va="bottom",
-                    fontsize=8,
+                    zorder=4,
                 )
-
-    ax.set_ylabel("Bandwidth (GB/s)")
-    title = "DCRTPoly Shuffle-Mode Comparison: Gather / Scatter-Gather ADD and TRIAD"
-    if n_val and l_val:
-        title += f" [N={n_val}, L={l_val}, Batch={batch_size}]"
-    ax.set_title(title)
-    ax.set_xticks(x_positions)
-    ax.set_xticklabels([label for _, _, label in CATEGORIES])
-    ax.grid(axis="y", linestyle="--", alpha=0.3)
-    ax.set_axisbelow(True)
-    ax.legend(loc="upper left", frameon=False)
-
-    ymax = max((v for v in poly_heights + coeff_heights if v == v), default=0.0)
-    ax.set_ylim(0, ymax * 1.22)
 
     plt.tight_layout()
     fig.savefig(output_path, format="pdf", bbox_inches="tight")

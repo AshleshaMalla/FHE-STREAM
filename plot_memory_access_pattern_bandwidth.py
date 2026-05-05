@@ -51,20 +51,11 @@ def configure_matplotlib() -> None:
     available_fonts = {font.name for font in font_manager.fontManager.ttflist}
     serif_fonts = ["Times New Roman"] if "Times New Roman" in available_fonts else []
     serif_fonts.extend(["Times", "DejaVu Serif", "Liberation Serif", "serif"])
-
     plt.rcParams.update(
         {
             "font.family": "serif",
             "font.serif": serif_fonts,
-            "font.size": 11,
-            "axes.labelsize": 12,
-            "axes.titlesize": 13,
-            "axes.titleweight": "normal",
-            "axes.labelweight": "normal",
-            "legend.fontsize": 10,
-            "legend.title_fontsize": 10,
-            "xtick.labelsize": 11,
-            "ytick.labelsize": 11,
+            "font.size": 13,
             "text.color": "black",
             "axes.edgecolor": "black",
             "axes.labelcolor": "black",
@@ -185,6 +176,24 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
             n_val, l_val = entry["n"], entry["l"]
             break
 
+    # Update title with backend and parameters
+    title_str = "DCRTPoly Backend: Bandwidth Across Memory Access Patterns (Coeff mode)"
+    if n_val and l_val:
+        title_str += f"\n(N={n_val}, L={l_val}, Batch={batch_size})"
+    ax.set_title(title_str, fontweight="bold")
+    ax.set_xlabel("Kernels")
+    ax.set_ylabel("Bandwidth (GB/s)")
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels(KERNEL_ORDER)
+    ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
+    ax.set_axisbelow(True)
+
+    ymax = max((item["mean_gbs"] for item in summary.values() if isinstance(item, dict)), default=0)
+    ax.set_ylim(0, ymax * 1.15)
+
+    # Add secondary x-axis for Total CPU Cores (assuming n_val represents this context if applicable, 
+    # but here we just need bars and labels).
+    
     for pattern_index, pattern in enumerate(PATTERN_ORDER):
         heights = [
             summary.get((kernel, pattern), {}).get("mean_gbs", float("nan"))
@@ -199,35 +208,20 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
             edgecolor="black",
             linewidth=0.6,
             label=PATTERN_LABELS[pattern],
+            zorder=3
         )
         for bar, height in zip(bars, heights):
             if not (height != height):  # Skip NaN
                 ax.text(
                     bar.get_x() + bar.get_width() / 2,
-                    height,
+                    height + ymax * 0.018,
                     f"{height:.1f}",
                     ha="center",
                     va="bottom",
-                    fontsize=8,
+                    zorder=4
                 )
 
-    # Update title with backend and parameters
-    title_str = "DCRTPoly Backend: Bandwidth Across Memory Access Patterns (Coeff mode)"
-    if n_val and l_val:
-        title_str += f" [N={n_val}, L={l_val}, Batch={batch_size}]"
-    ax.set_title(title_str)
-    ax.set_xlabel("Kernels")
-    ax.set_ylabel("Bandwidth (GB/s)")
-    ax.set_xticks(x_positions)
-    ax.set_xticklabels(KERNEL_ORDER)
-    ax.grid(axis="y", linestyle="--", alpha=0.3)
-    ax.set_axisbelow(True)
-
-    ymax = max((item["mean_gbs"] for item in summary.values() if isinstance(item, dict)), default=0)
-    ax.set_ylim(0, ymax * 1.18)
-
-    ax.legend(loc="upper left", frameon=False, fontsize=8)
-
+    ax.legend(loc="upper left", frameon=False, fontsize=13, ncol=2)
     plt.tight_layout()
     fig.savefig(output_path, format="pdf", bbox_inches="tight")
     plt.close(fig)

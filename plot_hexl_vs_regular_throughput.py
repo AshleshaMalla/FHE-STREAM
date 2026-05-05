@@ -41,12 +41,12 @@ def configure_matplotlib() -> None:
         {
             "font.family": "serif",
             "font.serif": serif_fonts,
-            "font.size": 11,
-            "axes.labelsize": 12,
-            "axes.titlesize": 14,
-            "legend.fontsize": 10,
-            "xtick.labelsize": 11,
-            "ytick.labelsize": 11,
+            "font.size": 13,
+            "text.color": "black",
+            "axes.edgecolor": "black",
+            "axes.labelcolor": "black",
+            "xtick.color": "black",
+            "ytick.color": "black",
         }
     )
 
@@ -82,7 +82,7 @@ def parse_category(name: str) -> tuple[str, str | None, str | None] | None:
     return pattern, kernel, suffix
 
 
-def load_system(path: Path) -> tuple[dict[tuple[str, str | None], float], int | None, int | None]:
+def load_system(path: Path) -> tuple[dict[tuple[str, str | None], float], int | None, int | None, int | None]:
     with path.open("r", encoding="utf-8") as handle:
         data = json.load(handle)
 
@@ -90,6 +90,7 @@ def load_system(path: Path) -> tuple[dict[tuple[str, str | None], float], int | 
     median_values: dict[tuple[str, str | None], float] = {}
     n_val = None
     l_val = None
+    batch_val = None
 
     for benchmark in data.get("benchmarks", []):
         name = benchmark.get("name") or benchmark.get("run_name") or ""
@@ -103,14 +104,17 @@ def load_system(path: Path) -> tuple[dict[tuple[str, str | None], float], int | 
         if bandwidth is None:
             continue
 
-        if n_val is None or l_val is None:
+        if n_val is None or l_val is None or batch_val is None:
             label = benchmark.get("label", "")
             n_match = re.search(r"N=(\d+)", label)
             l_match = re.search(r"L=(\d+)", label)
+            batch_match = re.search(r"Batch[Ss]ize=(\d+)", label)
             if n_match:
                 n_val = int(n_match.group(1))
             if l_match:
                 l_val = int(l_match.group(1))
+            if batch_match:
+                batch_val = int(batch_match.group(1))
 
         key = (category, kernel if category != "NTT" else None)
 
@@ -130,23 +134,26 @@ def load_system(path: Path) -> tuple[dict[tuple[str, str | None], float], int | 
     for key, value in median_values.items():
         summary[key] = value
 
-    return summary, n_val, l_val
+    return summary, n_val, l_val, batch_val
 
 
-def build_summary(system_files: dict[str, Path]) -> tuple[dict[str, dict[tuple[str, str | None], float]], int | None, int | None]:
+def build_summary(system_files: dict[str, Path]) -> tuple[dict[str, dict[tuple[str, str | None], float]], int | None, int | None, int | None]:
     summary: dict[str, dict[tuple[str, str | None], float]] = {}
     n_val = None
     l_val = None
+    batch_val = None
 
     for system_key, path in system_files.items():
-        values, local_n, local_l = load_system(path)
+        values, local_n, local_l, local_batch = load_system(path)
         summary[system_key] = values
         if n_val is None and local_n is not None:
             n_val = local_n
         if l_val is None and local_l is not None:
             l_val = local_l
+        if batch_val is None and local_batch is not None:
+            batch_val = local_batch
 
-    return summary, n_val, l_val
+    return summary, n_val, l_val, batch_val
 
 
 def print_summary(summary: dict[str, dict[tuple[str, str | None], float]]) -> None:
@@ -170,6 +177,7 @@ def plot_summary(
     output: Path,
     n_val: int | None,
     l_val: int | None,
+    batch_val: int | None,
 ) -> None:
     configure_matplotlib()
 
@@ -189,6 +197,7 @@ def plot_summary(
         edgecolor="black",
         linewidth=0.8,
         label=SYSTEM_LABELS["regular"],
+        zorder=3,
     )
     bars_hexl = ax.bar(
         [x + width / 2 for x in x_positions],
@@ -198,45 +207,53 @@ def plot_summary(
         edgecolor="black",
         linewidth=0.8,
         label=SYSTEM_LABELS["hexl"],
+        zorder=3,
     )
 
-    title = "HEXL-off vs HEXL-on Bandwidth Comparison (GiB/s)"
-    if n_val is not None and l_val is not None:
-        fig.suptitle(f"{title}\nN={n_val}, L={l_val}", fontweight="bold", y=0.98)
+    title = "DCRTPoly: HEXL-off vs HEXL-on Bandwidth Comparison (GiB/s)"
+    params = []
+    if n_val is not None:
+        params.append(f"N={n_val}")
+    if l_val is not None:
+        params.append(f"L={l_val}")
+    if batch_val is not None:
+        params.append(f"Batch={batch_val}")
+    
+    if params:
+        ax.set_title(f"{title}\n({', '.join(params)})", fontweight="bold")
     else:
-        fig.suptitle(title, fontweight="bold", y=0.98)
-    # ax.set_title("Requested Kernel Comparison", fontweight="bold")
+        ax.set_title(title, fontweight="bold")
 
-    ax.set_ylabel("Bandwidth (GiB/s)", fontweight="bold")
+    ax.set_ylabel("Bandwidth (GiB/s)")
     ax.set_xticks(x_positions)
     ax.set_xticklabels(labels)
-    ax.set_ylim(0, max(v for v in regular_vals + hexl_vals if v == v) * 1.18)
-    ax.grid(axis="y", linestyle="--", alpha=0.3)
+    
+    max_val = max(v for v in regular_vals + hexl_vals if v == v)
+    ax.set_ylim(0, max_val * 1.15)
+    ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper right", frameon=True)
+    ax.legend(loc="upper right", frameon=False, fontsize=13)
 
     for bar, value in zip(bars_regular, regular_vals):
         if value == value:
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
-                value + 3.0,
+                value + max_val * 0.018,
                 f"{value:.1f}",
                 ha="center",
                 va="bottom",
-                fontsize=10,
-                fontweight="bold",
+                zorder=4,
             )
 
     for bar, value in zip(bars_hexl, hexl_vals):
         if value == value:
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
-                value + 3.0,
+                value + max_val * 0.018,
                 f"{value:.1f}",
                 ha="center",
                 va="bottom",
-                fontsize=10,
-                fontweight="bold",
+                zorder=4,
             )
 
     plt.tight_layout()
@@ -256,12 +273,12 @@ def main() -> None:
     if not args.hexl.exists():
         raise FileNotFoundError(f"HEXL input not found: {args.hexl}")
 
-    summary, n_val, l_val = build_summary({"regular": args.regular, "hexl": args.hexl})
+    summary, n_val, l_val, batch_val = build_summary({"regular": args.regular, "hexl": args.hexl})
     if not summary.get("regular") or not summary.get("hexl"):
         raise RuntimeError("No matching benchmark categories were found in both input files.")
 
     print_summary(summary)
-    plot_summary(summary, args.output, n_val, l_val)
+    plot_summary(summary, args.output, n_val, l_val, batch_val)
     print(f"\nSaved figure to {args.output}")
 
 
