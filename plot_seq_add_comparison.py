@@ -22,14 +22,7 @@ def configure_matplotlib() -> None:
         {
             "font.family": "serif",
             "font.serif": serif_fonts,
-            "font.size": 11,
-            "axes.labelsize": 12,
-            "axes.titlesize": 13,
-            "axes.titleweight": "normal",
-            "axes.labelweight": "normal",
-            "legend.fontsize": 10,
-            "xtick.labelsize": 11,
-            "ytick.labelsize": 11,
+            "font.size": 13,
             "text.color": "black",
             "axes.edgecolor": "black",
             "axes.labelcolor": "black",
@@ -93,7 +86,7 @@ def load_summary(json_path: Path):
     for kernel, values in kernels.items():
         if values:
             summary[kernel] = {
-                "mean_gbs": mean(values) / 1e9,
+                "mean_gbs": mean(values) / (1024.0**3),
                 "count": len(values),
             }
 
@@ -120,32 +113,35 @@ def plot_comparison(summary: dict, n_val: int | None, l_val: int | None, output_
         color=kernel_colors,
         edgecolor="black",
         linewidth=0.8,
+        zorder=3,
     )
 
     # Add value labels on bars
     for bar, height, count in zip(bars, heights, counts):
+        label_y = min(height + max(heights) * 0.018, max(heights) * 1.25 - max(heights) * 0.03)
         ax.text(
             bar.get_x() + bar.get_width() / 2,
-            height,
-            f"{height:.1f} GB/s",
+            label_y,
+            f"{height:.1f} GiB/s",
             ha="center",
             va="bottom",
-            fontsize=10,
+            fontsize=11,
             fontweight="bold",
+            zorder=4,
         )
 
-    ax.set_ylabel("Payload Bandwidth (GB/s)")
-    title = "ADD Kernel: Software Overhead Comparison (256 threads, Batch=256)"
+    ax.set_ylabel("Payload Bandwidth (GiB/s)")
+    title = "ADD Kernel (256 threads, Batch=256)"
     if n_val and l_val:
-        title += f"\nN={n_val}, L={l_val}"
-    ax.set_title(title)
+        title += f"\n(N={n_val}, L={l_val}, Batch=256)"
+    ax.set_title(title, fontweight="bold")
     ax.set_xticks(x_positions)
     ax.set_xticklabels(kernel_labels)
-    ax.grid(axis="y", linestyle="--", alpha=0.3)
+    ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
     ax.set_axisbelow(True)
 
     ymax = max(heights) if heights else 0
-    ax.set_ylim(0, ymax * 1.25)
+    ax.set_ylim(0, ymax * 1.15)
 
     plt.tight_layout()
     fig.savefig(output_path, format="pdf", bbox_inches="tight")
@@ -156,7 +152,7 @@ def plot_comparison(summary: dict, n_val: int | None, l_val: int | None, output_
 
 def print_summary_table(summary: dict) -> None:
     print("\nSEQ_ADD Kernel Comparison (256 threads, Batch=256)\n")
-    print(f"{'Kernel':<25} {'Bandwidth (GB/s)':>20} {'Samples':>10}")
+    print(f"{'Kernel':<25} {'Bandwidth (GiB/s)':>20} {'Samples':>10}")
     print("-" * 55)
     for kernel in ["RS_SEQ_ADD", "CT_SEQ_ADD", "CT_SEQ_ADD_INPLACE"]:
         item = summary.get(kernel)

@@ -13,12 +13,12 @@ def configure_matplotlib():
     plt.rcParams.update({
         "font.family": "serif",
         "font.serif": serif_fonts,
-        "font.size": 11,
-        "axes.labelsize": 12,
-        "axes.titlesize": 13,
-        "legend.fontsize": 9,
-        "xtick.labelsize": 10,
-        "ytick.labelsize": 10,
+        "font.size": 10,
+        "text.color": "black",
+        "axes.edgecolor": "black",
+        "axes.labelcolor": "black",
+        "xtick.color": "black",
+        "ytick.color": "black",
     })
 
 def load_scaling(path: Path):
@@ -63,28 +63,39 @@ def plot_bandwidth(threads, dcrt_map, ct_map, n, l, out: Path):
     configure_matplotlib()
     fig, ax = plt.subplots(figsize=(7.5, 4.5))
     t_arr = np.array(threads)
-    def to_gbs(m):
-        return [ (m.get(t) / 1e9) if (m.get(t) is not None and not math.isnan(m.get(t))) else float("nan") for t in threads ]
-    dcrt_gbs = to_gbs(dcrt_map)
-    ct_gbs = to_gbs(ct_map)
+    def to_gibs(m):
+        return [ (m.get(t) / (1024.0**3)) if (m.get(t) is not None and not math.isnan(m.get(t))) else float("nan") for t in threads ]
+    dcrt_gbs = to_gibs(dcrt_map)
+    ct_gbs = to_gibs(ct_map)
     ax.plot(t_arr, dcrt_gbs, marker="o", linestyle="-", color="#377eb8", label="DCRT (RS, Batch=512)")
     ax.plot(t_arr, ct_gbs, marker="s", linestyle="-", color="#ff7f00", label="CT (CTFixture, Batch=256)")
     ax.set_xscale("log", base=2)
     ax.set_xticks(t_arr)
     ax.get_xaxis().set_major_formatter(plt.FuncFormatter(lambda val, pos: f"{int(val)}"))
     ax.set_xlabel("Threads")
-    ax.set_ylabel("Bandwidth (GB/s)")
+    ax.set_ylabel("Bandwidth (GiB/s)")
     title = "ADD Kernel: Bandwidth vs Threads"
     if n and l:
-        title += f" [N={n}, L={l}]"
-    ax.set_title(title)
-    ax.grid(axis="y", linestyle="--", alpha=0.35)
-    ax.legend(loc="upper left", frameon=False)
+        title += f"\n(N={n}, L={l})"
+    ax.set_title(title, fontweight="bold")
+
+    # Calculate y-axis max for headroom and label positioning
+    y_vals = [v for v in dcrt_gbs + ct_gbs if not math.isnan(v)]
+    ymax = max(y_vals) if y_vals else 0
+    ax.set_ylim(0, ymax * 1.15)
+    ax.margins(x=0.07)
+
+    ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper left", frameon=False, fontsize=12)
+
     for i, t in enumerate(threads):
         if not math.isnan(dcrt_gbs[i]):
-            ax.text(t, dcrt_gbs[i], f"{dcrt_gbs[i]:.1f}", fontsize=8, ha="left", va="bottom")
+            dcrt_label_y = min(dcrt_gbs[i] + ymax * 0.018, ymax * 1.15 - ymax * 0.03)
+            ax.text(t, dcrt_label_y, f"{dcrt_gbs[i]:.1f}", fontsize=10, ha="left", va="bottom", zorder=4)
         if not math.isnan(ct_gbs[i]):
-            ax.text(t, ct_gbs[i], f"{ct_gbs[i]:.1f}", fontsize=8, ha="right", va="bottom")
+            ct_label_y = min(ct_gbs[i] + ymax * 0.018, ymax * 1.15 - ymax * 0.03)
+            ax.text(t, ct_label_y, f"{ct_gbs[i]:.1f}", fontsize=10, ha="right", va="bottom", zorder=4)
     plt.tight_layout()
     fig.savefig(out, format="pdf", bbox_inches="tight")
     plt.close(fig)

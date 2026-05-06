@@ -26,12 +26,12 @@ def configure_matplotlib():
         {
             "font.family": "serif",
             "font.serif": serif_fonts,
-            "font.size": 11,
-            "axes.labelsize": 12,
-            "axes.titlesize": 13,
-            "legend.fontsize": 9,
-            "xtick.labelsize": 11,
-            "ytick.labelsize": 11,
+            "font.size": 10,
+            "text.color": "black",
+            "axes.edgecolor": "black",
+            "axes.labelcolor": "black",
+            "xtick.color": "black",
+            "ytick.color": "black",
         }
     )
 
@@ -40,7 +40,7 @@ def extract_bandwidth(b: dict) -> float | None:
     for key in ("PayloadBandwidth", "payload_bandwidth", "bytes_per_second"):
         v = b.get(key)
         if v is not None:
-            return float(v) / 1e9
+            return float(v) / (1024.0**3)
     return None
 
 
@@ -110,25 +110,31 @@ def plot_allocation_tax(results: dict, out: Path, N: int = 131072, L: int = 40):
     pos_serial = [i + group_offsets[idx] for idx, i in enumerate(x)]
     pos_rss = [i + width + group_offsets[idx] for idx, i in enumerate(x)]
 
-    bars_math = ax.bar(pos_math, math_vals, width=width, color=c_math, edgecolor="black", linewidth=0.6, label="Mathematical Payload")
-    bars_serial = ax.bar(pos_serial, serialized_vals, width=width, color=c_serial, edgecolor="black", linewidth=0.6, label="Serialized Size")
-    bars_rss = ax.bar(pos_rss, rss_vals, width=width, color=c_rss, edgecolor="black", linewidth=0.6, label="RSS (Resident)")
+    bars_math = ax.bar(pos_math, math_vals, width=width, color=c_math, edgecolor="black", linewidth=0.6, label="Mathematical Payload", zorder=3)
+    bars_serial = ax.bar(pos_serial, serialized_vals, width=width, color=c_serial, edgecolor="black", linewidth=0.6, label="Serialized Size", zorder=3)
+    bars_rss = ax.bar(pos_rss, rss_vals, width=width, color=c_rss, edgecolor="black", linewidth=0.6, label="RSS (Resident)", zorder=3)
 
     tick_positions = [i + group_offsets[idx] for idx, i in enumerate(x)]
     ax.set_xticks(tick_positions)
     ax.set_xticklabels(groups)
     ax.set_ylabel("Size (GB)")
     ax.set_xlabel("Operation")
-    ax.set_title("Allocation Tax: Mathematical vs Serialized vs Resident (RSS)")
+    ax.set_title("Estimated vs Serialized vs Resident (RSS) Payload", fontweight="bold")
+
+    ymax = max((v for v in math_vals + serialized_vals + rss_vals if v == v), default=0.0)
+    ax.set_ylim(0, ymax * 1.15)
 
     # Add value labels on bars
     for bar in (list(bars_math) + list(bars_serial) + list(bars_rss)):
         height = bar.get_height()
-        ax.text(bar.get_x() + bar.get_width() / 2, height,
+        label_y = min(height + ymax * 0.018, ymax * 1.15 - ymax * 0.03)
+        ax.text(bar.get_x() + bar.get_width() / 2, label_y,
                 f"{height:.2f}",
-                ha="center", va="bottom", fontsize=9)
+                ha="center", va="bottom", fontsize=10, zorder=4)
 
-    ax.legend(loc="upper left", frameon=False, fontsize=9)
+    ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
+    ax.set_axisbelow(True)
+    ax.legend(loc="upper right", frameon=False)
 
     plt.tight_layout()
     fig.savefig(out, format="pdf", bbox_inches="tight")

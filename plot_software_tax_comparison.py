@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Compare Software Tax results: DCRT baseline vs CT adjusted.
 
-Creates a publication-quality grouped bar chart of bandwidth (GB/s)
+Creates a publication-quality grouped bar chart of bandwidth (GiB/s)
 for each kernel, comparing the DCRT (RS) baseline to the CT (CTFixture)
 measurements. Also plots the CT/DCRT ratio on a secondary axis.
 """
@@ -51,7 +51,7 @@ def extract_bandwidth(b: dict) -> float | None:
     for key in ("PayloadBandwidth", "payload_bandwidth", "bytes_per_second"):
         v = b.get(key)
         if v is not None:
-            return float(v) / 1e9
+            return float(v) / (1024.0**3)
     return None
 
 
@@ -110,7 +110,7 @@ def plot_comparison(summary: dict, out: Path):
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.set_xlabel("Kernel")
-    ax.set_ylabel("Bandwidth (GB/s)")
+    ax.set_ylabel("Bandwidth (GiB/s)")
     ax.set_title("Software Tax Comparison: DCRT baseline vs CT adjusted")
 
     # Small interior legend top-left

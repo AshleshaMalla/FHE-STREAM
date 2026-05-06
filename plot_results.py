@@ -12,7 +12,7 @@ def parse_data(csv_file):
     df['Kernel'] = cols[1]
     df['RingDim'] = cols[2].astype(int)
     df['Depth'] = cols[3].astype(int)
-    df['GB_s'] = df['bytes_per_second'] / 1e9
+    df['GiB_s'] = df['bytes_per_second'] / (1024.0**3)
     return df
 
 def generate_plots():
@@ -34,9 +34,9 @@ def generate_plots():
         plt.figure(figsize=(10, 6))
         order1 = ['RS_SEQ_COPY', 'RS_GATHER_COPY', 'RS_GATHER_ADD', 'RS_GATHER_TRIAD', 'RS_NTT_ROUNDTRIP']
         actual_order1 = [k for k in order1 if k in subset1['Kernel'].values]
-        sns.barplot(data=subset1, x='Kernel', y='GB_s', order=actual_order1, palette='magma', width=0.5)
+        sns.barplot(data=subset1, x='Kernel', y='GiB_s', order=actual_order1, palette='magma', width=0.5)
         plt.title('Plot 1: Memory Bandwidth by Access Pattern\n(Ring=65k, Depth=20)', fontweight='bold')
-        plt.ylabel('Utilizable Bandwidth (GB/s)', fontweight='bold')
+        plt.ylabel('Utilizable Bandwidth (GiB/s)', fontweight='bold')
         plt.xlabel('Operation Kernel', fontweight='bold')
         plt.xticks(rotation=15)
         plt.tight_layout()
@@ -49,9 +49,9 @@ def generate_plots():
     subset2 = df[(df['RingDim'] == 65536) & (df['Kernel'] == 'RS_SEQ_ADD')].copy()
     if not subset2.empty:
         plt.figure(figsize=(8, 5))
-        sns.lineplot(data=subset2, x='Depth', y='GB_s', marker='o', markersize=10, linewidth=3, color='#e74c3c')
+        sns.lineplot(data=subset2, x='Depth', y='GiB_s', marker='o', markersize=10, linewidth=3, color='#e74c3c')
         plt.title('Plot 2: Multi-Stream Memory Degradation\n(Ring=65k, RS_SEQ_ADD)', fontweight='bold')
-        plt.ylabel('Bandwidth (GB/s)', fontweight='bold')
+        plt.ylabel('Bandwidth (GiB/s)', fontweight='bold')
         plt.xlabel('Multiplicative Depth (Simultaneous RNS Towers)', fontweight='bold')
         plt.xticks([1, 5, 20, 40])
         plt.ylim(subset2['GB_s'].min() - 5, subset2['GB_s'].max() + 5)
@@ -65,11 +65,11 @@ def generate_plots():
     subset3 = df[(df['Depth'] == 1) & (df['Kernel'] == 'RS_SEQ_TRIAD')].copy()
     if not subset3.empty:
         plt.figure(figsize=(8, 5))
-        sns.lineplot(data=subset3, x='RingDim', y='GB_s', marker='s', markersize=10, linewidth=3, color='#3498db')
+        sns.lineplot(data=subset3, x='RingDim', y='GiB_s', marker='s', markersize=10, linewidth=3, color='#3498db')
         plt.xscale('log', base=2)
         plt.xticks([32768, 65536, 131072], ['32k', '65k', '131k'])
         plt.title('Plot 3: Ring Dimension Scaling\n(Depth=1, RS_SEQ_TRIAD)', fontweight='bold')
-        plt.ylabel('Bandwidth (GB/s)', fontweight='bold')
+        plt.ylabel('Bandwidth (GiB/s)', fontweight='bold')
         plt.xlabel('Ring Dimension', fontweight='bold')
         plt.ylim(0, subset3['GB_s'].max() * 1.1)
         plt.tight_layout()
@@ -82,9 +82,9 @@ def generate_plots():
     subset4 = df[(df['RingDim'] == 65536) & (df['Depth'] == 20) & (df['Kernel'].str.startswith('RS_SEQ'))].copy()
     if not subset4.empty:
         plt.figure(figsize=(8, 5))
-        sns.barplot(data=subset4, x='Kernel', y='GB_s', order=['RS_SEQ_COPY', 'RS_SEQ_SCALE', 'RS_SEQ_ADD', 'RS_SEQ_TRIAD'], palette='crest', width=0.5)
+        sns.barplot(data=subset4, x='Kernel', y='GiB_s', order=['RS_SEQ_COPY', 'RS_SEQ_SCALE', 'RS_SEQ_ADD', 'RS_SEQ_TRIAD'], palette='crest', width=0.5)
         plt.title('Plot 4: Bandwidth by Arithmetic Intensity\n(Ring=65k, Depth=20)', fontweight='bold')
-        plt.ylabel('Bandwidth (GB/s)', fontweight='bold')
+        plt.ylabel('Bandwidth (GiB/s)', fontweight='bold')
         plt.xlabel('Kernel Type', fontweight='bold')
         plt.tight_layout()
         plt.savefig('plot4_arithmetic.png', dpi=300)
@@ -99,9 +99,9 @@ def generate_plots():
         subset5['Access'] = subset5['Kernel'].apply(lambda x: 'Sequential' if 'SEQ' in x else 'Gather')
         subset5['Operation'] = subset5['Kernel'].apply(lambda x: x.split('_')[-1])
         plt.figure(figsize=(8, 5))
-        sns.barplot(data=subset5, x='Operation', y='GB_s', hue='Access', palette='Set2', width=0.5)
+        sns.barplot(data=subset5, x='Operation', y='GiB_s', hue='Access', palette='Set2', width=0.5)
         plt.title('Plot 5: The Indirection Penalty\n(Ring=65k, Depth=20)', fontweight='bold')
-        plt.ylabel('Bandwidth (GB/s)', fontweight='bold')
+        plt.ylabel('Bandwidth (GiB/s)', fontweight='bold')
         plt.xlabel('Operation', fontweight='bold')
         plt.legend(title='Access Pattern')
         plt.tight_layout()
@@ -116,10 +116,10 @@ def generate_plots():
         # Footprint = Ring * Depth * Batch * 8 bytes * 2 arrays
         subset6['Footprint_MB'] = (subset6['RingDim'] * subset6['Depth'] * 40 * 8 * 2) / (1024**2)
         plt.figure(figsize=(8, 5))
-        sns.lineplot(data=subset6, x='Footprint_MB', y='GB_s', marker='D', markersize=8, color='purple', linewidth=2.5)
+        sns.lineplot(data=subset6, x='Footprint_MB', y='GiB_s', marker='D', markersize=8, color='purple', linewidth=2.5)
         plt.xscale('log', base=10)
         plt.title('Plot 6: The Capacity Wall\nBandwidth vs. Memory Footprint (RS_SEQ_COPY)', fontweight='bold')
-        plt.ylabel('Bandwidth (GB/s)', fontweight='bold')
+        plt.ylabel('Bandwidth (GiB/s)', fontweight='bold')
         plt.xlabel('Working Set Size (MB, Log Scale)', fontweight='bold')
         plt.grid(True, which="both", ls="--", alpha=0.5)
         plt.tight_layout()

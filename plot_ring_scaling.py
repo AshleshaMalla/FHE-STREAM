@@ -46,7 +46,7 @@ def extract_bandwidth(benchmark: dict) -> float | None:
     for key in ("PayloadBandwidth", "payload_bandwidth", "bytes_per_second"):
         value = benchmark.get(key)
         if value is not None:
-            return float(value) / 1e9  # Convert to GiB/s
+            return float(value) / (1024.0**3)  # Convert to GiB/s
     return None
 
 
