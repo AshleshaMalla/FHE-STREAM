@@ -11,7 +11,16 @@ from pathlib import Path
 from statistics import mean
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
+
+from fhe_plot_style import (
+    configure_matplotlib,
+    save_plot,
+    add_value_labels,
+    COLOR_DCRT,
+    COLOR_REGULAR,
+    FIGSIZE_SINGLE,
+    HATCH_PATTERNS,
+)
 
 CATEGORIES = [
     ("GATHER", "ADD", "Gather Add"),
@@ -25,35 +34,11 @@ MODE_LABELS = {
     "coeff": "Coeff",
 }
 
-MODE_COLORS = {
-    "poly": "#377eb8",
-    "coeff": "#e41a1c",
-}
-
 BENCHMARK_RE = re.compile(
     r"^FHERaiderSTREAM/RS_"
     r"(GATHER|SCATTER_GATHER)_(ADD|TRIAD)"
     r"/(?P<n>\d+)/(?P<l>\d+)/(?P<mode>[12])$"
 )
-
-
-def configure_matplotlib() -> None:
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_fonts = ["Times New Roman"] if "Times New Roman" in available_fonts else []
-    serif_fonts.extend(["Times", "DejaVu Serif", "Liberation Serif", "serif"])
-
-    plt.rcParams.update(
-        {
-            "font.family": "serif",
-            "font.serif": serif_fonts,
-            "font.size": 13,
-            "text.color": "black",
-            "axes.edgecolor": "black",
-            "axes.labelcolor": "black",
-            "xtick.color": "black",
-            "ytick.color": "black",
-        }
-    )
 
 
 def extract_bandwidth(benchmark: dict) -> float | None:
@@ -137,7 +122,7 @@ def print_summary_table(summary: dict) -> None:
 def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> None:
     configure_matplotlib()
 
-    fig, ax = plt.subplots(figsize=(12, 6.2))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
     x_positions = list(range(len(CATEGORIES)))
     width = 0.34
 
@@ -154,51 +139,44 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
         [x - width / 2 for x in x_positions],
         poly_heights,
         width=width,
-        color=MODE_COLORS["poly"],
+        color=COLOR_DCRT,
         edgecolor="black",
         linewidth=0.8,
         label=MODE_LABELS["poly"],
         zorder=3,
+        hatch=HATCH_PATTERNS[0],
     )
     bars_coeff = ax.bar(
         [x + width / 2 for x in x_positions],
         coeff_heights,
         width=width,
-        color=MODE_COLORS["coeff"],
+        color=COLOR_REGULAR,
         edgecolor="black",
         linewidth=0.8,
         label=MODE_LABELS["coeff"],
         zorder=3,
+        hatch=HATCH_PATTERNS[1],
     )
 
     ymax = max((v for v in poly_heights + coeff_heights if v == v), default=0.0)
     ax.set_ylim(0, ymax * 1.15)
 
     ax.set_ylabel("Bandwidth (GiB/s)")
-    title = "DCRTPoly Shuffle-Mode Comparison: Gather / Scatter-Gather ADD and TRIAD"
+    title = "DCRTPoly Shuffle-Mode Comparison"
     if n_val and l_val:
-        title += f"\n(N={n_val}, L={l_val}, Batch={batch_size})"
+        title += f" (N={n_val}, L={l_val})"
     ax.set_title(title, fontweight="bold")
     ax.set_xticks(x_positions)
-    ax.set_xticklabels([label for _, _, label in CATEGORIES])
+    ax.set_xticklabels([label for _, _, label in CATEGORIES], rotation=15, ha="right")
     ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper left", frameon=False, fontsize=13, ncol=2)
+    ax.legend(loc="upper right", frameon=False, ncol=2)
 
-    for bars, heights in ((bars_poly, poly_heights), (bars_coeff, coeff_heights)):
-        for bar, height in zip(bars, heights):
-            if height == height:
-                ax.text(
-                    bar.get_x() + bar.get_width() / 2,
-                    height + ymax * 0.018,
-                    f"{height:.1f}",
-                    ha="center",
-                    va="bottom",
-                    zorder=4,
-                )
+    add_value_labels(ax, bars_poly, max_val=ymax)
+    add_value_labels(ax, bars_coeff, max_val=ymax)
 
     plt.tight_layout()
-    fig.savefig(output_path, format="pdf", bbox_inches="tight")
+    save_plot(str(output_path))
     plt.close(fig)
     print(f"Saved figure to {output_path}")
 
@@ -206,7 +184,7 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
 def main() -> None:
     parser = argparse.ArgumentParser(description="Plot DCRTPoly shuffle-mode comparison.")
     parser.add_argument("--input", type=Path, default=Path("results/shuffle_mode_compare.json"))
-    parser.add_argument("--output", type=Path, default=Path("shuffle_mode_compare.pdf"))
+    parser.add_argument("--output", type=Path, default=Path("plots/shuffle_mode_compare.pdf"))
     parser.add_argument("--batch-size", type=int, default=512)
     args = parser.parse_args()
 

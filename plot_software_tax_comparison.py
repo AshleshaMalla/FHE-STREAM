@@ -16,34 +16,18 @@ from pathlib import Path
 from statistics import mean
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
+from fhe_plot_style import (
+    configure_matplotlib,
+    save_plot,
+    add_value_labels,
+    COLOR_DCRT,
+    COLOR_CT,
+    FIGSIZE_SINGLE,
+    HATCH_PATTERNS,
+)
 
 
 OP_ORDER = ["COPY", "ADD", "ADD_INPLACE"]
-
-COLORS = {
-    "DCRT": "#377eb8",
-    "CT": "#ff7f00",
-}
-
-
-def configure_matplotlib():
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_fonts = ["Times New Roman"] if "Times New Roman" in available_fonts else []
-    serif_fonts.extend(["Times", "DejaVu Serif", "Liberation Serif", "serif"])
-
-    plt.rcParams.update(
-        {
-            "font.family": "serif",
-            "font.serif": serif_fonts,
-            "font.size": 11,
-            "axes.labelsize": 12,
-            "axes.titlesize": 13,
-            "legend.fontsize": 9,
-            "xtick.labelsize": 11,
-            "ytick.labelsize": 11,
-        }
-    )
 
 
 def extract_bandwidth(b: dict) -> float | None:
@@ -103,28 +87,31 @@ def plot_comparison(summary: dict, out: Path):
     dcrt_vals = [summary.get(("DCRT", op), {}).get("mean_gbs", float("nan")) for op in labels]
     ct_vals = [summary.get(("CT", op), {}).get("mean_gbs", float("nan")) for op in labels]
 
-    fig, ax = plt.subplots(figsize=(7.5, 4.5))
-    bars1 = ax.bar([i - width / 2 for i in x], dcrt_vals, width=width, color=COLORS["DCRT"], label="DCRT (RS)", edgecolor="black", linewidth=0.6)
-    bars2 = ax.bar([i + width / 2 for i in x], ct_vals, width=width, color=COLORS["CT"], label="CT (CTFixture)", edgecolor="black", linewidth=0.6)
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
+    bars1 = ax.bar([i - width / 2 for i in x], dcrt_vals, width=width, color=COLOR_DCRT, label="DCRT (RS)", edgecolor="black", linewidth=0.6, hatch=HATCH_PATTERNS[0])
+    bars2 = ax.bar([i + width / 2 for i in x], ct_vals, width=width, color=COLOR_CT, label="CT (CTFixture)", edgecolor="black", linewidth=0.6, hatch=HATCH_PATTERNS[1])
+
+    add_value_labels(ax, bars1)
+    add_value_labels(ax, bars2)
 
     ax.set_xticks(x)
     ax.set_xticklabels(labels)
     ax.set_xlabel("Kernel")
     ax.set_ylabel("Bandwidth (GiB/s)")
-    ax.set_title("Software Tax Comparison: DCRT baseline vs CT adjusted")
+    ax.set_title("Software Tax Comparison", fontweight="bold")
 
     # Small interior legend top-left
-    ax.legend(loc="upper left", frameon=False, fontsize=9)
+    ax.legend(loc="upper left", frameon=False)
 
     plt.tight_layout()
-    fig.savefig(out, format="pdf", bbox_inches="tight")
+    save_plot(str(out))
     plt.close(fig)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Plot software tax comparison from Google Benchmark JSON.")
     parser.add_argument("--input", type=Path, default=Path("results/software_tax_results.json"), help="Input JSON file")
-    parser.add_argument("--output", type=Path, default=Path("software_tax_comparison.pdf"), help="Output PDF file")
+    parser.add_argument("--output", type=Path, default=Path("plots/software_tax_comparison.pdf"), help="Output PDF file")
     args = parser.parse_args()
 
     if not args.input.exists():

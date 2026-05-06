@@ -10,6 +10,19 @@ from collections import defaultdict
 from pathlib import Path
 from statistics import mean
 
+import matplotlib.pyplot as plt
+
+from fhe_plot_style import (
+    configure_matplotlib,
+    save_plot,
+    COLOR_DCRT,
+    COLOR_CT,
+    COLOR_HEXL,
+    COLOR_REGULAR,
+    FIGSIZE_SINGLE,
+    HATCH_PATTERNS,
+)
+
 
 KERNEL_ORDER = ["COPY", "SCALE", "ADD", "TRIAD"]
 PATTERN_ORDER = ["SEQ", "GATHER", "SCATTER", "SG"]
@@ -22,10 +35,10 @@ PATTERN_LABELS = {
 }
 
 PATTERN_COLORS = {
-    "SEQ": "#377eb8",
-    "GATHER": "#ff7f00",
-    "SCATTER": "#4daf4a",
-    "SG": "#e41a1c",
+    "SEQ": COLOR_DCRT,
+    "GATHER": COLOR_CT,
+    "SCATTER": COLOR_HEXL,
+    "SG": COLOR_REGULAR,
 }
 
 # Supports both the documented DCRTFixture/DCRT_* layout and the current
@@ -37,34 +50,6 @@ BENCHMARK_RE = re.compile(
     r"(?:_(poly|coeff))?"
     r"/(?P<n>\d+)/(?P<l>\d+)/(?P<mode>[0-2])$"
 )
-
-
-def configure_matplotlib() -> None:
-    try:
-        import matplotlib.pyplot as plt
-        from matplotlib import font_manager
-    except ImportError as exc:
-        raise ImportError(
-            "Matplotlib is required to generate the PDF figure. Install it in the active Python environment."
-        ) from exc
-
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_fonts = ["Times New Roman"] if "Times New Roman" in available_fonts else []
-    serif_fonts.extend(["Times", "DejaVu Serif", "Liberation Serif", "serif"])
-    plt.rcParams.update(
-        {
-            "font.family": "serif",
-            "font.serif": serif_fonts,
-            "font.size": 13,
-            "text.color": "black",
-            "axes.edgecolor": "black",
-            "axes.labelcolor": "black",
-            "xtick.color": "black",
-            "ytick.color": "black",
-        }
-    )
-
-    return plt
 
 
 def extract_payload_bandwidth(benchmark: dict) -> float | None:
@@ -158,9 +143,9 @@ def print_summary_table(summary: dict) -> None:
 
 
 def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> None:
-    plt = configure_matplotlib()
+    configure_matplotlib()
 
-    fig, ax = plt.subplots(figsize=(13, 6.5))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
 
     x_positions = list(range(len(KERNEL_ORDER)))
     bar_width = 0.18
@@ -177,23 +162,18 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
             break
 
     # Update title with backend and parameters
-    title_str = "DCRTPoly Backend: Bandwidth Across Memory Access Patterns (Coeff mode)"
+    title_str = "Bandwidth across Access Patterns"
     if n_val and l_val:
-        title_str += f"\n(N={n_val}, L={l_val}, Batch={batch_size})"
+        title_str += f" (N={n_val}, L={l_val})"
     ax.set_title(title_str, fontweight="bold")
     ax.set_xlabel("Kernels")
     ax.set_ylabel("Bandwidth (GiB/s)")
     ax.set_xticks(x_positions)
     ax.set_xticklabels(KERNEL_ORDER)
-    ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
-    ax.set_axisbelow(True)
 
     ymax = max((item["mean_gbs"] for item in summary.values() if isinstance(item, dict)), default=0)
-    ax.set_ylim(0, ymax * 1.15)
+    ax.set_ylim(0, ymax * 1.3)
 
-    # Add secondary x-axis for Total CPU Cores (assuming n_val represents this context if applicable, 
-    # but here we just need bars and labels).
-    
     for pattern_index, pattern in enumerate(PATTERN_ORDER):
         heights = [
             summary.get((kernel, pattern), {}).get("mean_gbs", float("nan"))
@@ -208,22 +188,14 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
             edgecolor="black",
             linewidth=0.6,
             label=PATTERN_LABELS[pattern],
-            zorder=3
+            zorder=3,
+            hatch=HATCH_PATTERNS[pattern_index % len(HATCH_PATTERNS)],
         )
-        for bar, height in zip(bars, heights):
-            if not (height != height):  # Skip NaN
-                ax.text(
-                    bar.get_x() + bar.get_width() / 2,
-                    height + ymax * 0.018,
-                    f"{height:.1f}",
-                    ha="center",
-                    va="bottom",
-                    zorder=4,
-                )
+        # Value labels removed for 1-column IEEE layout to avoid congestion
 
-    ax.legend(loc="upper left", frameon=False, fontsize=13, ncol=2)
+    ax.legend(loc="upper left", frameon=False, ncol=2)
     plt.tight_layout()
-    fig.savefig(output_path, format="pdf", bbox_inches="tight")
+    save_plot(str(output_path))
     plt.close(fig)
 
 
@@ -240,7 +212,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("bandwidth_breakdown.pdf"),
+        default=Path("plots/bandwidth_breakdown.pdf"),
         help="Path to the output PDF figure.",
     )
     parser.add_argument(
