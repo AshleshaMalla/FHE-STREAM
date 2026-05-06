@@ -132,7 +132,7 @@ def load_summary(json_path: Path):
                 continue
 
             summary[key] = {
-                "mean_gbs": mean(values) / 1e9,
+                "mean_gbs": mean(values) / (1024.0**3),
                 "count": len(values),
                 **metadata.get(key, {}),
             }
@@ -141,8 +141,8 @@ def load_summary(json_path: Path):
 
 
 def print_summary_table(summary: dict) -> None:
-    print("\nBandwidth summary (GB/s) - DCRTPoly Backend (Coeff mode for shuffled kernels)\n")
-    print(f"{'Kernel':<10} {'Pattern':<20} {'Variant':<10} {'Mean GB/s':>12} {'Samples':>10}")
+    print("\nBandwidth summary (GiB/s) - DCRTPoly Backend (Coeff mode for shuffled kernels)\n")
+    print(f"{'Kernel':<10} {'Pattern':<20} {'Variant':<10} {'Mean GiB/s':>12} {'Samples':>10}")
     print("-" * 62)
     for kernel in KERNEL_ORDER:
         for pattern in PATTERN_ORDER:
@@ -182,7 +182,7 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
         title_str += f"\n(N={n_val}, L={l_val}, Batch={batch_size})"
     ax.set_title(title_str, fontweight="bold")
     ax.set_xlabel("Kernels")
-    ax.set_ylabel("Bandwidth (GB/s)")
+    ax.set_ylabel("Bandwidth (GiB/s)")
     ax.set_xticks(x_positions)
     ax.set_xticklabels(KERNEL_ORDER)
     ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
@@ -218,7 +218,7 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
                     f"{height:.1f}",
                     ha="center",
                     va="bottom",
-                    zorder=4
+                    zorder=4,
                 )
 
     ax.legend(loc="upper left", frameon=False, fontsize=13, ncol=2)

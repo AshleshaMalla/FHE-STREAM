@@ -112,7 +112,7 @@ def load_summary(json_path: Path):
             if not values:
                 continue
             summary[key] = {
-                "mean_gbs": mean(values) / 1e9,
+                "mean_gbs": mean(values) / (1024.0**3),
                 "count": len(values),
                 **metadata.get(key, {}),
             }
@@ -121,8 +121,8 @@ def load_summary(json_path: Path):
 
 
 def print_summary_table(summary: dict) -> None:
-    print("\nShuffle mode comparison (GB/s) - DCRTPoly Backend\n")
-    print(f"{'Category':<26} {'Mode':<8} {'Mean GB/s':>12} {'Samples':>10}")
+    print("\nShuffle mode comparison (GiB/s) - DCRTPoly Backend\n")
+    print(f"{'Category':<26} {'Mode':<8} {'Mean GiB/s':>12} {'Samples':>10}")
     print("-" * 60)
     for pattern, kernel, label in CATEGORIES:
         for mode in ("poly", "coeff"):
@@ -174,7 +174,7 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
     ymax = max((v for v in poly_heights + coeff_heights if v == v), default=0.0)
     ax.set_ylim(0, ymax * 1.15)
 
-    ax.set_ylabel("Bandwidth (GB/s)")
+    ax.set_ylabel("Bandwidth (GiB/s)")
     title = "DCRTPoly Shuffle-Mode Comparison: Gather / Scatter-Gather ADD and TRIAD"
     if n_val and l_val:
         title += f"\n(N={n_val}, L={l_val}, Batch={batch_size})"
@@ -183,7 +183,7 @@ def plot_summary(summary: dict, output_path: Path, batch_size: int = 512) -> Non
     ax.set_xticklabels([label for _, _, label in CATEGORIES])
     ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper left", frameon=False, fontsize=13)
+    ax.legend(loc="upper left", frameon=False, fontsize=13, ncol=2)
 
     for bars, heights in ((bars_poly, poly_heights), (bars_coeff, coeff_heights)):
         for bar, height in zip(bars, heights):
