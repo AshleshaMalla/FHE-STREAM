@@ -11,34 +11,13 @@ from pathlib import Path
 from statistics import mean
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
-
-
-def configure_matplotlib() -> None:
-    """Configure matplotlib with serif font and styling."""
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_fonts = ["Times New Roman"] if "Times New Roman" in available_fonts else []
-    serif_fonts.extend(["Times", "DejaVu Serif", "Liberation Serif", "serif"])
-
-    plt.rcParams.update(
-        {
-            "font.family": "serif",
-            "font.serif": serif_fonts,
-            "font.size": 11,
-            "axes.labelsize": 12,
-            "axes.titlesize": 13,
-            "axes.titleweight": "normal",
-            "axes.labelweight": "normal",
-            "legend.fontsize": 11,
-            "xtick.labelsize": 11,
-            "ytick.labelsize": 11,
-            "text.color": "black",
-            "axes.edgecolor": "black",
-            "axes.labelcolor": "black",
-            "xtick.color": "black",
-            "ytick.color": "black",
-        }
-    )
+from fhe_plot_style import (
+    configure_matplotlib,
+    save_plot,
+    COLOR_DCRT,
+    COLOR_CT,
+    FIGSIZE_SINGLE,
+)
 
 
 def extract_bandwidth(benchmark: dict) -> float | None:
@@ -83,10 +62,10 @@ def plot_ring_scaling(
 
     Args:
         json_path: Path to merged ring_scaling_seq_add.json
-        output_path: Path to save plot PDF (default: ring_scaling_plot.pdf)
+        output_path: Path to save plot PDF (default: plots/ring_scaling_plot.pdf)
     """
     if output_path is None:
-        output_path = Path("ring_scaling_plot.pdf")
+        output_path = Path("plots/ring_scaling_plot.pdf")
 
     configure_matplotlib()
 
@@ -137,11 +116,11 @@ def plot_ring_scaling(
             print(f"  {n:>10} | {bw:>20.2f} | {count:>6}")
 
     # Create plot
-    fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
 
     colors = {
-        "DCRT (RS_SEQ_ADD)": "#1f77b4",  # blue
-        "CT (CT_SEQ_ADD)": "#ff7f0e",    # orange
+        "DCRT (RS_SEQ_ADD)": COLOR_DCRT,
+        "CT (CT_SEQ_ADD)": COLOR_CT,
     }
 
     for kernel in sorted(data_by_kernel.keys()):
@@ -150,27 +129,22 @@ def plot_ring_scaling(
             ring_dims,
             means,
             marker="o",
-            linewidth=2,
-            markersize=8,
             label=kernel,
             color=colors.get(kernel, None),
         )
 
-    ax.set_xlabel("Ring Dimension (N)", fontsize=12)
-    ax.set_ylabel("Bandwidth (GiB/s)", fontsize=12)
-    ax.set_title("Ring Dimension Scaling: SEQ_ADD Bandwidth", fontsize=13)
-    ax.legend(loc="best", fontsize=11)
-    ax.grid(True, alpha=0.3)
+    ax.set_xlabel("Ring Dimension (N)")
+    ax.set_ylabel("Bandwidth (GiB/s)")
+    ax.set_title("Ring Dimension Scaling", fontweight="bold")
+    ax.legend(loc="best", frameon=False)
 
     # Set x-axis to show all ring dimensions
     if data_by_kernel:
         first_ring_dims = next(iter(data_by_kernel.values()))[0]
         ax.set_xticks(first_ring_dims)
-        ax.set_xticklabels([str(n) for n in first_ring_dims])
+        ax.set_xticklabels([f"{n//1024}k" for n in first_ring_dims])
 
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=100, bbox_inches="tight")
-    print(f"\nPlot saved to {output_path}")
+    save_plot(str(output_path))
     plt.close(fig)
 
 
@@ -187,8 +161,8 @@ def main():
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("ring_scaling_plot.pdf"),
-        help="Output PDF path (default: ring_scaling_plot.pdf)",
+        default=Path("plots/ring_scaling_plot.pdf"),
+        help="Output PDF path (default: plots/ring_scaling_plot.pdf)",
     )
 
     args = parser.parse_args()

@@ -11,7 +11,15 @@ from pathlib import Path
 from statistics import mean
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
+from fhe_plot_style import (
+    configure_matplotlib,
+    save_plot,
+    add_value_labels,
+    COLOR_HEXL,
+    COLOR_REGULAR,
+    FIGSIZE_SINGLE,
+    HATCH_PATTERNS,
+)
 
 
 CATEGORY_ORDER = [
@@ -27,28 +35,9 @@ SYSTEM_LABELS = {
 }
 
 SYSTEM_COLORS = {
-    "regular": "#5b6fa4",
-    "hexl": "#6fcf6a",
+    "regular": COLOR_REGULAR,
+    "hexl": COLOR_HEXL,
 }
-
-
-def configure_matplotlib() -> None:
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_fonts = ["Times New Roman"] if "Times New Roman" in available_fonts else []
-    serif_fonts.extend(["Times", "DejaVu Serif", "Liberation Serif", "serif"])
-
-    plt.rcParams.update(
-        {
-            "font.family": "serif",
-            "font.serif": serif_fonts,
-            "font.size": 13,
-            "text.color": "black",
-            "axes.edgecolor": "black",
-            "axes.labelcolor": "black",
-            "xtick.color": "black",
-            "ytick.color": "black",
-        }
-    )
 
 
 def extract_bandwidth_gibs(benchmark: dict) -> float | None:
@@ -188,7 +177,7 @@ def plot_summary(
     regular_vals = [summary.get("regular", {}).get((pattern, variant), float("nan")) for pattern, variant, _ in CATEGORY_ORDER]
     hexl_vals = [summary.get("hexl", {}).get((pattern, variant), float("nan")) for pattern, variant, _ in CATEGORY_ORDER]
 
-    fig, ax = plt.subplots(figsize=(12.4, 6.4))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
     bars_regular = ax.bar(
         [x - width / 2 for x in x_positions],
         regular_vals,
@@ -198,6 +187,7 @@ def plot_summary(
         linewidth=0.8,
         label=SYSTEM_LABELS["regular"],
         zorder=3,
+        hatch=HATCH_PATTERNS[0],
     )
     bars_hexl = ax.bar(
         [x + width / 2 for x in x_positions],
@@ -208,56 +198,25 @@ def plot_summary(
         linewidth=0.8,
         label=SYSTEM_LABELS["hexl"],
         zorder=3,
+        hatch=HATCH_PATTERNS[1],
     )
 
-    title = "DCRTPoly: HEXL-off vs HEXL-on Bandwidth Comparison (GiB/s)"
-    params = []
-    if n_val is not None:
-        params.append(f"N={n_val}")
-    if l_val is not None:
-        params.append(f"L={l_val}")
-    if batch_val is not None:
-        params.append(f"Batch={batch_val}")
-    
-    if params:
-        ax.set_title(f"{title}\n({', '.join(params)})", fontweight="bold")
-    else:
-        ax.set_title(title, fontweight="bold")
-
+    ax.set_title("Intel HEXL Acceleration Benefit", fontweight="bold")
     ax.set_ylabel("Bandwidth (GiB/s)")
     ax.set_xticks(x_positions)
-    ax.set_xticklabels(labels)
+    ax.set_xticklabels(labels, rotation=15, ha="right")
     
     max_val = max(v for v in regular_vals + hexl_vals if v == v)
     ax.set_ylim(0, max_val * 1.15)
     ax.grid(axis="y", linestyle="--", alpha=0.3, zorder=0)
     ax.set_axisbelow(True)
-    ax.legend(loc="upper right", frameon=False, fontsize=13)
+    ax.legend(loc="upper right", frameon=False)
 
-    for bar, value in zip(bars_regular, regular_vals):
-        if value == value:
-            ax.text(
-                bar.get_x() + bar.get_width() / 2,
-                value + max_val * 0.018,
-                f"{value:.1f}",
-                ha="center",
-                va="bottom",
-                zorder=4,
-            )
-
-    for bar, value in zip(bars_hexl, hexl_vals):
-        if value == value:
-            ax.text(
-                bar.get_x() + bar.get_width() / 2,
-                value + max_val * 0.018,
-                f"{value:.1f}",
-                ha="center",
-                va="bottom",
-                zorder=4,
-            )
+    add_value_labels(ax, bars_regular)
+    add_value_labels(ax, bars_hexl)
 
     plt.tight_layout()
-    fig.savefig(output, format="pdf", bbox_inches="tight")
+    save_plot(str(output))
     plt.close(fig)
 
 
@@ -265,7 +224,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Plot Regular vs HEXL throughput comparison from benchmark JSON files.")
     parser.add_argument("--regular", type=Path, default=Path("results/hexl_off.json"), help="Regular-node JSON file")
     parser.add_argument("--hexl", type=Path, default=Path("results/hexl_on.json"), help="HEXL-node JSON file")
-    parser.add_argument("--output", type=Path, default=Path("hexl_vs_regular_throughput.pdf"), help="Output PDF file")
+    parser.add_argument("--output", type=Path, default=Path("plots/hexl_vs_regular_throughput.pdf"), help="Output PDF file")
     args = parser.parse_args()
 
     if not args.regular.exists():

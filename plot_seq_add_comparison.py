@@ -5,33 +5,21 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 from pathlib import Path
 from statistics import mean
 
 import matplotlib.pyplot as plt
-from matplotlib import font_manager
 
-
-def configure_matplotlib() -> None:
-    available_fonts = {font.name for font in font_manager.fontManager.ttflist}
-    serif_fonts = ["Times New Roman"] if "Times New Roman" in available_fonts else []
-    serif_fonts.extend(["Times", "DejaVu Serif", "Liberation Serif", "serif"])
-
-    plt.rcParams.update(
-        {
-            "font.family": "serif",
-            "font.serif": serif_fonts,
-            "font.size": 13,
-            "text.color": "black",
-            "axes.edgecolor": "black",
-            "axes.labelcolor": "black",
-            "xtick.color": "black",
-            "ytick.color": "black",
-        }
-    )
-
-    return plt
+from fhe_plot_style import (
+    configure_matplotlib,
+    save_plot,
+    add_value_labels,
+    COLOR_DCRT,
+    COLOR_CT,
+    COLOR_HEXL,
+    FIGSIZE_SINGLE,
+    HATCH_PATTERNS,
+)
 
 
 def extract_bandwidth(benchmark: dict) -> float | None:
@@ -51,7 +39,7 @@ def load_summary(json_path: Path):
         "CT_SEQ_ADD": [],
         "CT_SEQ_ADD_INPLACE": [],
     }
-    n_val = l_val = batch_val = None
+    n_val = l_val = None
 
     for benchmark in data.get("benchmarks", []):
         name = benchmark.get("name") or benchmark.get("run_name") or ""
@@ -98,12 +86,11 @@ def plot_comparison(summary: dict, n_val: int | None, l_val: int | None, output_
 
     kernel_labels = ["RS_SEQ_ADD\n(DCRT)", "CT_SEQ_ADD\n(CT)", "CT_SEQ_ADD_INPLACE\n(CT)"]
     kernel_keys = ["RS_SEQ_ADD", "CT_SEQ_ADD", "CT_SEQ_ADD_INPLACE"]
-    kernel_colors = ["#377eb8", "#ff7f00", "#4daf4a"]
+    kernel_colors = [COLOR_DCRT, COLOR_CT, COLOR_HEXL]
 
     heights = [summary.get(k, {}).get("mean_gbs", 0.0) for k in kernel_keys]
-    counts = [summary.get(k, {}).get("count", 0) for k in kernel_keys]
 
-    fig, ax = plt.subplots(figsize=(9, 5.5))
+    fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
 
     x_positions = list(range(len(kernel_keys)))
     bars = ax.bar(
@@ -115,25 +102,16 @@ def plot_comparison(summary: dict, n_val: int | None, l_val: int | None, output_
         linewidth=0.8,
         zorder=3,
     )
+    
+    for i, bar in enumerate(bars):
+        bar.set_hatch(HATCH_PATTERNS[i % len(HATCH_PATTERNS)])
 
-    # Add value labels on bars
-    for bar, height, count in zip(bars, heights, counts):
-        label_y = min(height + max(heights) * 0.018, max(heights) * 1.25 - max(heights) * 0.03)
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,
-            label_y,
-            f"{height:.1f} GiB/s",
-            ha="center",
-            va="bottom",
-            fontsize=11,
-            fontweight="bold",
-            zorder=4,
-        )
+    add_value_labels(ax, bars)
 
     ax.set_ylabel("Payload Bandwidth (GiB/s)")
-    title = "ADD Kernel (256 threads, Batch=256)"
+    title = "ADD Kernel Comparison"
     if n_val and l_val:
-        title += f"\n(N={n_val}, L={l_val}, Batch=256)"
+        title += f" (N={n_val}, L={l_val})"
     ax.set_title(title, fontweight="bold")
     ax.set_xticks(x_positions)
     ax.set_xticklabels(kernel_labels)
@@ -144,7 +122,7 @@ def plot_comparison(summary: dict, n_val: int | None, l_val: int | None, output_
     ax.set_ylim(0, ymax * 1.15)
 
     plt.tight_layout()
-    fig.savefig(output_path, format="pdf", bbox_inches="tight")
+    save_plot(str(output_path))
     plt.close(fig)
 
     print(f"Saved comparison figure to {output_path}")
@@ -189,7 +167,7 @@ def main() -> None:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("seq_add_comparison.pdf"),
+        default=Path("plots/seq_add_comparison.pdf"),
         help="Path to the output PDF figure.",
     )
     args = parser.parse_args()
