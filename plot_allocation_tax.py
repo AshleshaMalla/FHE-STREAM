@@ -67,19 +67,19 @@ def plot_allocation_tax(results: dict, out: Path, N: int = 131072, L: int = 40):
 
     # Mathematical payload per RNS tensor (bytes)
     math_payload_bytes = int(N) * int(L) * 8
-    math_payload_gb = math_payload_bytes / 1e9
+    math_payload_mib = math_payload_bytes / (1024**2)
 
-    # Gather serialized and rss sizes (bytes) and convert to GB
-    mult_serialized_gb = results.get("MULT_NO_RELIN", {}).get("serialized_deg2", 0) / 1e9
-    mult_rss_gb = results.get("MULT_NO_RELIN", {}).get("rss_deg2", 0) / 1e9
+    # Gather serialized and rss sizes (bytes) and convert to MiB
+    mult_serialized_mib = results.get("MULT_NO_RELIN", {}).get("serialized_deg2", 0) / (1024**2)
+    mult_rss_mib = results.get("MULT_NO_RELIN", {}).get("rss_deg2", 0) / (1024**2)
 
-    relin_serialized_gb = results.get("RELIN", {}).get("serialized", 0) / 1e9
-    relin_rss_gb = results.get("RELIN", {}).get("rss_deg1", 0) / 1e9
+    relin_serialized_mib = results.get("RELIN", {}).get("serialized", 0) / (1024**2)
+    relin_rss_mib = results.get("RELIN", {}).get("rss_deg1", 0) / (1024**2)
 
     # Values per group for the three bars: [math, serialized, rss]
-    math_vals = [math_payload_gb, math_payload_gb]
-    serialized_vals = [mult_serialized_gb, relin_serialized_gb]
-    rss_vals = [mult_rss_gb, relin_rss_gb]
+    math_vals = [math_payload_mib, math_payload_mib]
+    serialized_vals = [mult_serialized_mib, relin_serialized_mib]
+    rss_vals = [mult_rss_mib, relin_rss_mib]
 
     x = list(range(len(groups)))
     width = 0.2
@@ -104,9 +104,9 @@ def plot_allocation_tax(results: dict, out: Path, N: int = 131072, L: int = 40):
     tick_positions = [i + group_offsets[idx] for idx, i in enumerate(x)]
     ax.set_xticks(tick_positions)
     ax.set_xticklabels(groups)
-    ax.set_ylabel("Size (GB)")
+    ax.set_ylabel("Size (MiB)")
     ax.set_xlabel("Operation")
-    ax.set_title("Memory Allocation Tax", fontweight="bold")
+    ax.set_title("Memory Allocation", fontweight="bold")
 
     ymax = max((v for v in math_vals + serialized_vals + rss_vals if v == v), default=0.0)
     ax.set_ylim(0, ymax * 1.3)
