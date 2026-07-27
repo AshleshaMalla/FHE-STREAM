@@ -19,6 +19,10 @@
 #include <mpi.h>
 #endif
 
+#ifdef LIKWID_PERFMON
+#include <likwid-marker.h>
+#endif
+
 // Global variable used by StreamCore.h for threading
 int RS_Execution_Threads = 1;
 // Global toggle used by fixture.cpp for optional setup configuration printing
@@ -171,8 +175,16 @@ int main(int argc, char** argv) {
 #endif
     return 1;
   }
+#ifdef LIKWID_PERFMON
+  LIKWID_MARKER_INIT;
+#endif
+
   ::benchmark::RunSpecifiedBenchmarks();
   ::benchmark::Shutdown();
+
+#ifdef LIKWID_PERFMON
+  LIKWID_MARKER_CLOSE;
+#endif
 
 #ifdef RAIDERSTREAM_MPI
   MPI_Finalize();

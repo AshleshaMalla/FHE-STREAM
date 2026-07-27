@@ -75,13 +75,13 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_GATHER_ADD)(benchmark::State& state) {
                     for (std::size_t j = 0; j < dim; ++j) {
                       seqC[j] = rndA[j].ModAddFast(rndB[j], mod);
                     }
-                  });
+                  }, "RS_GATHER_ADD_POLY");
   } else if (mode == ShuffleMode::Coeff) {
     RunGatherCoeff(*this, state, bytesPerIter,
                    [](auto& rndA, auto& rndB, auto& seqC,
                       const auto& mod, const auto&, const auto&) {
                      seqC = rndA.ModAddFast(rndB, mod);
-                   });
+                   }, "RS_GATHER_ADD_COEFF");
   }
 }
 

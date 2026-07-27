@@ -14,6 +14,7 @@ option(BUILD_STATIC "Set to ON to use OpenFHE static libraries" OFF)
 option(ENABLE_DCRT "Build the DCRTPoly backend" ON)
 option(ENABLE_CIPHERTEXT "Build the Ciphertext backend" OFF)
 option(ENABLE_HEXL "Enable Intel HEXL acceleration" ON)
+option(LIKWID_PERFMON "Enable LIKWID Marker API instrumentation" OFF)
 
 # ---- intel hexl ----
 if(ENABLE_HEXL)
@@ -88,6 +89,25 @@ if(ENABLE_MPI)
     target_link_libraries(fhe_raiderstream PRIVATE MPI::MPI_CXX)
   else()
     message(STATUS "MPI not found. Distributed benchmarking disabled.")
+  endif()
+endif()
+
+# ---- LIKWID Marker API ----
+if(LIKWID_PERFMON)
+  find_path(LIKWID_INCLUDE_DIR likwid-marker.h
+    HINTS ENV LIKWID_INC /usr/include /usr/local/include)
+  find_library(LIKWID_LIBRARY NAMES likwid
+    HINTS ENV LIKWID_LIB /usr/lib /usr/local/lib)
+  if(LIKWID_INCLUDE_DIR AND LIKWID_LIBRARY)
+    message(STATUS "LIKWID found: inc=${LIKWID_INCLUDE_DIR}  lib=${LIKWID_LIBRARY}")
+    target_compile_definitions(fhe_raiderstream PRIVATE LIKWID_PERFMON)
+    target_include_directories(fhe_raiderstream PRIVATE ${LIKWID_INCLUDE_DIR})
+    target_link_libraries(fhe_raiderstream PRIVATE ${LIKWID_LIBRARY})
+  else()
+    message(FATAL_ERROR
+      "LIKWID_PERFMON=ON but likwid-marker.h or liblikwid not found.\n"
+      "Run: module load likwid/5.4.1-daemon\n"
+      "Or set LIKWID_INC / LIKWID_LIB env vars pointing at the install.")
   endif()
 endif()
 

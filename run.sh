@@ -25,4 +25,5 @@ for arg in "$@"; do
     esac
 done
 
+export RS_BATCH_SIZE="${RS_BATCH_SIZE:-512}"
 exec "$BINARY" "${EXTRA_ARGS[@]}"

@@ -27,6 +27,10 @@
 
 #include "common/MPIUtils.h"
 
+#ifdef LIKWID_PERFMON
+#include <likwid-marker.h>
+#endif
+
 /* Global thread count for benchmarks */
 extern int RS_Execution_Threads;
 
@@ -59,7 +63,7 @@ inline void SchemeArgs(benchmark::internal::Benchmark* b, std::initializer_list<
 }
 
 template <typename Kernel>
-inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
+inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel, const char* markerRegion = nullptr) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -68,99 +72,186 @@ inline void RunSequential(FHERaiderSTREAM& self, benchmark::State& state, int64_
 
   RS_BARRIER();
 
-  for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      auto& aTowers = self.A[i].GetAllElements();
-      auto& bTowers = self.B[i].GetAllElements();
-      auto& cTowers = self.C[i].GetAllElements();
-      const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& aTower = aTowers[t];
-        auto& bTower = bTowers[t];
-        auto& cTower = cTowers[t];
-        const auto& mod = self.towerModuli[t];
-        const auto& mu = self.towerMu[t];
-        kernel(aTower, bTower, cTower, mod, mu, scalarNI, dim);
-      }
+#ifdef LIKWID_PERFMON
+  if (markerRegion) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+      LIKWID_MARKER_THREADINIT;
+      LIKWID_MARKER_REGISTER(markerRegion);
     }
-    benchmark::ClobberMemory();
   }
-
-  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-  AggregateBandwidth(state);
-}
-
-template <typename Kernel>
-inline void RunGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
-  SetLabel(state);
-  const std::int64_t ringDim = state.range(0);
-  const std::int64_t numTowers = state.range(1);
-  const std::size_t nPolys = self.A.size();
-  const std::size_t dim = static_cast<std::size_t>(ringDim);
-
-  RS_BARRIER();
+#endif
 
   for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      const std::size_t src = self.IDX[i];
-      auto& aSeqTowers = self.A[i].GetAllElements();
-      auto& bSeqTowers = self.B[i].GetAllElements();
-      auto& cSeqTowers = self.C[i].GetAllElements();
-      auto& aRndTowers = self.A[src].GetAllElements();
-      auto& bRndTowers = self.B[src].GetAllElements();
-      auto& cRndTowers = self.C[src].GetAllElements();
-      const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& aSeq = aSeqTowers[t];
-        auto& bSeq = bSeqTowers[t];
-        auto& cSeq = cSeqTowers[t];
-        auto& aRnd = aRndTowers[t];
-        auto& bRnd = bRndTowers[t];
-        auto& cRnd = cRndTowers[t];
-        const auto& mod = self.towerModuli[t];
-        const auto& mu = self.towerMu[t];
-        kernel(aSeq, aRnd, bSeq, bRnd, cSeq, cRnd, mod, mu, scalarNI, dim);
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_THREADINIT;
+        LIKWID_MARKER_REGISTER(markerRegion);
+        LIKWID_MARKER_START(markerRegion);
       }
-    }
-    benchmark::ClobberMemory();
-  }
-
-  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
-  AggregateBandwidth(state);
-}
-
-template <typename Kernel>
-inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
-  SetLabel(state);
-  const std::int64_t ringDim = state.range(0);
-  const std::int64_t numTowers = state.range(1);
-  const std::size_t nPolys = self.A.size();
-  const std::size_t dim = static_cast<std::size_t>(ringDim);
-
-  RS_BARRIER();
-
-  for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      auto& aTowers = self.A[i].GetAllElements();
-      auto& bTowers = self.B[i].GetAllElements();
-      auto& cTowers = self.C[i].GetAllElements();
-      const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& aTower = aTowers[t];
-        auto& bTower = bTowers[t];
-        auto& cTower = cTowers[t];
-        const auto& mod = self.towerModuli[t];
-        const auto& mu = self.towerMu[t];
-        /* Coefficient-level gather: read random, write sequential */
-        for (std::size_t j = 0; j < dim; ++j) {
-          const std::size_t src_k = self.COEFF_IDX[j];
-          kernel(aTower[src_k], bTower[src_k], cTower[j], mod, mu, scalarNI);
+#endif
+#pragma omp for schedule(static)
+      for (std::size_t i = 0; i < nPolys; ++i) {
+        auto& aTowers = self.A[i].GetAllElements();
+        auto& bTowers = self.B[i].GetAllElements();
+        auto& cTowers = self.C[i].GetAllElements();
+        const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
+        for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
+          auto& aTower = aTowers[t];
+          auto& bTower = bTowers[t];
+          auto& cTower = cTowers[t];
+          const auto& mod = self.towerModuli[t];
+          const auto& mu = self.towerMu[t];
+          kernel(aTower, bTower, cTower, mod, mu, scalarNI, dim);
         }
       }
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_STOP(markerRegion);
+      }
+#endif
+    }  // end omp parallel
+    benchmark::ClobberMemory();
+  }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
+}
+
+template <typename Kernel>
+inline void RunGatherPoly(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel, const char* markerRegion = nullptr) {
+  SetLabel(state);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::size_t nPolys = self.A.size();
+  const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
+
+#ifdef LIKWID_PERFMON
+  if (markerRegion) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+      LIKWID_MARKER_THREADINIT;  // void — no return value to check
+      int _lk_reg = likwid_markerRegisterRegion(markerRegion);
+      if (_lk_reg != 0)
+        fprintf(stderr, "[LIKWID WARN] warmup REGISTER: thread %d returned %d\n",
+                omp_get_thread_num(), _lk_reg);
     }
+  }
+#endif
+
+  for (auto _ : state) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_THREADINIT;  // void — no return value to check
+        int _lk_reg = likwid_markerRegisterRegion(markerRegion);
+        if (_lk_reg != 0)
+          fprintf(stderr, "[LIKWID WARN] loop REGISTER: thread %d returned %d\n",
+                  omp_get_thread_num(), _lk_reg);
+        int _lk_start = likwid_markerStartRegion(markerRegion);
+        if (_lk_start != 0)
+          fprintf(stderr, "[LIKWID WARN] loop START: thread %d returned %d\n",
+                  omp_get_thread_num(), _lk_start);
+      }
+#endif
+#pragma omp for schedule(static)
+      for (std::size_t i = 0; i < nPolys; ++i) {
+        const std::size_t src = self.IDX[i];
+        auto& aSeqTowers = self.A[i].GetAllElements();
+        auto& bSeqTowers = self.B[i].GetAllElements();
+        auto& cSeqTowers = self.C[i].GetAllElements();
+        auto& aRndTowers = self.A[src].GetAllElements();
+        auto& bRndTowers = self.B[src].GetAllElements();
+        auto& cRndTowers = self.C[src].GetAllElements();
+        const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
+        for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
+          auto& aSeq = aSeqTowers[t];
+          auto& bSeq = bSeqTowers[t];
+          auto& cSeq = cSeqTowers[t];
+          auto& aRnd = aRndTowers[t];
+          auto& bRnd = bRndTowers[t];
+          auto& cRnd = cRndTowers[t];
+          const auto& mod = self.towerModuli[t];
+          const auto& mu = self.towerMu[t];
+          kernel(aSeq, aRnd, bSeq, bRnd, cSeq, cRnd, mod, mu, scalarNI, dim);
+        }
+      }
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        int _lk_stop = likwid_markerStopRegion(markerRegion);
+        if (_lk_stop != 0)
+          fprintf(stderr, "[LIKWID WARN] loop STOP: thread %d returned %d\n",
+                  omp_get_thread_num(), _lk_stop);
+      }
+#endif
+    }  // end omp parallel
+    benchmark::ClobberMemory();
+  }
+
+  state.SetBytesProcessed(static_cast<int64_t>(state.iterations()) * bytesPerIter);
+  AggregateBandwidth(state);
+}
+
+template <typename Kernel>
+inline void RunGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel, const char* markerRegion = nullptr) {
+  SetLabel(state);
+  const std::int64_t ringDim = state.range(0);
+  const std::int64_t numTowers = state.range(1);
+  const std::size_t nPolys = self.A.size();
+  const std::size_t dim = static_cast<std::size_t>(ringDim);
+
+  RS_BARRIER();
+
+#ifdef LIKWID_PERFMON
+  if (markerRegion) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+      LIKWID_MARKER_THREADINIT;
+      LIKWID_MARKER_REGISTER(markerRegion);
+    }
+  }
+#endif
+
+  for (auto _ : state) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_THREADINIT;
+        LIKWID_MARKER_REGISTER(markerRegion);
+        LIKWID_MARKER_START(markerRegion);
+      }
+#endif
+#pragma omp for schedule(static)
+      for (std::size_t i = 0; i < nPolys; ++i) {
+        auto& aTowers = self.A[i].GetAllElements();
+        auto& bTowers = self.B[i].GetAllElements();
+        auto& cTowers = self.C[i].GetAllElements();
+        const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
+        for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
+          auto& aTower = aTowers[t];
+          auto& bTower = bTowers[t];
+          auto& cTower = cTowers[t];
+          const auto& mod = self.towerModuli[t];
+          const auto& mu = self.towerMu[t];
+          /* Coefficient-level gather: read random, write sequential */
+          for (std::size_t j = 0; j < dim; ++j) {
+            const std::size_t src_k = self.COEFF_IDX[j];
+            kernel(aTower[src_k], bTower[src_k], cTower[j], mod, mu, scalarNI);
+          }
+        }
+      }
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_STOP(markerRegion);
+      }
+#endif
+    }  // end omp parallel
     benchmark::ClobberMemory();
   }
 
@@ -281,7 +372,7 @@ inline void RunScatterGatherPoly(FHERaiderSTREAM& self, benchmark::State& state,
 }
 
 template <typename Kernel>
-inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel) {
+inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, Kernel&& kernel, const char* markerRegion = nullptr) {
   SetLabel(state);
   const std::int64_t ringDim = state.range(0);
   const std::int64_t numTowers = state.range(1);
@@ -290,26 +381,51 @@ inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state
 
   RS_BARRIER();
 
+#ifdef LIKWID_PERFMON
+  if (markerRegion) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+      LIKWID_MARKER_THREADINIT;
+      LIKWID_MARKER_REGISTER(markerRegion);
+    }
+  }
+#endif
+
   for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      auto& aTowers = self.A[i].GetAllElements();
-      auto& bTowers = self.B[i].GetAllElements();
-      auto& cTowers = self.C[i].GetAllElements();
-      const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
-      for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
-        auto& aTower = aTowers[t];
-        auto& bTower = bTowers[t];
-        auto& cTower = cTowers[t];
-        const auto& mod = self.towerModuli[t];
-        const auto& mu = self.towerMu[t];
-        for (std::size_t j = 0; j < dim; ++j) {
-          const std::size_t src_k = self.COEFF_IDX[j];
-          const std::size_t dst_k = self.COEFF_IDX_WRITE[j];
-          kernel(aTower[src_k], bTower[src_k], cTower[dst_k], mod, mu, scalarNI);
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_THREADINIT;
+        LIKWID_MARKER_REGISTER(markerRegion);
+        LIKWID_MARKER_START(markerRegion);
+      }
+#endif
+#pragma omp for schedule(static)
+      for (std::size_t i = 0; i < nPolys; ++i) {
+        auto& aTowers = self.A[i].GetAllElements();
+        auto& bTowers = self.B[i].GetAllElements();
+        auto& cTowers = self.C[i].GetAllElements();
+        const lbcrypto::NativeInteger scalarNI(static_cast<uint64_t>(self.scalar));
+        for (std::size_t t = 0; t < static_cast<std::size_t>(numTowers); ++t) {
+          auto& aTower = aTowers[t];
+          auto& bTower = bTowers[t];
+          auto& cTower = cTowers[t];
+          const auto& mod = self.towerModuli[t];
+          const auto& mu = self.towerMu[t];
+          for (std::size_t j = 0; j < dim; ++j) {
+            const std::size_t src_k = self.COEFF_IDX[j];
+            const std::size_t dst_k = self.COEFF_IDX_WRITE[j];
+            kernel(aTower[src_k], bTower[src_k], cTower[dst_k], mod, mu, scalarNI);
+          }
         }
       }
-    }
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_STOP(markerRegion);
+      }
+#endif
+    }  // end omp parallel
     benchmark::ClobberMemory();
   }
 
