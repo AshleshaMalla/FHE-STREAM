@@ -444,20 +444,45 @@ inline void RunScatterGatherCoeff(FHERaiderSTREAM& self, benchmark::State& state
   - self: FHERaiderSTREAM fixture containing polynomial arrays A, B, C
   - state: Google Benchmark state object for measuring iterations and time
 */
-inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter) {
+inline void RunNTT(FHERaiderSTREAM& self, benchmark::State& state, int64_t bytesPerIter, const char* markerRegion = nullptr) {
   SetLabel(state);
   const std::size_t nPolys = self.A.size();
 
   RS_BARRIER();
 
-  for (auto _ : state) {
-#pragma omp parallel for schedule(static) num_threads(RS_Execution_Threads)
-    for (std::size_t i = 0; i < nPolys; ++i) {
-      /* Inverse Transform: Coefficient format */
-      self.A[i].SetFormat(Format::COEFFICIENT);
-      /* Forward Transform: Evaluation format */
-      self.A[i].SetFormat(Format::EVALUATION);
+#ifdef LIKWID_PERFMON
+  if (markerRegion) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+      LIKWID_MARKER_THREADINIT;
+      LIKWID_MARKER_REGISTER(markerRegion);
     }
+  }
+#endif
+
+  for (auto _ : state) {
+#pragma omp parallel num_threads(RS_Execution_Threads)
+    {
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_THREADINIT;
+        LIKWID_MARKER_REGISTER(markerRegion);
+        LIKWID_MARKER_START(markerRegion);
+      }
+#endif
+#pragma omp for schedule(static)
+      for (std::size_t i = 0; i < nPolys; ++i) {
+        /* Inverse Transform: Coefficient format */
+        self.A[i].SetFormat(Format::COEFFICIENT);
+        /* Forward Transform: Evaluation format */
+        self.A[i].SetFormat(Format::EVALUATION);
+      }
+#ifdef LIKWID_PERFMON
+      if (markerRegion) {
+        LIKWID_MARKER_STOP(markerRegion);
+      }
+#endif
+    }  // end omp parallel
     benchmark::ClobberMemory();
   }
 
