@@ -1,0 +1,38 @@
+
+                                                                                                                                    
+ ▄▄▄▄▄▄▄ ▄▄▄   ▄▄▄  ▄▄▄▄▄▄▄       ▄▄▄▄▄▄▄                ▄▄              ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄    ▄▄▄▄▄▄▄   ▄▄▄▄   ▄▄▄      ▄▄▄ 
+███▀▀▀▀▀ ███   ███ ███▀▀▀▀▀       ███▀▀███▄       ▀▀     ██             █████▀▀▀ ▀▀▀███▀▀▀ ███▀▀███▄ ███▀▀▀▀▀ ▄██▀▀██▄ ████▄  ▄████ 
+███▄▄    █████████ ███▄▄          ███▄▄███▀  ▀▀█▄ ██  ▄████ ▄█▀█▄ ████▄  ▀████▄     ███    ███▄▄███▀ ███▄▄    ███  ███ ███▀████▀███ 
+███▀▀    ███▀▀▀███ ███      ▀▀▀▀▀ ███▀▀██▄  ▄█▀██ ██  ██ ██ ██▄█▀ ██ ▀▀    ▀████    ███    ███▀▀██▄  ███      ███▀▀███ ███  ▀▀  ███ 
+███      ███   ███ ▀███████       ███  ▀███ ▀█▄██ ██▄ ▀████ ▀█▄▄▄ ██    ███████▀    ███    ███  ▀███ ▀███████ ███  ███ ███      ███ 
+                                                                                                                                    
+                                                                                                                                    
+
+Running without Marker API. Activate Marker API with -m on commandline.
+2026-07-27T17:29:00-05:00
+Running ./build/fhe_raiderstream
+Run on (256 X 400 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x256)
+  L1 Instruction 32 KiB (x256)
+  L2 Unified 1024 KiB (x256)
+  L3 Unified 16384 KiB (x32)
+Load Average: 0.00, 4.00, 21.47
+***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
+----------------------------------------------------------------------------------------------------
+Benchmark                                          Time             CPU   Iterations UserCounters...
+----------------------------------------------------------------------------------------------------
+CTFixture/CT_SEQ_RELIN/131072/40/0             37129 ms        14851 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.61506G/s RSSDeg1BytesPerCt=87.4302M RSSDeg2BytesPerCt=354.347M SerializedBandwidth=2.53073G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.36679Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             31622 ms        11475 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=4.67857G/s RSSDeg1BytesPerCt=84.7697M RSSDeg2BytesPerCt=349.396M SerializedBandwidth=3.27524G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=4.35726Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             30613 ms        13610 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.94481G/s RSSDeg1BytesPerCt=84.8086M RSSDeg2BytesPerCt=349.419M SerializedBandwidth=2.76156G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.67389Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             31156 ms        11726 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=4.57843G/s RSSDeg1BytesPerCt=84.8197M RSSDeg2BytesPerCt=350.052M SerializedBandwidth=3.20513G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=4.26399Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             31096 ms        13097 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=4.09907G/s RSSDeg1BytesPerCt=85.0631M RSSDeg2BytesPerCt=350.141M SerializedBandwidth=2.86955G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.81755Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             31237 ms        12578 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=4.2682G/s RSSDeg1BytesPerCt=85.3541M RSSDeg2BytesPerCt=350.104M SerializedBandwidth=2.98796G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.97507Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             32897 ms        15935 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.3692G/s RSSDeg1BytesPerCt=85.5345M RSSDeg2BytesPerCt=348.559M SerializedBandwidth=2.35861G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.13781Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             31364 ms        16233 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.30729G/s RSSDeg1BytesPerCt=85.8166M RSSDeg2BytesPerCt=346.181M SerializedBandwidth=2.31527G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.08015Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             31768 ms        13687 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.92241G/s RSSDeg1BytesPerCt=86.0395M RSSDeg2BytesPerCt=345.718M SerializedBandwidth=2.74588G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.65303Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0             32178 ms        15782 ms            1 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.4017G/s RSSDeg1BytesPerCt=84.8286M RSSDeg2BytesPerCt=349.349M SerializedBandwidth=2.38137G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.16808Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0_mean        32106 ms        13897 ms           10 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.91847G/s RSSDeg1BytesPerCt=85.4465M RSSDeg2BytesPerCt=349.327M SerializedBandwidth=2.74313G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.64936Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0_median      31493 ms        13648 ms           10 ObjectToPayloadRatio=0.700051 PayloadBandwidth=3.93361G/s RSSDeg1BytesPerCt=85.2086M RSSDeg2BytesPerCt=349.407M SerializedBandwidth=2.75372G/s SerializedBytesPerCt=58.7243M SerializedDeg2BytesPerCt=88.087M bytes_per_second=3.66346Gi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0_stddev       1876 ms         1737 ms           10 ObjectToPayloadRatio=15.7072n PayloadBandwidth=494.782M/s RSSDeg1BytesPerCt=831.759k RSSDeg2BytesPerCt=2.36919M SerializedBandwidth=346.372M/s SerializedBytesPerCt=0 SerializedDeg2BytesPerCt=1.05409 bytes_per_second=471.861Mi/s
+CTFixture/CT_SEQ_RELIN/131072/40/0_cv           5.84 %         12.50 %            10 ObjectToPayloadRatio=0.00% PayloadBandwidth=12.63% RSSDeg1BytesPerCt=0.97% RSSDeg2BytesPerCt=0.68% SerializedBandwidth=12.63% SerializedBytesPerCt=0.00% SerializedDeg2BytesPerCt=0.00% bytes_per_second=12.63%
