@@ -28,7 +28,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_NTT_ROUNDTRIP)(benchmark::State& state) {
   /* Report aggregate bytes traversed by NTT: 1 array (A) * data size * 2 (round-trip) */
   const std::int64_t bytesPerIter = DeepBytesPerPoly(ringDim, numTowers) * static_cast<std::int64_t>(nPolys) * 2;
 
-  RunNTT(*this, state, bytesPerIter);
+  RunNTT(*this, state, bytesPerIter, "RS_NTT_ROUNDTRIP");
 }
 
 /* Register the NTT benchmark kernel with all parameter sets */
