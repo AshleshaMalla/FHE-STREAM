@@ -18,6 +18,10 @@
 #include <omp.h>
 #endif
 
+#ifdef LIKWID_PERFMON
+#include <likwid-marker.h>
+#endif
+
 namespace {
 
 inline void ReportCiphertextMetrics(benchmark::State& state,
@@ -222,10 +226,29 @@ BENCHMARK_DEFINE_F(CTFixture, CT_SEQ_ADD_INPLACE)(benchmark::State& state) {
 
   RS_BARRIER();
 
+#ifdef LIKWID_PERFMON
+#pragma omp parallel
+  {
+    LIKWID_MARKER_THREADINIT;
+    LIKWID_MARKER_REGISTER("RS_CT_SEQ_ADD_INPLACE");
+  }
+#endif
+
   for (auto _ : state) {
-#pragma omp parallel for schedule(static)
-    for (std::size_t i = 0; i < batchSz; ++i) {
-      cc->EvalAddInPlace(ct_C[i], ct_A[i]);
+#pragma omp parallel
+    {
+#ifdef LIKWID_PERFMON
+      LIKWID_MARKER_THREADINIT;
+      LIKWID_MARKER_REGISTER("RS_CT_SEQ_ADD_INPLACE");
+      LIKWID_MARKER_START("RS_CT_SEQ_ADD_INPLACE");
+#endif
+#pragma omp for schedule(static)
+      for (std::size_t i = 0; i < batchSz; ++i) {
+        cc->EvalAddInPlace(ct_C[i], ct_A[i]);
+      }
+#ifdef LIKWID_PERFMON
+      LIKWID_MARKER_STOP("RS_CT_SEQ_ADD_INPLACE");
+#endif
     }
   }
 
