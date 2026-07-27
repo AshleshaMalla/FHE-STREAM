@@ -45,7 +45,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_ADD)(benchmark::State& state) {
                   for (std::size_t j = 0; j < dim; ++j) {
                     C[j] = A[j].ModAddFast(B[j], mod);
                   }
-                });
+                }, "RS_SEQ_ADD");
 }
 
 BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SEQ_TRIAD)(benchmark::State& state) {

@@ -1,0 +1,837 @@
+Warning: The Marker API requires the application to run on the selected CPUs.
+Warning: likwid-perfctr pins the application only when using the -C command line option.
+Warning: LIKWID assumes that the application does it before the first instrumented code region is started.
+Warning: You can use the string in the environment variable LIKWID_THREADS to pin you application to
+Warning: to the CPUs specified after the -c command line option.
+
+                                                                                                                                    
+ ▄▄▄▄▄▄▄ ▄▄▄   ▄▄▄  ▄▄▄▄▄▄▄       ▄▄▄▄▄▄▄                ▄▄              ▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄▄▄ ▄▄▄▄▄▄▄    ▄▄▄▄▄▄▄   ▄▄▄▄   ▄▄▄      ▄▄▄ 
+███▀▀▀▀▀ ███   ███ ███▀▀▀▀▀       ███▀▀███▄       ▀▀     ██             █████▀▀▀ ▀▀▀███▀▀▀ ███▀▀███▄ ███▀▀▀▀▀ ▄██▀▀██▄ ████▄  ▄████ 
+███▄▄    █████████ ███▄▄          ███▄▄███▀  ▀▀█▄ ██  ▄████ ▄█▀█▄ ████▄  ▀████▄     ███    ███▄▄███▀ ███▄▄    ███  ███ ███▀████▀███ 
+███▀▀    ███▀▀▀███ ███      ▀▀▀▀▀ ███▀▀██▄  ▄█▀██ ██  ██ ██ ██▄█▀ ██ ▀▀    ▀████    ███    ███▀▀██▄  ███      ███▀▀███ ███  ▀▀  ███ 
+███      ███   ███ ▀███████       ███  ▀███ ▀█▄██ ██▄ ▀████ ▀█▄▄▄ ██    ███████▀    ███    ███  ▀███ ▀███████ ███  ███ ███      ███ 
+                                                                                                                                    
+                                                                                                                                    
+
+2026-07-26T20:02:41-05:00
+Running ./build/fhe_raiderstream
+Run on (256 X 400 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x256)
+  L1 Instruction 32 KiB (x256)
+  L2 Unified 1024 KiB (x256)
+  L3 Unified 16384 KiB (x32)
+Load Average: 0.00, 0.13, 0.67
+***WARNING*** ASLR is enabled, the results may have unreproducible noise in them.
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Region RS_GATHER_ADD_POLY was already started
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 135 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 30 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 232 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 190 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 206 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 43 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 96 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 159 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 199 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 121 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 189 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 11 returned -14
+[LIKWID WARN] loop STOP: thread 97 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 161 returned -14
+[LIKWID WARN] loop STOP: thread 64 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 32 returned -14
+[LIKWID WARN] loop STOP: thread 87 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 252 returned -14
+[LIKWID WARN] loop STOP: thread 77 returned -14
+[LIKWID WARN] loop STOP: thread 1 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 92 returned -14
+[LIKWID WARN] loop STOP: thread 25 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 183 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 61 returned -14
+[LIKWID WARN] loop STOP: thread 156 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 35 returned -14
+[LIKWID WARN] loop STOP: thread 83 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 197 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 150 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 207 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 186 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 184 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 41 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 39 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 147 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 137 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 63 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 170 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 7 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 69 returned -14
+[LIKWID WARN] loop STOP: thread 17 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 74 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 169 returned -14
+[LIKWID WARN] loop STOP: thread 204 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 166 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 165 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 154 returned -14
+[LIKWID WARN] loop STOP: thread 228 returned -14
+[LIKWID WARN] loop STOP: thread 223 returned -14
+[LIKWID WARN] loop STOP: thread 125 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 112 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 160 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 153 returned -14
+[LIKWID WARN] loop STOP: thread 237 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 4 returned -14
+[LIKWID WARN] loop STOP: thread 200 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 38 returned -14
+[LIKWID WARN] loop STOP: thread 116 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 144 returned -14
+[LIKWID WARN] loop STOP: thread 66 returned -14
+[LIKWID WARN] loop STOP: thread 181 returned -14
+[LIKWID WARN] loop STOP: thread 102 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 27 returned -14
+[LIKWID WARN] loop STOP: thread 182 returned -14
+[LIKWID WARN] loop STOP: thread 56 returned -14
+[LIKWID WARN] loop STOP: thread 236 returned -14
+[LIKWID WARN] loop STOP: thread 227 returned -14
+[LIKWID WARN] loop STOP: thread 193 returned -14
+[LIKWID WARN] loop STOP: thread 177 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 118 returned -14
+WARN: Stopping an unknown/not-started region RS_GATHER_ADD_POLY
+[LIKWID WARN] loop STOP: thread 253 returned -14
+----------------------------------------------------------------------------------------------------
+Benchmark                                          Time             CPU   Iterations UserCounters...
+----------------------------------------------------------------------------------------------------
+FHERaiderSTREAM/RS_GATHER_ADD/131072/40/1       5977 ms          209 ms            1 bytes_per_second=287.282Gi/s N=131072 L=40 Poly
+FHERaiderSTREAM/RS_GATHER_ADD/131072/40/2        172 ms          170 ms            1 bytes_per_second=353.019Gi/s N=131072 L=40 Coeff
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.E-06*(FIXC1/FIXC2)/inverseClock
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula PMC1/PMC0
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time
+ERROR - [/tmp/root/spack-stage/spack-stage-likwid-5.4.1-2oy7g3xywvy22343ue5hcohmpqnolbl4/spack-src/src/perfmon.c:perfmon_getMetricOfRegionThread:4038] No such file or directory.
+Cannot calculate formula 1.0E-06*(DFC0+DFC1+DFC2+DFC3+DFC4+DFC5+DFC6+DFC7+DFC8+DFC9+DFC10+DFC11)*64.0/time

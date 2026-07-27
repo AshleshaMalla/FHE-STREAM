@@ -125,7 +125,7 @@ BENCHMARK_DEFINE_F(FHERaiderSTREAM, RS_SCATTER_GATHER_TRIAD)(benchmark::State& s
                              const auto& mod, const auto& mu, const auto& sc) {
                             const auto scaled = cC.ModMulFast(sc, mod, mu);
                             cA = cB.ModAddFast(scaled, mod);
-                          });
+                          }, "RS_SCATTER_GATHER_TRIAD_COEFF");
   }
 }
 
