@@ -260,6 +260,10 @@ inflated, overhead-corrupted time. Instead use a three-step approach:
 
 Cross-socket LIKWID marker registration is unreliable for GATHER/SCATTER-GATHER kernels (confirmed working for SEQ_ADD, fails intermittently on socket 1 for GATHER_ADD_POLY — root cause not isolated despite return-value checking). Workaround: measure each socket separately by restricting OMP_NUM_THREADS/OMP_PLACES to one socket at a time (128 threads, {0:128} then {128:128}), and sum the resulting byte counts manually. This is the standard measurement procedure for all irregular-access kernels going forward.
 
+CT_SEQ_ADD_INPLACE could not be reliably hardware-validated with either measurement approach. Marker-mode instrumentation causes a ~148× wall-clock stall (cause not isolated, ruled out thread-pool teardown). Whole-process fallback captures CTFixture::SetUp()'s ciphertext-batch encryption cost alongside the timed kernel, producing physically implausible totals (~15× theoretical peak bandwidth for the observed wall-time). Not resolved due to time constraints. The five DCRTPoly-backend kernels (SEQ_ADD, GATHER_ADD poly/coeff, SCATTER_GATHER_TRIAD_COEFF, NTT_ROUNDTRIP) remain fully validated with measured hardware amplification factors of 2.57×–6.23×.
+
+**Source-of-truth validation doc: `results/validation_summary.md`** — consolidates the five-kernel amplification table (read/write) with per-kernel caveats, and the matched CT correlation point (CT_SEQ_ADD/MULT_NO_RELIN/RELIN, 1:28:182). Every number carries exact node/threads/batch/date. Open item: write-amp cells for SEQ_ADD and GATHER_ADD_POLY are left blank — their on-disk `_memwrite` CSVs were combined cross-socket captures that recorded implausibly low volume (yield sub-unity 0.029×/0.171×, physically impossible); a fresh socket-split ({0:128} then {128:128}) marker re-run for just these two is deferred to later in the sprint. Do not insert the impossible values.
+
 ## Do NOT
 - Do not modify the byte-accounting formulas (BenchmarkUtils.cpp,
   likely — Eq. 2/3 in the paper) without flagging it. These are kept
