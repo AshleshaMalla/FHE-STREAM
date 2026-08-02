@@ -65,9 +65,17 @@ def plot_allocation_tax(results: dict, out: Path, N: int = 131072, L: int = 40):
 
     groups = ["MULT_NO_RELIN", "RELIN"]
 
-    # Mathematical payload per RNS tensor (bytes)
-    math_payload_bytes = int(N) * int(L) * 8
-    math_payload_mib = math_payload_bytes / (1024**2)
+    # Mathematical payload of a single RNS tensor / polynomial (bytes).
+    # A ciphertext is composed of (degree + 1) such polynomials:
+    #   degree-1 (fresh/relinearized) ct = 2 polys, degree-2 ct = 3 polys.
+    math_payload_per_poly_bytes = int(N) * int(L) * 8
+    math_payload_per_poly_mib = math_payload_per_poly_bytes / (1024**2)
+
+    # Per-operation OUTPUT payload: the size of the ciphertext each op produces.
+    #   MULT_NO_RELIN: degree-1 x degree-1 -> degree-2 output (3 polys)
+    #   RELIN:         degree-2 -> degree-1 output (2 polys)
+    mult_math_payload_mib = 3 * math_payload_per_poly_mib
+    relin_math_payload_mib = 2 * math_payload_per_poly_mib
 
     # Gather serialized and rss sizes (bytes) and convert to MiB
     mult_serialized_mib = results.get("MULT_NO_RELIN", {}).get("serialized_deg2", 0) / (1024**2)
@@ -77,7 +85,7 @@ def plot_allocation_tax(results: dict, out: Path, N: int = 131072, L: int = 40):
     relin_rss_mib = results.get("RELIN", {}).get("rss_deg1", 0) / (1024**2)
 
     # Values per group for the three bars: [math, serialized, rss]
-    math_vals = [math_payload_mib, math_payload_mib]
+    math_vals = [mult_math_payload_mib, relin_math_payload_mib]
     serialized_vals = [mult_serialized_mib, relin_serialized_mib]
     rss_vals = [mult_rss_mib, relin_rss_mib]
 
@@ -109,14 +117,17 @@ def plot_allocation_tax(results: dict, out: Path, N: int = 131072, L: int = 40):
     ax.set_title("Memory Allocation", fontweight="bold")
 
     ymax = max((v for v in math_vals + serialized_vals + rss_vals if v == v), default=0.0)
-    ax.set_ylim(0, ymax * 1.3)
+    # Extra top headroom so the upper-right legend clears the tall RSS bar and
+    # its value label without moving the legend outside the axes.
+    ax.set_ylim(0, ymax * 1.6)
 
     # Add value labels on bars
     add_value_labels(ax, bars_math, max_val=ymax)
     add_value_labels(ax, bars_serial, max_val=ymax)
     add_value_labels(ax, bars_rss, max_val=ymax)
 
-    ax.legend(loc="upper right", frameon=False)
+    # Keep the legend snug in the upper-right corner, inside the axes, above the bars.
+    ax.legend(loc="upper right", frameon=False, borderaxespad=0.4)
 
     save_plot(str(out))
     plt.close(fig)
