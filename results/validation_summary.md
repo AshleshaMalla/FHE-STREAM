@@ -1,11 +1,19 @@
 # FHE-RaiderSTREAM — Validation Summary (Source of Truth)
 
-**Compiled:** 2026-07-27
+**Compiled:** 2026-07-30
 **Scope:** Consolidates (1) hardware DRAM-amplification validation of the five
-DCRTPoly-backend kernels and (2) the matched correlation point relating
-FHE-STREAM ciphertext kernels to real OpenFHE homomorphic operations.
+DCRTPoly-backend kernels, measured by **whole-process (non-marker) LIKWID DF
+counters with a SetUp-cancelling differential**, and (2) the matched correlation
+point relating FHE-STREAM ciphertext kernels to real OpenFHE homomorphic operations.
 This document is the authoritative reference for the PMBS26 (SC26) paper rewrite.
 Every number below carries its exact node, thread count, batch size, and date.
+
+> **This replaces the retracted marker-mode table.** The previous Part 1 (marker-mode
+> amplification, factors 2.57×–6.23×) is retracted and preserved for the record in
+> `results/validation_summary_MARKER_MODE_RETRACTED.md`. It was non-reproducible and its
+> socket-summed values double-counted the working set (implied bandwidths exceeded the
+> hardware peak). Do not cite those numbers. Part 2 (CT correlation) below was never
+> marker-derived and is carried forward unchanged.
 
 ---
 
@@ -13,105 +21,133 @@ Every number below carries its exact node, thread count, batch size, and date.
 
 | Purpose | Node | Slurm Job ID | Partition | Allocation | Date(s) |
 |---------|------|-------------|-----------|------------|---------|
+| DCRT kernel amplification (Part 1, whole-process differential) | rpc-91-2 | **134030** | zen4 | `salloc --exclusive --nodes=1 --partition=zen4 --time=2-00:00:00` | 2026-07-29 – 2026-07-30 |
+| CT correlation runs (Part 2) | rpc-91-2 | **130756** | zen4 | prior standing allocation | 2026-07-27 |
 | Idle counter-access baseline (noise floor) | rpc-91-3 | **130567** | zen4 | `salloc --exclusive --nodes=1 --partition=zen4` | 2026-07-24 |
-| DCRT kernel amplification runs (Part 1) | rpc-91-2 | **130756** | zen4 | `salloc --exclusive --nodes=1 --partition=zen4 --time=2-00:00:00` (standing alloc, started 2026-07-25 22:27:35) | 2026-07-26 |
-| CT correlation runs (Part 2) | rpc-91-2 | **130756** | zen4 | same standing allocation | 2026-07-27 |
-| Intel idle baseline (reference only) | rpg-93-4 | **130577** | h100 | `salloc --exclusive --nodes=1 --partition=h100` | 2026-07-24 |
 
 **Hardware:** AMD EPYC 9754 (Bergamo), 2 sockets × 128 cores = 256 cores, 1 thread/core
 (no SMT), 8 NUMA nodes, 12 DDR5 memory channels/socket. L1d 32 KiB×256, L2 1 MiB×256,
-L3 16 MiB×32. Vendor theoretical peak ≈ 921.6 GB/s (node).
+L3 16 MiB×32. **Theoretical peak ≈ 921.6 GB/s = 858 GiB/s (node).**
 **Counter tool:** LIKWID 5.4.1 (daemon build; `likwid/5.4.1-daemon` module).
 **Idle DRAM floor (rpc-91-3, job 130567):** 75.95 MB/s node total (0.008% of peak) —
 confirms clean exclusive isolation. See `counter_validation_baseline.md`.
-
-> **Provenance note to reconcile before publication:** the idle counter-access
-> validation was performed on **rpc-91-3** (job 130567), but the actual kernel
-> amplification measurements (Part 1) were collected on **rpc-91-2** (job 130756).
-> Both are AMD EPYC 9754 / zen4 exclusive nodes; if the paper cites a single AMD
-> node name, note that the idle floor and the kernel runs came from two different
-> physical nodes of the same model.
 
 ---
 
 ## Part 1 — Five-kernel DRAM amplification (DCRTPoly backend)
 
-**Definition:** amplification factor = `measured DRAM bytes (LIKWID counter sum) /
-logical bytes (byte-accounting model)`. Per project methodology, measured bytes come
-from raw DFC counter sums in marker-mode runs; logical bytes and real timing come from
-a **separate unmarked run** — the LIKWID-derived bandwidth/time columns are **not** used
-(marker mode inflates wall time ~55×).
+**Definition:** amplification factor = `measured DRAM bytes / logical (byte-accounting)
+bytes`, per direction (read / write).
 
-**Common parameters (all five kernels):** N (ring dim) = 131072, L (RNS depth) = 40,
-**batch B = 512** (DCRTPoly, via `RS_BATCH_SIZE=512` in `measure_amplification.sh`),
-AMD EPYC 9754 / rpc-91-2 / job 130756 / zen4 exclusive, **2026-07-26**,
-LIKWID 5.4.1-daemon, `OMP_PROC_BIND=true`, no `-C` flag (per pinning-bug workaround).
+**Measurement method (whole-process differential).** LIKWID wrapper mode
+(`likwid-perfctr -g MEMREAD|MEMWRITE -C 0-255`, **non-marker**) reads both sockets'
+Data-Fabric DRAM counters over the entire process. To remove one-time `SetUp()` and
+fixed-overhead traffic, each kernel is run at two exact iteration counts (Google
+Benchmark `Nx` mode, no calibration search) and differenced:
 
-| Kernel | Access pattern | Shuffle mode | Read amp. | Write amp. | Threads / registration |
-|--------|----------------|--------------|-----------|------------|------------------------|
-| `RS_SEQ_ADD` | Sequential | None (0) | **2.57×** | — ¹ | 256, cross-socket `{0:256}` (single pass) |
-| `RS_GATHER_ADD` | Gather | Poly (1) | **3.90×** | — ¹ | 128+128 per-socket, summed ² |
-| `RS_GATHER_ADD` | Gather | Coeff (2) | **3.27×** | **1.56×** | 128+128 per-socket, summed ² |
-| `RS_SCATTER_GATHER_TRIAD` | Scatter-Gather | Coeff (2) | **5.68×** | **2.24×** | 128+128 per-socket, summed ² |
-| `RS_NTT_ROUNDTRIP` | NTT round-trip | None (0) | **6.23×** | **2.56×** | 128+128 per-socket, summed ² |
+```
+per_iter_bytes = (total_bytes[N_high] − total_bytes[N_low]) / (N_high − N_low)
+amplification  = per_iter_bytes / logical_bytes_per_iter
+```
 
-Values transcribed from `counter_validation_baseline.md` (authoritative). Read amp.
-range across the five kernels: **2.57× – 6.23×**.
+`N_low = 5`, `N_high = 30` (SEQ_ADD read used `5 / 40`). Two low-iter + **three
+high-iter replicates** per kernel per direction. This avoids both the banned `-C`
+marker-collapse bug and the SetUp contamination of naïve whole-process totals.
 
-### Per-kernel measurement caveats
+**Why marker mode was abandoned:** see the retracted file. Fresh marker-mode SEQ_ADD
+gave 0.19×/0.00×/0.49× with thread collapse; whole-process wrapper mode is stable and
+reads both sockets cleanly (per-socket DF totals land on HWThread 0 / HWThread 128,
+balanced to within ≤8%).
 
-1. **Write amplification remains "—" for `SEQ_ADD` and `GATHER_ADD_POLY` — the on-disk
-   write CSVs are unrecoverable (verified 2026-07-27, no rerun).** A derivation was
-   attempted from the existing `_memwrite` CSVs using the *exact* `parse_likwid_csv.py`
-   methodology (measured = Σ "Memory data volume [GBytes]" over nonzero-call-count threads,
-   summed across sockets; logical write = `iters × B × 1 × Vpoly`). **Method was validated**
-   by reproducing the two published coeff write-amps to the decimal from their socket-split
-   files: `GATHER_ADD_COEFF` → 1.56× and `SCATTER_GATHER_TRIAD_COEFF` → 2.24× (exact match).
-   Applied identically to these two kernels the result is **physically impossible**:
+**Common parameters:** N = 131072, L = 40, **batch B = 512** (`RS_BATCH_SIZE=512`),
+256 threads, AMD EPYC 9754 / rpc-91-2 / job 134030 / zen4 exclusive, 2026-07-29–30,
+LIKWID 5.4.1-daemon. Logical bytes: `Vpoly = N·L·8 = 0.041943 GB/poly`;
+read logical/iter = `B·(arrays−1)·Vpoly` (42.95 GB for 3-array kernels, 21.47 GB for
+NTT's 2-array round-trip); write logical/iter = `B·1·Vpoly` = 21.47 GB.
 
-   | Kernel | Write CSV | nz/threads | iters | Measured | Logical | Computed amp |
-   |--------|-----------|-----------|-------|----------|---------|--------------|
-   | `SEQ_ADD` | `seq_add_131072_40_write.csv` (combined 256-col) | 166/256 | 8 | 4.92 GB | 171.80 GB | **0.029×** ✗ |
-   | `GATHER_ADD_POLY` | `gather_add_poly_write.csv` (combined 256-col) | 151/256 | 3 | 10.99 GB | 64.42 GB | **0.171×** ✗ |
+| Kernel | Access pattern | Shuffle | **Read amp** | **Write amp** | 3-run spread |
+|--------|----------------|---------|:---:|:---:|:---:|
+| `RS_SEQ_ADD` | Sequential | None (0) | **1.51×** | **1.00×** | ≤1.5% |
+| `RS_GATHER_ADD` | Gather | Poly (1) | **1.00×** ¹ | **1.00×** ³ | ≤0.9% |
+| `RS_GATHER_ADD` | Gather | Coeff (2) | **1.87×** | **1.01×** ² | ≤0.8% |
+| `RS_SCATTER_GATHER_TRIAD` | Scatter-Gather | Coeff (2) | **3.84×** | **2.44×** | ≤0.1% |
+| `RS_NTT_ROUNDTRIP` | NTT round-trip | None (0) | **2.78×** | **2.20×** | ≤0.6% |
 
-   A write-amp < 1 is impossible for a kernel that streams a full output array to DRAM.
-   **Root cause:** unlike the coeff kernels (clean socket-split `_memwrite_s0/s1.csv` pairs),
-   these two kernels' write passes were captured as **single combined cross-socket 256-column
-   files** that recorded almost no data volume (4.9 / 11.0 GB vs the ~100–144 GB the coeff
-   kernels captured) — a cross-socket counter-attribution failure, the same class of bug
-   documented in CLAUDE.md. Both **trip the partial-registration warning** (166/256 and
-   151/256 nonzero call-counts, far below a healthy full-node 256), and the write pass used
-   a different iteration count than the read pass (SEQ_ADD: read iters 4 vs write iters 8),
-   which `parse_likwid_csv.py` itself flags as making the ratios non-comparable.
-   Corroborating evidence that these specific files are not the clean source: the *published
-   read* amps (2.57×, 3.90×) also do **not** reproduce from the same on-disk files, whereas
-   the coeff kernels reproduce perfectly. **Do not insert the 0.029×/0.171× values.** A valid
-   write-amp for these two requires a fresh socket-split (`{0:128}` then `{128:128}`) marker
-   re-run on an exclusive zen4 node — deferred (no rerun authorized this pass).
+Read-amp range: **1.00× – 3.84×**. Write-amp range: **1.00× – 2.44×**.
 
-2. **Partial / cross-socket marker-registration reliability.** `SEQ_ADD` registers and
-   measures reliably across both sockets in a single 256-thread pass. The irregular-access
-   kernels — **`GATHER_ADD` (poly & coeff), `SCATTER_GATHER_TRIAD_COEFF`, and
-   `NTT_ROUNDTRIP`** — exhibit unreliable cross-socket LIKWID marker registration
-   (socket-1 markers fail intermittently; root cause not isolated). **Standard workaround
-   applied:** each socket measured separately (`OMP_NUM_THREADS=128` with `OMP_PLACES={0:128}`
-   then `{128:128}`), and byte counts summed manually. All four irregular kernels above
-   were measured this way; treat their factors as socket-summed, not single-pass.
+**Replication note (supersedes the old "single-shot" caveat).** Unlike the retracted
+marker data, these are **replicated**: three high-iteration runs per cell, total DRAM
+volume agreeing within **≤1.5%** (typically <1%), both sockets balanced. The differential
+per-iteration value is the slope of two independently-measured points. Error bars at
+paper scale are dominated by this ≤1.5% run-to-run spread; report as tight point estimates.
 
-3. **`CT_SEQ_ADD_INPLACE` — hardware validation UNRESOLVED (Ciphertext backend, not in the
-   table above).** Could not be reliably hardware-validated by either approach:
-   - Marker-mode instrumentation induces a ~148× wall-clock stall (cause not isolated;
-     thread-pool teardown ruled out).
-   - Whole-process fallback captures `CTFixture::SetUp()`'s ciphertext-batch encryption
-     cost alongside the timed kernel, producing physically implausible totals (~15× the
-     theoretical peak bandwidth for the observed wall time).
+### Physical-bandwidth sanity check (resolves the old >peak problem)
 
-     Left unresolved due to time constraints. **Do not reopen** for this revision. The
-   five DCRTPoly kernels above remain the fully validated set.
+Implied physical DRAM bandwidth = (measured read + write bytes/iter) ÷ wall time/iter.
+**All five kernels fall well under the 858 GiB/s peak** — the corrected numbers are
+physically consistent (the retracted socket-summed table was not):
+
+| Kernel | ms/iter | phys GB/iter | phys BW (GiB/s) | % of peak |
+|--------|:---:|:---:|:---:|:---:|
+| SEQ_ADD | 122 | 86.1 | 658 | 77% |
+| GATHER_POLY | 160 | 64.4 | 375 | 44% |
+| GATHER_COEFF | 170 | 102.0 | 559 | 65% |
+| SGT_COEFF | 446 | 217.5 | 454 | 53% |
+| NTT | 534 | 107.0 | 187 | 22% |
+
+### Mechanistic interpretation
+
+Amplification is driven by **sub-cache-line (8-byte) random access**, which wastes
+64-byte cache-line bandwidth — not by "irregularity" in the abstract. Read amps order
+monotonically by degree of sub-cache-line randomness:
+`poly (1.00) < seq (1.51) < gather-coeff (1.87) < ntt (2.78) < sgt (3.84)`.
+
+- **SEQ_ADD — read 1.51×, write 1.00×.** Write-back is one clean array (1.00×), so the
+  0.5× read excess is **read-side write-allocate / RFO + prefetch** on the sequential
+  triple-stream (reading each output line before overwrite). Confirmed by the matched
+  write measurement.
+- **GATHER_ADD_POLY — read 1.00× ¹ (flagged, legitimate).** Poly-mode shuffles the *order*
+  of whole polys, but each poly is a ≥1 MiB block read fully sequentially → **zero
+  sub-cache-line waste**. This is the true no-amplification floor; poly-granularity
+  "irregularity" is sequential at the cache/DRAM level. It sits *below* SEQ_ADD because it
+  does not incur SEQ_ADD's triple-stream prefetch/RFO overhead (why that overhead is
+  specific to fully-sequential triple-streaming is not fully micro-architecturally pinned).
+- **GATHER_ADD_COEFF — read 1.87×, write 1.01× ² (write flagged, legitimate).** 8-byte
+  random *reads* cause partial-cache-line waste (moderate: the 1 MiB tower is partly cache-
+  resident). The *write* is **sequential** (`seqC[j] = …`) → one clean array → ~1.0×, as
+  expected; the low write-amp is correct, not an error.
+- **SCATTER_GATHER_TRIAD_COEFF — read 3.84×, write 2.44×.** Random 8-byte access on **both**
+  ends (gather read + scatter write). Highest read amp; partial-line scatter writes force
+  RFO + write-back → real write amplification.
+- **NTT_ROUNDTRIP — read 2.78×, write 2.20×.** Strided butterfly access across log₂N stages
+  → cache-line under-utilization + conflict misses on both read and write.
+
+### Per-kernel caveats
+
+1. **GATHER_ADD_POLY read = 1.00× is below SEQ_ADD's 1.51×** — expected (see mechanism).
+   Implication for the paper: **SEQ_ADD is not the clean "unit" baseline**; the ~1.0×
+   floor is poly/sequential (no cache-line waste), and SEQ_ADD's 1.51× is itself a mild
+   sequential-streaming overhead. Frame the floor as ~1.0×.
+2. **GATHER_ADD_COEFF write = 1.01× is below 1.51×** — expected: gather kernels write
+   sequentially, so their write side has no amplification.
+3. **GATHER_ADD_POLY write = 1.00×** (measured 2026-07-30, whole-process differential,
+   3-run spread 0.05%) — confirms the prediction of caveat 2 (a sequential write incurs no
+   amplification). The table and both amplification figures now cover all five kernels in
+   both directions.
+
+### `CT_SEQ_ADD_INPLACE` — still not hardware-validated (Ciphertext backend)
+
+Marker mode induces a ~148× stall; whole-process capture includes `CTFixture::SetUp()`
+ciphertext-encryption traffic. The whole-process **differential** method used here for the
+DCRT kernels would in principle cancel that SetUp cost — a candidate follow-up — but it was
+not attempted this pass. Not part of the validated set.
 
 ---
 
 ## Part 2 — Matched correlation: FHE-STREAM CT kernels vs real OpenFHE ops
+
+**(Carried forward unchanged — this was never marker-derived; it is unmarked
+Google-Benchmark timing, unaffected by the Part 1 retraction.)**
 
 **Purpose:** answer the reviewer question of whether FHE-STREAM ciphertext kernel scores
 predict the cost of real OpenFHE homomorphic operations. This is the first clean,
@@ -164,6 +200,12 @@ with the "Capacity Wall" claim (report §4.4). Note this is **not** present in A
   **not** a like-for-like batch comparison and should not be presented as one.
 - **Google Benchmark `threads` field reads 1** in all CT JSONs — parallelism is internal
   OpenMP (256-way), not GBench thread ranges. Do not misread as single-threaded.
+- **Reproduce Part 1** (per kernel, per direction):
+  ```bash
+  RS_BATCH_SIZE=512 OMP_NUM_THREADS=256 likwid-perfctr -g MEMREAD -C 0-255 -o out.csv \
+    ./build/fhe_raiderstream --benchmark_filter='FHERaiderSTREAM/RS_SEQ_ADD/131072/40/0' \
+    --benchmark_min_time=30x --benchmark_repetitions=1     # repeat at 5x; differential
+  ```
 - **Reproduce Part 2** exactly:
   ```bash
   RS_BATCH_SIZE=256 OMP_NUM_THREADS=256 OMP_PROC_BIND=true OMP_PLACES="{0:256}" \

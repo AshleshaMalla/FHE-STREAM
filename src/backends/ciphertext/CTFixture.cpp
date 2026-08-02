@@ -140,30 +140,40 @@ void CTFixture::SetUp(const benchmark::State& state) {
   Plaintext pt_ones = cc->MakePackedPlaintext(ones);
   Plaintext pt_twos = cc->MakePackedPlaintext(twos);
 
-  const std::uint64_t rssBeforeCtAlloc = CurrentRSSBytes();
-
-  /* ---- Allocate ciphertext vectors ---- */
+  /* ---- Allocate ciphertext vector storage (the shared_ptr vectors
+     themselves; the ciphertext payloads are populated below) ---- */
   ct_A.resize(batchSz);
   ct_B.resize(batchSz);
   ct_C.resize(batchSz);
   ct_A_deg2.resize(batchSz);
 
-  /* Encrypt in parallel; each call is independent */
+  /* ---- Isolated degree-1 RSS measurement ----
+     Encrypt ct_A ALONE (batchSz degree-1 ciphertexts) between two snapshots,
+     so the marginal resident cost is measured for exactly one batch of one
+     object type. This mirrors the degree-2 measurement below (one batch,
+     divided by batchSz) so the two numbers are directly comparable. */
+  const std::uint64_t rssBeforeDeg1 = CurrentRSSBytes();
 #pragma omp parallel for schedule(static)
   for (std::size_t i = 0; i < batchSz; ++i) {
     ct_A[i] = cc->Encrypt(keyPair.publicKey, pt_ones);
+  }
+  const std::uint64_t rssAfterDeg1 = CurrentRSSBytes();
+
+  /* Allocate the remaining working buffers the kernels need (ct_B, ct_C).
+     These are NOT included in the degree-1 RSS delta measured above. */
+#pragma omp parallel for schedule(static)
+  for (std::size_t i = 0; i < batchSz; ++i) {
     ct_B[i] = cc->Encrypt(keyPair.publicKey, pt_twos);
     ct_C[i] = ct_A[i]->Clone();
   }
 
-  const std::uint64_t rssAfterDeg1 = CurrentRSSBytes();
-
-  /* Precompute degree-2 ciphertexts for relinearization benchmarking */
+  /* ---- Isolated degree-2 RSS measurement ----
+     Marginal delta of the degree-2 batch alone, divided by batchSz. */
+  const std::uint64_t rssBeforeDeg2 = CurrentRSSBytes();
 #pragma omp parallel for
   for (std::size_t i = 0; i < batchSz; ++i) {
     ct_A_deg2[i] = cc->EvalMultNoRelin(ct_A[i], ct_B[i]);
   }
-
   const std::uint64_t rssAfterDeg2 = CurrentRSSBytes();
 
   if (!ct_A.empty()) {
@@ -174,13 +184,13 @@ void CTFixture::SetUp(const benchmark::State& state) {
     ctDeg2SerializedBytes = 0;
   }
 
-  const std::uint64_t deg1Baseline = (rssAfterDeg1 > rssBeforeCtAlloc) ? (rssAfterDeg1 - rssBeforeCtAlloc) : 0;
-  const std::uint64_t deg2Baseline = (rssAfterDeg2 > rssAfterDeg1) ? (rssAfterDeg2 - rssAfterDeg1) : 0;
+  const std::uint64_t deg1Baseline = (rssAfterDeg1 > rssBeforeDeg1) ? (rssAfterDeg1 - rssBeforeDeg1) : 0;
+  const std::uint64_t deg2Baseline = (rssAfterDeg2 > rssBeforeDeg2) ? (rssAfterDeg2 - rssBeforeDeg2) : 0;
   rssDeltaDeg1Bytes = deg1Baseline;
   rssDeltaDeg2Bytes = deg2Baseline;
 
   if (batchSz > 0) {
-    rssDeg1BytesPerCt = rssDeltaDeg1Bytes / static_cast<std::uint64_t>(3 * batchSz);
+    rssDeg1BytesPerCt = rssDeltaDeg1Bytes / static_cast<std::uint64_t>(batchSz);
     rssDeg2BytesPerCt = rssDeltaDeg2Bytes / static_cast<std::uint64_t>(batchSz);
   } else {
     rssDeg1BytesPerCt = 0;
