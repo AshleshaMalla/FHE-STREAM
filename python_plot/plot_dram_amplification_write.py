@@ -33,6 +33,7 @@ from fhe_plot_style import (
 #   Kernels ordered by measured write amplification (seq < gather-coeff < ntt < sgt).
 WRITE_DATA = [
     ("SEQ_ADD\n(Seq)",                21.475, 21.477, 1.00),
+    ("GATHER_ADD\n(Poly)",            21.475, 21.478, 1.00),
     ("GATHER_ADD\n(Coeff)",           21.475, 21.624, 1.01),
     ("NTT\nROUNDTRIP",                21.475, 47.289, 2.20),
     ("SCATTER_GATHER\nTRIAD (Coeff)", 21.475, 52.500, 2.44),
