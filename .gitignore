@@ -50,3 +50,16 @@ build/
 # helpers
 setup_env.sh
 env/
+
+# Raw LIKWID / validation intermediate captures (results/).
+# These are NOT read by any python_plot/ script — they are consolidated into
+# results/validation_summary.md, which the plots use. Archived out-of-repo as
+# ~/fhe_results_raw_captures_*.tar.gz for provenance. Do not commit them.
+# NOTE: prefix-scoped on purpose so tracked plot inputs (rss_expansion_results.json,
+# shuffle_mode_compare.json, etc.) are never matched.
+results/reval_*
+results/rss_expansion_remeasure_*
+results/shuffle_mode_reval_*
+results/verify_seq_add_*
+results/wholeproc_seq_add_*
+results/wpdiff_seq_add_*
