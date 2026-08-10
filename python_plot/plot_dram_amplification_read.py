@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read-side DRAM amplification: per-iteration Logical (modeled) vs Measured (hardware)
-byte volume for the five hardware-validated DCRTPoly kernels shown in the paper-style
+byte volume for the four hardware-validated DCRTPoly kernels shown in the paper-style
 comparison plot.
 
 Grouped two-series bar chart with the amplification factor (measured / logical)
@@ -32,9 +32,8 @@ from fhe_plot_style import (
 #   21.47 GB for NTT's 2-array roundtrip read (1 read/iter).
 #   All measured values are whole-process differential per-iteration counter means
 #   (high-iter minus low-iter totals, divided by the iteration delta — SetUp cancelled).
-#   All five kernels ordered by measured read amplification (poly < seq < gather-coeff < ntt < sgt).
+#   Kernels are ordered by measured read amplification.
 READ_DATA = [
-    ("GATHER_ADD\n(Poly)",            42.950,  42.904, 1.00),
     ("SEQ_ADD\n(Seq)",                42.950,  64.655, 1.51),
     ("GATHER_ADD\n(Coeff)",           42.950,  80.347, 1.87),
     ("NTT\nROUNDTRIP",                21.475,  59.731, 2.78),
@@ -48,7 +47,7 @@ def configure_matplotlib() -> None:
         "font.size": 13,
         "axes.titlesize": 13,
         "axes.labelsize": 13,
-        "xtick.labelsize": 8.5,
+        "xtick.labelsize": 11,
         "ytick.labelsize": 11,
         "legend.fontsize": 11,
         "axes.linewidth": 1.6,
@@ -103,7 +102,7 @@ def plot(data, output_path: Path) -> None:
                 f"{h:.1f}",
                 ha="center",
                 va="bottom",
-                fontsize=8.5,
+                fontsize=11,
                 fontweight="bold",
                 zorder=4,
             )
@@ -115,7 +114,7 @@ def plot(data, output_path: Path) -> None:
             f"{amp:.2f}×",
             ha="center",
             va="bottom",
-            fontsize=10.5,
+            fontsize=12,
             fontweight="bold",
             zorder=4,
         )
