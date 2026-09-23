@@ -1,5 +1,6 @@
 # CMake build artifacts
 build/
+build_nomarker/
 cmake-build-debug/
 cmake-build-release/
 cmake-build-relwithdebinfo/
@@ -37,7 +38,6 @@ fhe_raiderstream.exe
 # Temporary and backup files
 *.tmp
 *.bak
-.git/
 
 # Python
 __pycache__/
@@ -45,18 +45,38 @@ __pycache__/
 *$py.class
 *.egg-info/
 dist/
-build/
 
-# helpers
-setup_env.sh
+# Environment (built by setup_env.sh)
 env/
 
+# Claude Code
+CLAUDE.md
+.claude/
+
+# Reproducibility build directories and timestamped results
+reproducibility/build_timing/
+reproducibility/build_counter/
+reproducibility/build_hexl_off/
+reproducibility/build_hexl_on/
+reproducibility/build_mpi/
+reproducibility/results_*/
+reproducibility/slurm_*.out
+reproducibility/slurm_*.err
+
+# Timing probe (development-only)
+timing_probe/
+
+# Scratch / development notes
+commands_to_run.txt
+memory_stats.txt
+style.md
+
+# Superseded plots and scripts moved to extra/
+plots/extra/
+python_plot/extra/
+
 # Raw LIKWID / validation intermediate captures (results/).
-# These are NOT read by any python_plot/ script — they are consolidated into
-# results/validation_summary.md, which the plots use. Archived out-of-repo as
-# ~/fhe_results_raw_captures_*.tar.gz for provenance. Do not commit them.
-# NOTE: prefix-scoped on purpose so tracked plot inputs (rss_expansion_results.json,
-# shuffle_mode_compare.json, etc.) are never matched.
+# Consolidated into results/validation_summary.md.
 results/reval_*
 results/rss_expansion_remeasure_*
 results/shuffle_mode_reval_*
