@@ -65,11 +65,14 @@ reproducibility/slurm_*.err
 
 # Timing probe (development-only)
 timing_probe/
+scripts/time_experiments.sh
 
 # Scratch / development notes
 commands_to_run.txt
 memory_stats.txt
 style.md
+counter_validation_baseline.md
+sbatch_likwid_seq_add.sh
 
 # Superseded plots and scripts moved to extra/
 plots/extra/
