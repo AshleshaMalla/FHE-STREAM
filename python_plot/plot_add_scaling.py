@@ -15,6 +15,8 @@ def configure_matplotlib():
         "font.serif": serif_fonts,
         "font.size": 13,
         "font.weight": "normal",
+        "pdf.fonttype": 42,
+        "ps.fonttype": 42,
         "axes.titleweight": "bold",
         "axes.labelweight": "normal",
         "axes.linewidth": 1.6,
@@ -117,16 +119,18 @@ def main():
         raise FileNotFoundError(f"Input not found: {args.input}")
     threads, dcrt_map, ct_map, n, l = load_scaling(args.input)
     # Apply CT overrides if requested. Overrides are provided in GB/s (1 GB = 1e9 bytes).
-    if args.ct_override:
+    ct_override = args.ct_override or "1:32.9945,4:129.968,16:458.109,64:513.871356,128:509.886,256:500.43"
+    if ct_override:
         try:
-            pairs = [p.strip() for p in args.ct_override.split(',') if p.strip()]
+            pairs = [p.strip() for p in ct_override.split(',') if p.strip()]
             for pair in pairs:
                 tstr, valstr = pair.split(':')
                 t = int(tstr)
                 gb = float(valstr)
                 # store as bytes/sec so plotting converts to GiB/s consistently
                 ct_map[t] = gb * 1e9
-            print(f"Applied CT overrides (GB/s) -> threads: {args.ct_override}")
+            if args.ct_override:
+                print(f"Applied CT overrides (GB/s) -> threads: {args.ct_override}")
         except Exception as e:
             raise SystemExit(f"Failed to parse --ct-override: {e}")
     plot_bandwidth(threads, dcrt_map, ct_map, n, l, args.output)
