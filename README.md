@@ -1,108 +1,55 @@
-# FHE-RaiderSTREAM
+# FHE-STREAM
 
-FHE-RaiderSTREAM is a C++ micro-benchmark suite for OpenFHE memory behavior.
-It measures bandwidth limits across three layers:
+A memory microbenchmark suite for RNS-based fully homomorphic encryption (FHE),
+built on [OpenFHE](https://github.com/openfheorg/openfhe-development) 1.5.0.
+It runs the access patterns of [RaiderSTREAM](https://github.com/michael-beebe/RaiderSTREAM)
+(Sequential, Gather, Scatter, Scatter-Gather) over OpenFHE's real data layouts. It then
+compares the bytes each kernel needs to move with the DRAM traffic measured
+by LIKWID.
 
-- `DCRTPoly` backend: hardware and irregular-access limits
-- `Ciphertext` backend: payload goodput plus serialized object footprint
-- `MPI` extension: distributed aggregation and serialization overhead
+**Paper:** *FHE-STREAM: Characterizing Memory Access Behavior in Fully Homomorphic
+Encryption Workloads*, PMBS Workshop at SC26 ([PDF](FHE-STREAM_SC26.pdf)).
 
-For full kernel descriptions and bytes models, see `BENCHMARKS.md`.
+## Key result
 
-**To reproduce the paper results**, see [`reproducibility/README.md`](reproducibility/README.md).
+Amplification is measured DRAM bytes ÷ the bytes the algorithm needs to move
+(1.00× = no wasted traffic).
 
-## Dependencies
+| Kernel | Read | Write |
+|---|:---:|:---:|
+| Gather, whole-polynomial shuffle | 1.00× | 1.00× |
+| Sequential add | 1.51× | 1.00× |
+| Gather, coefficient shuffle | 1.87× | 1.01× |
+| NTT round trip | 2.78× | 2.20× |
+| Scatter-Gather, coefficient shuffle | 3.84× | 2.44× |
 
-- GCC 11.5.0 (or any C++17 compiler)
-- CMake >= 3.5
-- OpenFHE 1.5.0
-- Google Benchmark 1.8.5 (auto-fetched if missing)
-- OpenMP
-- MPI (optional, for distributed runs)
-- Intel HEXL 1.2.6 (optional, Intel node only)
-- LIKWID 5.4.1-daemon (optional, for hardware counter validation)
+AMD EPYC 9754, 256 threads, N = 131072, L = 40. The main driver is random
+8-byte access, which wastes most of each 64-byte cache line.
+Details: [`results/validation_summary.md`](results/validation_summary.md).
 
-All dependencies except the compiler and CMake are built automatically
-by `setup_env.sh`.
+## Quick start
 
-## Setup
-
-```bash
-./setup_env.sh          # one-time: builds OpenFHE, Google Benchmark, HEXL
-source env/activate     # required before every build or run session
-```
-
-Add `--hexl` to `setup_env.sh` to build Intel HEXL support (requires
-an Intel node with AVX-512 IFMA).
-
-## Build
-
-### DCRT backend only (default)
+Requires a C++17 compiler, CMake ≥ 3.5 and OpenMP. `setup_env.sh` builds
+OpenFHE and Google Benchmark for you.
 
 ```bash
-source env/activate
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+./setup_env.sh                 # one time (add --hexl for Intel HEXL)
+source env/activate            # in every new shell
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_CIPHERTEXT=ON
 cmake --build build -j
+
+export RS_BATCH_SIZE=512       # always set; 256 for Ciphertext kernels
+OMP_NUM_THREADS=256 OMP_PROC_BIND=true \
+  ./build/fhe_raiderstream --benchmark_filter='RS_SEQ_ADD/131072/40/0'
 ```
 
-### DCRT + Ciphertext + MPI
+Benchmark names are `KERNEL/N/L/shuffle`, where shuffle is 0 (none),
+1 (whole polynomial) or 2 (coefficient). Kernel definitions are in
+[`BENCHMARKS.md`](BENCHMARKS.md).
 
-```bash
-source env/activate
-cmake -S . -B build \
-	-DCMAKE_BUILD_TYPE=Release \
-	-DENABLE_CIPHERTEXT=ON \
-	-DENABLE_MPI=ON
-cmake --build build -j
-```
+To reproduce the paper's figures, see
+[`reproducibility/README.md`](reproducibility/README.md).
 
-### CMake Options
+## License
 
-| Option | Default | Description |
-|---|---|---|
-| `ENABLE_DCRT` | ON | DCRTPoly backend |
-| `ENABLE_CIPHERTEXT` | OFF | Ciphertext backend |
-| `ENABLE_HEXL` | ON | Intel HEXL acceleration |
-| `ENABLE_MPI` | ON | MPI distributed support |
-| `LIKWID_PERFMON` | OFF | LIKWID Marker API instrumentation |
-
-## Run
-
-### Local DCRT example
-
-```bash
-RS_BATCH_SIZE=512 ./build/fhe_raiderstream \
-	--benchmark_filter="RS_SEQ_ADD/131072/40"
-```
-
-### Local Ciphertext example
-
-```bash
-RS_BATCH_SIZE=256 ./build/fhe_raiderstream \
-	--benchmark_filter="CTFixture/CT_SEQ_ADD/131072/40" \
-	--benchmark_min_time=1s
-```
-
-### MPI example
-
-```bash
-RS_BATCH_SIZE=512 srun -n 4 ./build/fhe_raiderstream \
-	--benchmark_filter="RS_SEQ_ADD/131072/40"
-```
-
-MPI runs report `AggregateBandwidth` on rank 0. Ciphertext kernels expose
-dual metrics for fair comparisons against DCRT and object-level realism:
-
-- `BytesProcessed` and `PayloadBandwidth`: payload-model goodput (same model family as DCRT).
-- `SerializedBandwidth`: wire-format proxy for full ciphertext object traffic.
-- `ObjectToPayloadRatio`: serialized bytes divided by payload bytes for the kernel.
-- `RSSDeg1BytesPerCt` and `RSSDeg2BytesPerCt`: setup-time resident-memory delta
-	per ciphertext (degree-1 and degree-2 pools, measured from `/proc/self/statm`).
-
-## Notes
-
-- `RS_BATCH_SIZE` controls working-set size (default `100`). Paper results
-  use `512` for the DCRTPoly backend and `256` for the Ciphertext backend;
-  always set this explicitly.
-- Large RingDim + Depth combinations can exceed memory quickly; start with
-  `RS_BATCH_SIZE=2` for initial ciphertext testing.
+MIT. See [`LICENSE`](LICENSE).
