@@ -10,6 +10,8 @@ by LIKWID.
 **Paper:** *FHE-STREAM: Characterizing Memory Access Behavior in Fully Homomorphic
 Encryption Workloads*, PMBS Workshop at SC26 ([PDF](FHE-STREAM_SC26.pdf)).
 
+**Archived artifact:** [doi.org/10.5281/zenodo.22882262](https://doi.org/10.5281/zenodo.22882262).
+
 ## Key result
 
 Amplification is measured DRAM bytes ÷ the bytes the algorithm needs to move
